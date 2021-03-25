@@ -1,0 +1,13 @@
+Index: uboot-2019.10/board/sunxi/board.c
+===================================================================
+--- uboot-2019.10.orig/board/sunxi/board.c
++++ uboot-2019.10/board/sunxi/board.c
+@@ -9,7 +9,7 @@
+  *
+  * Some board init for the Allwinner A10-evb board.
+  */
+-
++// prince message
+ #include <common.h>
+ #include <dm.h>
+ #include <env.h>
