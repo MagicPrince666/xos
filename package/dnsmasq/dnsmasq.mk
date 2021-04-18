@@ -100,6 +100,8 @@ endef
 define DNSMASQ_INSTALL_INIT_SYSV
 	$(INSTALL) -m 755 -D package/dnsmasq/S80dnsmasq \
 		$(TARGET_DIR)/etc/init.d/S80dnsmasq
+	$(INSTALL) -m 755 -D package/dnsmasq/dnsmasq.conf \
+        $(TARGET_DIR)/etc/dnsmasq.conf
 endef
 
 $(eval $(generic-package))
