@@ -5,11 +5,19 @@
 case "$1" in
 	start)
 		printf "Starting dnsmasq: "
+		ip link add name br-lan type bridge
+		ip link set br-lan up
+		if ifconfig -a | grep eth0 > /dev/null; then
+			ifconfig eth0 up
+			ip link set dev eth0 master br-lan
+		fi
+		ifconfig br-lan 192.168.34.1 up
 		start-stop-daemon -S -x /usr/sbin/dnsmasq
 		[ $? = 0 ] && echo "OK" || echo "FAIL"
 		;;
 	stop)
 		printf "Stopping dnsmasq: "
+		ip link delete br-lan
 		start-stop-daemon -K -q -x /usr/sbin/dnsmasq
 		[ $? = 0 ] && echo "OK" || echo "FAIL"
 		;;
