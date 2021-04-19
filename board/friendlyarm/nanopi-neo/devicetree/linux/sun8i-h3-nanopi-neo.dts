@@ -41,10 +41,15 @@
  */
 
 #include "sun8i-h3-nanopi.dtsi"
+#include <dt-bindings/pwm/pwm.h>
 
 / {
 	model = "FriendlyARM NanoPi NEO";
 	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
+
+	chosen {
+		/delete-node/ framebuffer@0;
+	};
 
 	leds {
 		compatible = "gpio-leds";
@@ -61,6 +66,22 @@
 			default-state = "on";
 			linux,default-trigger = "timer";
 		};
+/*
+		backlight {
+			label = "nanopi:backlight:pwr";
+			gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+*/
+	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm 0 50000 PWM_POLARITY_INVERTED>;
+		enable-gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>;
+
+		brightness-levels = <0 1 2 4 8 16 32 64 128 255>;
+		default-brightness-level = <0>;
 	};
 };
 
@@ -73,76 +94,28 @@
     pinctrl-0 = <&spi0_pins>;
     status = "okay";
 
-	display@0{
-		status = "okay";
-		compatible = "adafruit,yx240qv29", "ilitek,ili9341";
-		reg = <0>;
-		spi-max-frequency = <32000000>;
-		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>; // PA1
-		reset-gpios = <&pio 6 8 GPIO_ACTIVE_HIGH>; //PG8
-		led-gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>; //PG9
-		rotation = <270>;
-		buswidth = <8>;
-		bgr;
-		fps = <30>;
-		//backlight = <&backlight>;
-	};
-/*
-	spidev: spidev@0 {
-		reg = <0>;
-		compatible = "rohm,dh2228fv";
-		spi-max-frequency = <50000000>;
-	};
-
-	ili9341@1 {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		status = "okay";
-		compatible = "ilitek,ili9341";
-		reg = <1 0>;
-		spi-max-frequency = <32000000>;
-		txbuflen = <16>;
-		rotate = <0>;
-		bgr;
-		fps = <15>;
-		buswidth = <8>;
-		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>; // PA1
-	};
-
-	rpi-display@0{
+	ili9341@0 {
 		compatible = "ilitek,ili9341";
 		reg = <0>;
 		status = "okay";
-
 		spi-max-frequency = <32000000>;
 		rotate = <270>;
 		bgr;
 		fps = <30>;
 		buswidth = <8>;
-		reset-gpios = <&gpio 23 0>;
-		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>; // PA1
-		led-gpios = <&gpio 18 1>;
+		reset-gpios = <&pio 6 8 GPIO_ACTIVE_LOW>; //PG8
+		//led-gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>; //PG9
+		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>;//PA1
 		debug = <0>;
+		backlight = <&backlight>;
 	};
-
-	rpi-display_ts@1 {
-		compatible = "ti,ads7846";
-		reg = <1>;
-		status = "disabled";
-
-		spi-max-frequency = <2000000>;
-		interrupts = <3 25>;
-		pendown-gpio = <&gpio 25 0>;
-		ti,x-plate-ohms = /bits/ 16 <60>;
-		ti,pressure-max = /bits/ 16 <255>;
-	};
-*/
 };
 
 &emac {
 	phy-handle = <&int_mii_phy>;
 	phy-mode = "mii";
 	allwinner,leds-active-low;
+	local-mac-address = [a4 51 29 00 00 06];
 	status = "okay";
 };
 
