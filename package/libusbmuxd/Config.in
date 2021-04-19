@@ -1,0 +1,6 @@
+config BR2_PACKAGE_LIBUSBMUXD
+	bool "libusbmuxd"
+	help
+	  A client library for applications to handle usbmux protocol connections with iOS devices.
+
+	  https://github.com/libimobiledevice/libusbmuxd

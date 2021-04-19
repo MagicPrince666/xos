@@ -1,0 +1,4 @@
+# Locally calculated after checking pgp signature
+sha256	c0ec9700172bf635ccb5bed98daae607d2925c2bc3597f25706ecd9dfbfd2d9e  usbmuxd-1.1.1.tar.bz2
+# License files, locally calculated
+sha256	8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903  COPYING.GPLv3

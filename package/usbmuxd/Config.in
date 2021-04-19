@@ -1,0 +1,6 @@
+config BR2_PACKAGE_USBMUXD
+	bool "usbmuxd"
+	help
+	  A socket daemon to multiplex connections from and to iOS devices.
+
+	  https://github.com/libimobiledevice/usbmuxd

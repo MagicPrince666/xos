@@ -1,0 +1,7 @@
+config BR2_PACKAGE_LIBIMOBILEDEVICE
+	bool "libimobiledevice"
+	help
+	  A library to communicate with services on iOS devices
+	  using native protocols.
+
+	  https://github.com/libimobiledevice/libimobiledevice
