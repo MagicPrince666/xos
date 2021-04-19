@@ -60,8 +60,6 @@
 			gpios = <&r_pio 0 10 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 			linux,default-trigger = "timer";
-			linux,on_delay = "100";
-        	linux,off_delay = "100";
 		};
 	};
 };
@@ -75,11 +73,70 @@
     pinctrl-0 = <&spi0_pins>;
     status = "okay";
 
+	display@0{
+		status = "okay";
+		compatible = "adafruit,yx240qv29", "ilitek,ili9341";
+		reg = <0>;
+		spi-max-frequency = <32000000>;
+		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>; // PA1
+		reset-gpios = <&pio 6 8 GPIO_ACTIVE_HIGH>; //PG8
+		led-gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>; //PG9
+		rotation = <270>;
+		buswidth = <8>;
+		bgr;
+		fps = <30>;
+		//backlight = <&backlight>;
+	};
+/*
 	spidev: spidev@0 {
 		reg = <0>;
 		compatible = "rohm,dh2228fv";
 		spi-max-frequency = <50000000>;
 	};
+
+	ili9341@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		status = "okay";
+		compatible = "ilitek,ili9341";
+		reg = <1 0>;
+		spi-max-frequency = <32000000>;
+		txbuflen = <16>;
+		rotate = <0>;
+		bgr;
+		fps = <15>;
+		buswidth = <8>;
+		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>; // PA1
+	};
+
+	rpi-display@0{
+		compatible = "ilitek,ili9341";
+		reg = <0>;
+		status = "okay";
+
+		spi-max-frequency = <32000000>;
+		rotate = <270>;
+		bgr;
+		fps = <30>;
+		buswidth = <8>;
+		reset-gpios = <&gpio 23 0>;
+		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>; // PA1
+		led-gpios = <&gpio 18 1>;
+		debug = <0>;
+	};
+
+	rpi-display_ts@1 {
+		compatible = "ti,ads7846";
+		reg = <1>;
+		status = "disabled";
+
+		spi-max-frequency = <2000000>;
+		interrupts = <3 25>;
+		pendown-gpio = <&gpio 25 0>;
+		ti,x-plate-ohms = /bits/ 16 <60>;
+		ti,pressure-max = /bits/ 16 <255>;
+	};
+*/
 };
 
 &emac {

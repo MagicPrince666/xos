@@ -2,7 +2,7 @@ export PATH=@PATH@
 
 [ -f /etc/banner ] && cat /etc/banner
 
-PS1='\u@\h:\w$ '
+PS1='\u@\h:\w# '
 export PS1
 
 export EDITOR='/bin/vi'
