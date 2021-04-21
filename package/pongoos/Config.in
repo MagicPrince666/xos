@@ -1,0 +1,6 @@
+config BR2_PACKAGE_PONGOOS
+	bool "pongoos"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  A pre-boot execution environment for 
+	  Apple boards built on top of checkra1n.

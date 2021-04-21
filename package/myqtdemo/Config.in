@@ -1,0 +1,8 @@
+config BR2_PACKAGE_MYQTDEMO
+	bool "myqtdemo"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  My qt demo
+
+comment "my qt demo needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP

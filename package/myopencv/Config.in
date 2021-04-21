@@ -1,0 +1,8 @@
+config BR2_PACKAGE_MYOPENCV
+	bool "myopencv"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  My opencv demo
+
+comment "my opencv needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
