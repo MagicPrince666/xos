@@ -1,5 +1,6 @@
 config BR2_PACKAGE_LIBIRECOVERY
 	bool "libirecovery"
+	select BR2_PACKAGE_LIBUSB
 	help
 	  The libirecovery library allows communication with iBoot/iBSS of iOS devices via USB.
 
