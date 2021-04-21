@@ -148,6 +148,13 @@
 			};
 		};
 	};
+
+	wifi_pwrseq: wifi_pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&pio 1 5 GPIO_ACTIVE_LOW>; /* PB5 */
+		/* The esp8089 needs 200 ms after driving wifi-en high */
+		post-power-on-delay-ms = <200>;
+	};
 };
 
 &pio {
@@ -240,6 +247,14 @@
 	vmmc-supply = <&reg_vcc3v3>;
 	max-frequency = <25000000>;
 	status = "okay";
+
+	mmc-pwrseq = <&wifi_pwrseq>;
+
+	esp8089: sdio_wifi@1 {
+		compatible = "esp,esp8089";
+		reg = <1>;
+		esp,crystal-26M-en = <2>;
+	};
 };
 
 &spi0 {
