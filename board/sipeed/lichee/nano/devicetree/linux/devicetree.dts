@@ -23,7 +23,7 @@
 
 		status {
 			label = "status";
-			gpios = <&pio 4 4 GPIO_ACTIVE_LOW>; /* PE4 */
+			gpios = <&pio 4 4 GPIO_ACTIVE_HIGH>; /* PE4 */
 			linux,default-trigger = "heartbeat";
 		};
 
@@ -156,13 +156,13 @@
 		backlight = <&backlight>;
 	};
 };
-
+/*
 &pwm {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pwm1_pin>;
 	status = "okay";
 };
-
+*/
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pe_pins>;
@@ -211,15 +211,4 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c0_pd_pins>;
 	status = "okay";
-
-	rtp@48 {
-		compatible = "ti,tsc2007";
-		reg = <0x48>;
-		interrupt-parent = <&pio>;
-		interrupts = <4 12 IRQ_TYPE_EDGE_FALLING>;
-		gpios = <&pio 4 12 GPIO_ACTIVE_LOW>;
-		pendown-gpio = <&pio 4 12 GPIO_ACTIVE_LOW>;
-		ti,x-plate-ohms = <660>;
-		wakeup-source;
-	};
 };
