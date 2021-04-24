@@ -1,6 +1,9 @@
 config BR2_PACKAGE_LIBIMOBILEDEVICE
 	bool "libimobiledevice"
 	select BR2_PACKAGE_OPENSSL
+	select BR2_PACKAGE_LIBPLIST
+	select BR2_PACKAGE_LIBUSBMUXD
+	select BR2_PACKAGE_READLINE
 	help
 	  A library to communicate with services on iOS devices
 	  using native protocols.

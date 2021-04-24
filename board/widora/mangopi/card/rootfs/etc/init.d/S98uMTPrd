@@ -3,8 +3,6 @@
 # Start uMTPrd....
 #
 
-exit 0
-
 start() {
     printf "Starting uMTPrd: "
     mount none /sys/kernel/config -t configfs
@@ -18,8 +16,8 @@ start() {
     echo 0x0100 > idProduct
     echo 0x1D6B > idVendor
 
-    echo "Sipeed" > strings/0x409/manufacturer
-    echo "Lichee Nano" > strings/0x409/product
+    echo "Magic" > strings/0x409/manufacturer
+    echo "Prince" > strings/0x409/product
 
     echo "Conf 1" > configs/c.1/strings/0x409/configuration
     echo 120 > configs/c.1/MaxPower

@@ -11,6 +11,10 @@ case "$1" in
 			ifconfig eth0 up
 			ip link set dev eth0 master br-lan
 		fi
+		if ifconfig -a | grep usb0 > /dev/null; then
+			ifconfig usb0 up
+			ip link set dev usb0 master br-lan
+		fi
 		ifconfig br-lan 192.168.34.1 up
 		start-stop-daemon -S -x /usr/sbin/dnsmasq
 		[ $? = 0 ] && echo "OK" || echo "FAIL"

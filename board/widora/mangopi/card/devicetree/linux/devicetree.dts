@@ -2,21 +2,49 @@
 
 /dts-v1/;
 #include "suniv-f1c100s.dtsi"
+#include <dt-bindings/pwm/pwm.h>
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
-#include <dt-bindings/pwm/pwm.h>
 
 / {
-	model = "Sipeed Lichee Nano";
-	compatible = "allwinner,suniv-f1c100s";
+	model = "Prince Card";
+	compatible = "allwinner,suniv-f1c200s",
+			 "allwinner,suniv-f1c100s";
 
 	chosen {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
 
-		bootargs = "console=ttyS0,115200 earlyprintk rootwait init=/preinit root=/dev/mtdblock2 rootfstype=squashfs overlayfsdev=/dev/mtdblock3";
+		bootargs = "console=ttyS0,115200 rootwait init=/preinit root=/dev/mtdblock2 rootfstype=squashfs overlayfsdev=/dev/mtdblock3";
+
+		simplefb_lcd: framebuffer-lcd0 {
+			compatible = "allwinner,simple-framebuffer",
+				     "simple-framebuffer";
+			allwinner,pipeline = "de_be0-lcd0";
+			clocks = <&ccu CLK_BUS_DE_BE>, <&ccu CLK_DE_BE>,
+				 <&ccu CLK_DRAM_DE_BE>, <&ccu CLK_BUS_LCD>,
+				 <&ccu CLK_TCON>;
+			status = "disabled";
+		};
 	};
+
+	// panel: panel {
+	// 	compatible = "bananapi,s070wv20-ct16", "simple-panel";
+	// 	#address-cells = <1>;
+	// 	#size-cells = <0>;
+
+	// 	port@0 {
+	// 		reg = <0>;
+	// 		#address-cells = <1>;
+	// 		#size-cells = <0>;
+
+	// 		panel_input: endpoint@0 {
+	// 			reg = <0>;
+	// 			remote-endpoint = <&tcon0_out_lcd>;
+	// 		};
+	// 	};
+	// };
 
 	leds {
 		compatible = "gpio-leds";
@@ -24,6 +52,7 @@
 		status {
 			label = "status";
 			gpios = <&pio 4 4 GPIO_ACTIVE_LOW>; /* PE4 */
+			default-state = "on";
 			linux,default-trigger = "heartbeat";
 		};
 
@@ -35,7 +64,14 @@
 		enable-gpios = <&pio 4 6 GPIO_ACTIVE_HIGH>;
 
 		brightness-levels = <0 1 2 4 8 16 32 64 128 255>;
-		default-brightness-level = <2>;
+		default-brightness-level = <9>;
+	};
+};
+
+&pio {
+	spi1_pins: spi1-pins-pa {
+		pins = "PE7", "PE8", "PE9", "PE10";
+		function = "spi1";
 	};
 };
 
@@ -124,17 +160,6 @@
 	};
 };
 
-&pio {
-	spi1_pins: spi1-pins-pa {
-		pins = "PE7", "PE8", "PE9", "PE10";
-		function = "spi1";
-	};
-	pwm1_pin: pwm1@0 {
-		pins = "PE6";
-		function = "pwm1";
-	};
-};
-
 &spi1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -146,7 +171,7 @@
 		compatible = "ilitek,ili9341";
 		reg = <0>;
 		status = "okay";
-		spi-max-frequency = <50000000>;
+		spi-max-frequency = <32000000>;
 		rotate = <270>;
 		bgr;
 		fps = <30>;
@@ -155,12 +180,6 @@
 		debug = <0>;
 		backlight = <&backlight>;
 	};
-};
-
-&pwm {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pwm1_pin>;
-	status = "okay";
 };
 
 &uart0 {
@@ -179,12 +198,11 @@
 };
 
 &usb_otg {
-	dr_mode = "peripheral"; /* otg host peripheral */
+	dr_mode = "peripheral"; /* host peripheral */
 	status = "okay";
 };
 
 &usbphy {
-	//usb0_id_det-gpio = <&pio 4 2 GPIO_ACTIVE_HIGH>; /* PE2 */
 	status = "okay";
 };
 
@@ -211,15 +229,5 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c0_pd_pins>;
 	status = "okay";
-
-	rtp@48 {
-		compatible = "ti,tsc2007";
-		reg = <0x48>;
-		interrupt-parent = <&pio>;
-		interrupts = <4 12 IRQ_TYPE_EDGE_FALLING>;
-		gpios = <&pio 4 12 GPIO_ACTIVE_LOW>;
-		pendown-gpio = <&pio 4 12 GPIO_ACTIVE_LOW>;
-		ti,x-plate-ohms = <660>;
-		wakeup-source;
-	};
 };
+
