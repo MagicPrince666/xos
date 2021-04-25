@@ -112,13 +112,13 @@
 			};
 
 			partition@3 {
-				label = "vendor";
-				reg = <0x3000000 0x1000000>;
+				label = "overlay";
+				reg = <0x3000000 0x3000000>;
 			};
 
 			partition@4 {
-				label = "overlay";
-				reg = <0x4000000 0x3000000>;
+				label = "udisk";
+				reg = <0x6000000 0x1000000>;
 			};
 		};
 	};

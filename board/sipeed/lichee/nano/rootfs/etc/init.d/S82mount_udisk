@@ -1,0 +1,23 @@
+#!/bin/sh
+
+[ -f /lib/modules/`uname -r`/kernel/drivers/usb/gadget/legacy/g_mass_storage.ko ] || exit 0
+
+case "$1" in
+	start)
+		printf "Starting g_mass_storage: "
+		modprobe g_mass_storage file=/dev/mtdblock4 removable=1 stall=1
+		;;
+	stop)
+		printf "Stopping g_mass_storage: "
+		modprobe -r g_mass_storage
+		;;
+	restart|reload)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac
+
+exit 0
