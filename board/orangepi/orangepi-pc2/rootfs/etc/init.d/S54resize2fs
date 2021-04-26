@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# resize system fs
+#
+
+case "$1" in
+  start)
+	echo "Starting resizefs..."
+	/usr/bin/resize_fs.sh &
+	;;
+  stop)
+	echo "Stopping resizefs..."
+	killall -9 "resize_fs.sh"
+	;;
+  restart)
+	"$0" stop
+	sleep 1
+	"$0" start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|reload|force-reload}"
+	exit 1
+esac
