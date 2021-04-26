@@ -16,7 +16,7 @@ init_sys()
         echo "Start format /dev/mmcblk0p3"
         mkfs.ext4 /dev/mmcblk0p3
         mount -n -t ext4 /dev/mmcblk0p3 -o rw,noatime /overlay
-    echo "Format & mount /dev/mmcblk0p3 success"
+        echo "Format & mount /dev/mmcblk0p3 success"
     fi
 
         mkdir -p /overlay/upper /overlay/work
