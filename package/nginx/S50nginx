@@ -10,7 +10,7 @@ case "$1" in
   start)
 	echo "Starting nginx..."
 	mkdir -p /var/log/nginx /var/tmp/nginx
-	start-stop-daemon -S -x "$NGINX" -p "$PIDFILE"
+	start-stop-daemon -S -x "$NGINX" -p "$PIDFILE" &
 	;;
   stop)
 	echo "Stopping nginx..."
