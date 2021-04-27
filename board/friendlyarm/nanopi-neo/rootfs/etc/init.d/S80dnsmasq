@@ -15,6 +15,7 @@ case "$1" in
 #			udhcpc -i eth0 &
 #		fi
 		ifconfig br-lan 192.168.34.1 up
+		mount /dev/pts
 		start-stop-daemon -S -x /usr/sbin/dnsmasq
 		[ $? = 0 ] && echo "OK" || echo "FAIL"
 		;;
