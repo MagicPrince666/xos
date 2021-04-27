@@ -46,7 +46,6 @@ BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="5.4.99"
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_PATCH="board/allwinner/suniv-f1c100s/patch/linux"
-
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/allwinner/suniv-f1c100s/linux.defconfig"
 BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="board/allwinner/suniv-f1c100s/devicetree/linux/suniv-f1c100s.dtsi board/widora/mangopi/r3/devicetree/linux/devicetree.dts"
 
