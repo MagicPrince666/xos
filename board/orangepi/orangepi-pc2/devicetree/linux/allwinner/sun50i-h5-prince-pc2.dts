@@ -85,11 +85,19 @@
 			label = "orangepi:green:pwr";
 			gpios = <&r_pio 0 10 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
+			linux,default-trigger = "heartbeat";
 		};
 
 		status {
 			label = "orangepi:red:status";
 			gpios = <&pio 0 20 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+
+		backlight {
+			label = "backlight";
+			gpios = <&pio 2 4 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
 		};
 	};
 
@@ -122,16 +130,13 @@
 		gpio = <&r_pio 0 2 GPIO_ACTIVE_HIGH>; /* PL2 */
 		status = "okay";
 	};
-
+/*
 	backlight: backlight {
-		compatible = "pwm-backlight";
-		pwms = <&pwm 1 50000 PWM_POLARITY_INVERTED>;
-		enable-gpios = <&pio 0 6 GPIO_ACTIVE_HIGH>; //PA6 PWM1
-
-		brightness-levels = <0 1 2 4 8 16 32 64 128 255>;
-		default-brightness-level = <9>;
-		status = "okay";
+		compatible = "gpio-backlight";
+		gpios = <&pio 2 4 GPIO_ACTIVE_HIGH>; // PC4
+		default-on;
 	};
+*/
 };
 
 &codec {
@@ -291,7 +296,7 @@
 
 			partition@4 {
 				label = "overlay";
-				reg = <0x4800000 0x3000000>;
+				reg = <0x4800000 0x3800000>;
 			};
 		};
 	};
@@ -329,7 +334,7 @@
 
 &pio {
 	spi1_pins_cs1: spi1_pins_cs1 {
-		pins = "PA21";
+		pins = "PA13", "PA21";
 		function = "gpio_out";
 	};
 
@@ -338,15 +343,20 @@
 		function = "spi1";
 	};
 
-	pwm1_pin: pwm1@0 {
-		pins = "PA6";
-		function = "pwm1";
+	pwm0_pin: pwm0@0 {
+		pins = "PA5";
+		function = "pwm0";
+	};
+
+	backlight_pins: backlight_pins {
+		pins = "PC4";
+		function = "gpio_out";
 	};
 };
 /*
 &pwm {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pwm1_pin>;
+	pinctrl-0 = <&pwm0_pin>;
 	status = "okay";
 };
 */
@@ -356,27 +366,40 @@
 	pinctrl-names = "default";
 	spi-num-chipselects = <2>;
 	pinctrl-0 = <&spi1_pins &spi1_pins_cs1>;
-	cs-gpios = <&pio 0 13 GPIO_ACTIVE_LOW>, <&pio 0 21 GPIO_ACTIVE_LOW>;
+	cs-gpios = <&pio 0 13 GPIO_ACTIVE_HIGH>, <&pio 0 21 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
 	ili9341@0 {
 		compatible = "ilitek,ili9341";
 		reg = <0>;
 		status = "okay";
-		spi-max-frequency = <32000000>;
+		spi-max-frequency = <50000000>;
 		rotate = <270>;
 		bgr;
 		fps = <30>;
 		buswidth = <8>;
-		reset-gpios = <&pio 2 4 GPIO_ACTIVE_LOW>; 	//PC4
-		dc-gpios = <&pio 2 7 GPIO_ACTIVE_HIGH>;		//PC7
+		reset-gpios = <&pio 0 3 GPIO_ACTIVE_LOW>; 	//PA3
+		dc-gpios = <&pio 0 2 GPIO_ACTIVE_HIGH>;		//PA2
 		debug = <0>;
-		backlight = <&backlight>;
+		//backlight = <&backlight>;
 	};
 
-	spidev: spidev@1 {
-		reg = <1>;
-		compatible = "rohm,dh2228fv";
-		spi-max-frequency = <20000000>;
-	};
+	tsc2046@1 {
+			reg = <1>;	/* CS1 */
+			compatible = "ti,tsc2046";
+			interrupt-parent = <&pio>;
+			interrupts = <2 7 IRQ_TYPE_LEVEL_LOW>;	//PC7
+			spi-max-frequency = <1000000>;
+			pendown-gpio = <&pio 2 7 GPIO_ACTIVE_LOW>;
+			vcc-supply = <&reg_vcc3v3>;
+
+			ti,x-min = /bits/ 16 <0>;
+			ti,x-max = /bits/ 16 <320>;
+			ti,y-min = /bits/ 16 <0>;
+			ti,y-max = /bits/ 16 <240>;
+			ti,x-plate-ohms = /bits/ 16 <40>;
+			ti,pressure-max = /bits/ 16 <255>;
+
+			wakeup-source;
+		};
 };
