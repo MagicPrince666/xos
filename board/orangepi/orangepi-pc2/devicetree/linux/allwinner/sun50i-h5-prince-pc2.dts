@@ -374,7 +374,7 @@
 		reg = <0>;
 		status = "okay";
 		spi-max-frequency = <50000000>;
-		rotate = <270>;
+		rotate = <90>;
 		bgr;
 		fps = <30>;
 		buswidth = <8>;
