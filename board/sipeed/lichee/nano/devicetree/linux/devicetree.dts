@@ -141,8 +141,9 @@
 	pinctrl-0 = <&spi1_pins>;
 	status = "okay";
 
-	ili9341@0 {
-		compatible = "ilitek,ili9341";
+	display@0 {
+		//compatible = "ilitek,ili9341";
+		compatible = "himax,hx8347d";
 		reg = <0>;
 		status = "okay";
 		spi-max-frequency = <50000000>;

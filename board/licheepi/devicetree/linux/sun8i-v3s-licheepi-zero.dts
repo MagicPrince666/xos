@@ -47,9 +47,10 @@
 #include <dt-bindings/clock/sun8i-v3s-ccu.h>
 #include <dt-bindings/reset/sun8i-v3s-ccu.h>
 #include <dt-bindings/input/input.h>
+#include <dt-bindings/pwm/pwm.h>
 
 / {
-	model = "Lichee Pi Zero";
+	model = "Lichee Pi Zero for Prince";
 	compatible = "licheepi,licheepi-zero", "allwinner,sun8i-v3s";
 
 	aliases {
@@ -82,6 +83,14 @@
 				};
 			};
 		};
+
+		pwm: pwm@01c21400 {
+            compatible = "allwinner,sun7i-a20-pwm";         //这里选a20是因为v3s和a20一样有两路pwm
+            reg = <0x01c21400 0xC>;
+            clocks = <&osc24M>;
+            #pwm-cells = <3>;
+            status = "okay";
+    	};
 
 		ehci0: usb@01c1a000 {
 			compatible = "allwinner,sun8i-v3s-ehci", "generic-ehci";
@@ -148,13 +157,6 @@
 			};
 		};
 	};
-
-	wifi_pwrseq: wifi_pwrseq {
-		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pio 1 5 GPIO_ACTIVE_LOW>; /* PB5 */
-		/* The esp8089 needs 200 ms after driving wifi-en high */
-		post-power-on-delay-ms = <200>;
-	};
 };
 
 &pio {
@@ -183,6 +185,21 @@
 		bias-pull-up;
 	};
 
+	pwm0_pins: pwm0 {
+        pins = "PB4";
+        function = "pwm0";
+	};
+
+	pwm1_pins: pwm1 {
+		pins = "PB5";
+		function = "pwm1";
+	};
+};
+
+&pwm {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pwm0_pins>, <&pwm1_pins>;
+        status = "okay";
 };
 
 &ohci0 {
@@ -220,6 +237,7 @@
 	phy-handle = <&int_mii_phy>;
 	phy-mode = "mii";
 	allwinner,leds-active-low;
+	local-mac-address = [a4 51 29 00 00 05];
 	status = "okay";
 };
 
@@ -245,16 +263,8 @@
 	broken-cd;
 	bus-width = <4>;
 	vmmc-supply = <&reg_vcc3v3>;
-	max-frequency = <25000000>;
+	max-frequency = <12500000>;
 	status = "okay";
-
-	mmc-pwrseq = <&wifi_pwrseq>;
-
-	esp8089: sdio_wifi@1 {
-		compatible = "esp,esp8089";
-		reg = <1>;
-		esp,crystal-26M-en = <2>;
-	};
 };
 
 &spi0 {

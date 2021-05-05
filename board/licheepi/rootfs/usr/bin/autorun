@@ -1,0 +1,19 @@
+#!/bin/sh
+
+while true
+do
+ps | grep "frpc" | grep -v "grep"
+if [ "$?" -eq 1 ]     #0 success 1 fail
+then
+    if ifconfig eth0 | grep RUNNING > /dev/null ; then
+        /usr/bin/frpc -c /etc/frpc.ini &
+        echo "start frpc"
+    else
+        echo "wait net connect!"
+    fi
+    echo "process has been restarted!"
+else
+    sleep 3
+fi
+sleep 1
+done

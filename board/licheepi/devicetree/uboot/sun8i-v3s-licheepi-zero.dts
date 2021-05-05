@@ -50,10 +50,101 @@
 
 	aliases {
 		serial0 = &uart0;
+		spi0 = &spi0;
+		ethernet0 = &emac;
 	};
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+	};
+
+	soc {
+		syscon: syscon@1c00000 {
+			compatible = "allwinner,sun8i-v3s-system-controller",
+			"syscon";
+			reg = <0x01c00000 0x1000>;
+		};
+
+
+		emac: ethernet@1c30000 {
+			compatible = "allwinner,sun8i-v3s-emac";
+			syscon = <&syscon>;
+			reg = <0x01c30000 0x104>;
+			interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "macirq";
+			resets = <&ccu RST_BUS_EMAC>;
+			reset-names = "stmmaceth";
+			clocks = <&ccu CLK_BUS_EMAC>;
+			clock-names = "stmmaceth";
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			phy-handle = <&int_mii_phy>;
+			phy = <&int_mii_phy>;
+			phy-mode = "mii";
+			status = "okay";
+			allwinner,leds-active-low;
+			
+			mdio: mdio {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "snps,dwmac-mdio";
+			};
+
+			mdio-mux {
+				compatible = "allwinner,sun8i-h3-mdio-mux";
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				mdio-parent-bus = <&mdio>;
+
+				int_mdio: mdio@1 {
+					compatible = "allwinner,sun8i-h3-mdio-internal";
+					reg = <1>;
+					#address-cells = <1>;
+					#size-cells = <0>;
+					
+					int_mii_phy: ethernet-phy@1 {
+						compatible = "ethernet-phy-ieee802.3-c22";
+						reg = <1>;
+						clocks = <&ccu CLK_BUS_EPHY>;
+						resets = <&ccu RST_BUS_EPHY>;
+						phy-is-integrated;
+					};
+				};
+			};
+		};
+		
+		spi0: spi@01c68000 {
+			compatible = "allwinner,sun8i-h3-spi";
+			reg = <0x01c68000 0x1000>;
+			interrupts = <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&ccu CLK_BUS_SPI0>, <&ccu CLK_SPI0>;
+			clock-names = "ahb", "mod";
+			pinctrl-names = "default";
+			pinctrl-0 = <&spi0_pins>;
+			resets = <&ccu RST_BUS_SPI0>;
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			spi_nand: spi-nand@0 {
+				#address-cells = <1>;
+				#size-cells = <1>;
+				compatible = "spi-nand";
+				reg = <0>;
+				/* The layout on the DolphinPi is very good, 100mhz are possible! */
+				spi-max-frequency = <100000000>;
+
+				boot@0 {
+					label = "boot";
+					reg = <0x0000000 0x0100000>;
+				};
+				ubi0@100000 {
+					label = "ubi0";
+					reg = <0x0100000 0x0000000>;
+				};
+			};
+		};	
 	};
 };
 
@@ -80,4 +171,15 @@
 &usbphy {
 	usb0_id_det-gpio = <&pio 5 6 GPIO_ACTIVE_HIGH>;
 	status = "okay";
+};
+
+&pio {
+
+	spi0_pins: spi0-pins {
+		pins = "PC0", "PC1", "PC2", "PC3";
+		function = "spi0";
+		drive-strength = <10>;
+		bias-disable;
+	};
+	
 };
