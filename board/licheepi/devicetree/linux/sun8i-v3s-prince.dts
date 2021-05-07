@@ -59,6 +59,16 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+
+//		simplefb_lcd: framebuffer-lcd0 {
+//			compatible = "allwinner,simple-framebuffer",
+//				     "simple-framebuffer";
+//			allwinner,pipeline = "de_be0-lcd0";
+//			clocks = <&ccu CLK_BUS_DE_BE>, <&ccu CLK_DE_BE>,
+//				 <&ccu CLK_DRAM_DE_BE>, <&ccu CLK_BUS_LCD>,
+//				 <&ccu CLK_TCON>;
+//			status = "disabled";
+//		};
 	};
 
 	soc {
@@ -181,6 +191,26 @@
 			};
 		};
 
+		csi0: csi@01cb0000 {
+            compatible = "allwinner,sun8i-v3s-csi";
+            reg = <0x01cb0000 0x3000>;
+            interrupts = <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
+            clocks = <&ccu CLK_BUS_CSI>, <&ccu CLK_CSI1_SCLK>, <&ccu CLK_DRAM_CSI>, <&ccu CLK_MIPI_CSI>;
+            clock-names = "bus", "mod", "ram", "dphy";
+            resets = <&ccu RST_BUS_CSI>;
+            status = "disabled";
+        };
+
+        csi1: csi@1cb4000 {
+            compatible = "allwinner,sun8i-v3s-csi";
+            reg = <0x01cb4000 0x3000>;
+            interrupts = <GIC_SPI 84 IRQ_TYPE_LEVEL_HIGH>;
+            clocks = <&ccu CLK_BUS_CSI>, <&ccu CLK_CSI1_SCLK>, <&ccu CLK_DRAM_CSI>;
+            clock-names = "bus", "mod", "ram";
+            resets = <&ccu RST_BUS_CSI>;
+            status = "disabled";
+        };
+
 		dma: dma-controller@01c02000 {
 			compatible = "allwinner,sun8i-v3s-dma";
 			reg = <0x01c02000 0x1000>;
@@ -208,6 +238,14 @@
 			compatible = "allwinner,sun8i-v3s-codec-analog";
 			reg = <0x01c23000 0x4>;
 		};
+
+		nmi_intc: interrupt-controller@01c000d0 {
+            compatible = "allwinner,sun9i-a80-nmi";
+            reg = <0x01c000d0 0x0c>;
+            interrupt-controller;
+            #interrupt-cells = <2>;
+            interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
+        };
 	};
 
 	backlight: backlight {
@@ -234,6 +272,14 @@
 		};
 	};
 
+};
+
+&cedarx {
+	status = "okay";
+};
+
+&ion {
+	status = "okay";
 };
 
 &panel {
@@ -409,8 +455,40 @@
 	pinctrl-names = "default";
     pinctrl-0 = <&i2c0_pins>;
 
-	ns2009: ns2009@48 {
-		compatible = "nsiway,ns2009";
+	rtp@48 {
+		compatible = "ti,tsc2007";
 		reg = <0x48>;
+		interrupt-parent = <&pio>;
+		interrupts = <4 12 IRQ_TYPE_EDGE_FALLING>;
+		gpios = <&pio 4 12 GPIO_ACTIVE_LOW>;
+		pendown-gpio = <&pio 4 12 GPIO_ACTIVE_LOW>;
+		ti,x-plate-ohms = <660>;
+		wakeup-source;
+		status = "disabled";
 	};
+
+	ctp@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+		interrupt-parent = <&pio>;
+		interrupts = <4 12 IRQ_TYPE_EDGE_FALLING>; // PE12
+		irq-gpios = <&pio 4 12 GPIO_ACTIVE_HIGH>; // PE12
+		reset-gpios = <&pio 0 0 GPIO_ACTIVE_HIGH>; // PA0
+	};
+};
+
+&mixer0 {
+    status = "disabled";
+};
+
+&codec {
+    allwinner,audio-routing =
+	"Headphone",
+	"HP",
+	"Headphone",
+	"HPCOM",
+	"Mic",
+	"MIC1",
+	"Mic",
+	"HBIAS";
 };
