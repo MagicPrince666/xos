@@ -237,7 +237,7 @@
 };
 
 &panel {
-	compatible = "urt,umsh-8596md-t", "simple-panel";
+	compatible = "lg,lb070wv8", "simple-panel";
 };
 
 &de {
