@@ -36,8 +36,7 @@ After building, you should obtain this tree:
     +-- rootfs.ext4 -> rootfs.ext2
     +-- rootfs.tar
     +-- sdcard.img
-    +-- sun8i-v3s-licheepi-zero-dock.dtb
-    +-- sun8i-v3s-licheepi-zero.dtb
+    +-- sun8i-v3s-prince.dtb
     +-- u-boot.bin
     +-- u-boot-sunxi-with-spl.bin
     `-- zImage
