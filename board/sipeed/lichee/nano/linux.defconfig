@@ -4,7 +4,7 @@
 #
 
 #
-# Compiler: arm-f1c100s-linux-gnueabi-gcc.br_real (Buildroot -g1593406-dirty) 8.4.0
+# Compiler: arm-f1c100s-linux-gnueabi-gcc.br_real (Buildroot -gfa144da-dirty) 8.4.0
 #
 CONFIG_CC_IS_GCC=y
 CONFIG_GCC_VERSION=80400
@@ -3289,7 +3289,7 @@ CONFIG_FB_TFT=y
 # CONFIG_FB_TFT_AGM1264K_FL is not set
 # CONFIG_FB_TFT_BD663474 is not set
 # CONFIG_FB_TFT_HX8340BN is not set
-# CONFIG_FB_TFT_HX8347D is not set
+CONFIG_FB_TFT_HX8347D=y
 # CONFIG_FB_TFT_HX8353D is not set
 # CONFIG_FB_TFT_HX8357D is not set
 # CONFIG_FB_TFT_ILI9163 is not set

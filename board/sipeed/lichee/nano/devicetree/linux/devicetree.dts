@@ -112,12 +112,12 @@
 
 			partition@3 {
 				label = "overlay";
-				reg = <0x3000000 0x3000000>;
+				reg = <0x3000000 0x1000000>;
 			};
 
 			partition@4 {
 				label = "udisk";
-				reg = <0x6000000 0x2000000>;
+				reg = <0x4000000 0x4000000>;
 			};
 		};
 	};
@@ -128,6 +128,7 @@
 		pins = "PE7", "PE8", "PE9", "PE10";
 		function = "spi1";
 	};
+
 	pwm1_pin: pwm1@0 {
 		pins = "PE6";
 		function = "pwm1";
@@ -141,8 +142,9 @@
 	pinctrl-0 = <&spi1_pins>;
 	status = "okay";
 
-	ili9341@0 {
-		compatible = "ilitek,ili9341";
+	display@0 {
+		//compatible = "ilitek,ili9341";
+		compatible = "himax,hx8347d";
 		reg = <0>;
 		status = "okay";
 		spi-max-frequency = <50000000>;
