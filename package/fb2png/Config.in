@@ -1,0 +1,8 @@
+config BR2_PACKAGE_FB2PNG
+	bool "fb2png"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  Test spi interface lcd display png
+
+comment "spitft needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP

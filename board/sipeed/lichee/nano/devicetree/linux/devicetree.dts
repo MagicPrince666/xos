@@ -143,12 +143,12 @@
 	status = "okay";
 
 	display@0 {
-		//compatible = "ilitek,ili9341";
-		compatible = "himax,hx8347d";
+		compatible = "ilitek,ili9341";
+		//compatible = "himax,hx8347d";
 		reg = <0>;
 		status = "okay";
 		spi-max-frequency = <50000000>;
-		rotate = <270>;
+		rotate = <0>;
 		bgr;
 		fps = <30>;
 		buswidth = <8>;
@@ -157,13 +157,13 @@
 		backlight = <&backlight>;
 	};
 };
-/*
+
 &pwm {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pwm1_pin>;
 	status = "okay";
 };
-*/
+
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pe_pins>;

@@ -17,6 +17,8 @@ menu "prince custom software packages"
 	source "package/myjpeg/Config.in"
 	source "package/myopencv/Config.in"
 	source "package/pongoos/Config.in"
+	source "package/spitft/Config.in"
+	source "package/fb2png/Config.in"
 
 endmenu
 

@@ -7,7 +7,7 @@ CONFIG_SYS_CLK_FREQ=408000000
 CONFIG_DRAM_CLK=168
 CONFIG_DRAM_ZQ=0
 
-CONFIG_CONS_INDEX=2
+CONFIG_CONS_INDEX=1
 
 CONFIG_SPL=y
 CONFIG_SPL_SPI_SUNXI=y
@@ -22,7 +22,7 @@ CONFIG_DEFAULT_ENV_FILE="../../../board/allwinner/generic/uboot.env"
 
 CONFIG_BOOTDELAY=0
 
-CONFIG_VIDEO_LCD_MODE="x:800,y:480,depth:18,pclk_khz:30000,le:16,ri:209,up:22,lo:22,hs:30,vs:1,sync:0,vmode:0"
+CONFIG_VIDEO_LCD_MODE="x:480,y:272,depth:18,pclk_khz:9000,le:39,ri:8,up:2,lo:4,hs:4,vs:10,sync:3,vmode:0"
 CONFIG_BOOTCOMMAND="setenv lcd_bl_pin 134; run distro_bootcmd;"
 
 CONFIG_NET=n

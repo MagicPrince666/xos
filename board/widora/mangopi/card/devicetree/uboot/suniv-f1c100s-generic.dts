@@ -24,11 +24,9 @@
 
 		status {
 			label = "status";
-			gpios = <&pio 4 4 GPIO_ACTIVE_HIGH>; /* PE4 */
-			default-state = "off";
+			gpios = <&pio 4 4 GPIO_ACTIVE_LOW>; /* PE4 */
 			linux,default-trigger = "heartbeat";
 		};
-
 	};
 };
 

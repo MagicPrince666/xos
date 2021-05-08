@@ -1,0 +1,214 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR X11)
+
+/dts-v1/;
+#include "suniv-f1c100s.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/pwm/pwm.h>
+
+/ {
+	model = "Prince Name Card with lcd hx8347";
+	compatible = "allwinner,suniv-f1c100s";
+
+	chosen {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		bootargs = "console=ttyS0,115200 earlyprintk rootwait init=/preinit root=/dev/mtdblock2 rootfstype=squashfs overlayfsdev=/dev/mtdblock3";
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		status {
+			label = "status";
+			gpios = <&pio 4 4 GPIO_ACTIVE_HIGH>; /* PE4 */
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm 1 50000 PWM_POLARITY_INVERTED>;
+		enable-gpios = <&pio 4 6 GPIO_ACTIVE_HIGH>;
+
+		brightness-levels = <0 1 2 4 8 16 32 64 128 255>;
+		default-brightness-level = <2>;
+	};
+};
+
+&spi0 {
+	status = "okay";
+
+	spi-nor@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "winbond,w25q128", "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
+		status = "disabled";
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x70000>;
+				read-only;
+			};
+
+			partition@1 {
+				label = "kernel";
+				reg = <0x70000 0x590000>;
+				read-only;
+			};
+
+			partition@2 {
+				label = "rom";
+				reg = <0x600000 0x700000>;
+				read-only;
+			};
+
+			partition@3 {
+				label = "overlay";
+				reg = <0xd00000 0x300000>;
+			};
+		};
+	};
+
+	spi-nand@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-nand";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
+		status = "okay";
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x100000>;
+				read-only;
+			};
+
+			partition@1 {
+				label = "kernel";
+				reg = <0x100000 0x500000>;
+				read-only;
+			};
+
+			partition@2 {
+				label = "rom";
+				reg = <0x600000 0x2a00000>;
+				read-only;
+			};
+
+			partition@3 {
+				label = "overlay";
+				reg = <0x3000000 0x1000000>;
+			};
+
+			partition@4 {
+				label = "udisk";
+				reg = <0x4000000 0x4000000>;
+			};
+		};
+	};
+};
+
+&pio {
+	spi1_pins: spi1-pins-pa {
+		pins = "PE7", "PE8", "PE9", "PE10";
+		function = "spi1";
+	};
+
+	pwm1_pin: pwm1@0 {
+		pins = "PE6";
+		function = "pwm1";
+	};
+};
+
+&spi1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi1_pins>;
+	status = "okay";
+
+	display@0 {
+		compatible = "himax,hx8347d";
+		reg = <0>;
+		status = "okay";
+		spi-max-frequency = <50000000>;
+		rotate = <0>;
+		bgr;
+		fps = <30>;
+		buswidth = <8>;
+		dc-gpios = <&pio 4 5 GPIO_ACTIVE_HIGH>; //PE5
+		debug = <0>;
+		backlight = <&backlight>;
+	};
+};
+
+&pwm {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm1_pin>;
+	status = "okay";
+};
+
+&uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart0_pe_pins>;
+	status = "okay";
+};
+
+&mmc0 {
+	status = "okay";
+	broken-cd;
+};
+
+&otg_sram {
+	status = "okay";
+};
+
+&usb_otg {
+	dr_mode = "peripheral"; /* otg host peripheral */
+	status = "okay";
+};
+
+&usbphy {
+	//usb0_id_det-gpio = <&pio 4 2 GPIO_ACTIVE_HIGH>; /* PE2 */
+	status = "okay";
+};
+
+&cedar_ve {
+	status = "okay";
+};
+
+&ion {
+	status = "okay";
+};
+
+&codec {
+	allwinner,audio-routing =
+		"Headphone", "HP",
+		"Headphone", "HPCOM",
+		"LINEIN", "Line In",
+		"FMINL", "Left FM In",
+		"FMINR", "Right FM In",
+		"MIC", "Mic";
+	status = "okay";
+};
+
+&i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c0_pd_pins>;
+	status = "okay";
+};
