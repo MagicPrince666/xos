@@ -19,6 +19,7 @@ menu "prince custom software packages"
 	source "package/pongoos/Config.in"
 	source "package/spitft/Config.in"
 	source "package/fb2png/Config.in"
+	source "package/ui4linux/Config.in"
 
 endmenu
 
