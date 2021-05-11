@@ -1,0 +1,6 @@
+config BR2_PACKAGE_LIBDJVULIBRE
+	bool "libdjvulibre"
+	help
+	  DjVu is a web-centric format and software platform for distributing documents and images
+
+	  http://sourceforge.net/projects/djvu/

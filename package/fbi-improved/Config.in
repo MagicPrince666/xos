@@ -1,0 +1,10 @@
+config BR2_PACKAGE_FBI_IMPROVED
+	bool "fbi-improved"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_LIBEXIF
+	select BR2_PACKAGE_JPEG
+	select BR2_PACKAGE_LIBDJVULIBRE
+	select BR2_PACKAGE_TIFF
+	select BR2_PACKAGE_LIBPNG
+	help
+	  fbi improved
