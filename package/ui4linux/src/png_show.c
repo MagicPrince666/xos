@@ -12,24 +12,26 @@
 
 int  get_png_data(struct fb_var_screeninfo *vinfo,
 		unsigned  char *buf,
-		char *file_name,
+		const char *file_name,
 		int x_offset,
 		int y_offset)
 {
-	if ((x_offset < 400) || (x_offset >= width_mm) ||
-		(y_offset < 400) || (y_offset > hight_mm)) {
+	if ((x_offset < 0) || (x_offset > width_mm) ||
+		(y_offset < 0) || (y_offset > hight_mm)) {
 		printf("make sure x,y >= 0, and x < %d, y < %d\n", width_mm, hight_mm);
 		return 0;
 	}
 
 	float k  = 0;
-	int addr = 0;
+	int addr = 0; 
 
 	FILE* file = fopen(file_name, "rb");
 	if (file == NULL) {
 		printf(">>>>>>>>> %s open failed\n", file_name);
 		return -1;
 	}
+
+	printf(">>>>>>>>> %s open had open\n", file_name);
 
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 
@@ -49,9 +51,9 @@ int  get_png_data(struct fb_var_screeninfo *vinfo,
 	int i, j;
 
 	for (i = 0; i < m_height; i++) {
-		k = (x_offset-300) / 15 * 4;
+		k = (x_offset-320) / 15 * 4;
 		for (j = 0; j < (4 * m_width); j += 4) {
-			addr = k + vinfo->xres * (i + (y_offset - 300) / 15 - 1) * 4;
+			addr = k + vinfo->xres * (i + (y_offset - 240) / 15 - 1) * 4;
 			k+=4;
 			*(buf+addr)   = row_pointers[i][j + 2]; /*blue*/
 			*(buf+addr+1) = row_pointers[i][j + 1]; /*green*/
