@@ -4,7 +4,7 @@
 #
 
 #
-# Compiler: aarch64-pc2-linux-gnu-gcc.br_real (Buildroot -g926f84a-dirty) 8.4.0
+# Compiler: aarch64-pc2-linux-gnu-gcc.br_real (Buildroot -g5b3e3f5-dirty) 8.4.0
 #
 CONFIG_CC_IS_GCC=y
 CONFIG_GCC_VERSION=80400
@@ -2095,7 +2095,7 @@ CONFIG_MWIFIEX=m
 # CONFIG_MWIFIEX_SDIO is not set
 # CONFIG_MWIFIEX_USB is not set
 CONFIG_WLAN_VENDOR_MEDIATEK=y
-# CONFIG_MT7601U is not set
+CONFIG_MT7601U=m
 # CONFIG_MT76x0U is not set
 # CONFIG_MT76x2U is not set
 CONFIG_WLAN_VENDOR_RALINK=y

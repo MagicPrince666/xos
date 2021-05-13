@@ -12,11 +12,11 @@
 
 int picture_write(int x,
 		int y,
-		char *p);
+		const char *p);
 
 int  get_png_data(struct fb_var_screeninfo *vinfo,
 		unsigned  char *buf,
-		char *file_name,
+		const char *file_name,
 		int x_offset,
 		int y_offset);
 /*contex*/

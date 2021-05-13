@@ -230,7 +230,7 @@ int  get_bmp_data(struct fb_var_screeninfo *vinfo,
 	return 0;
 }
 
-int picture_write(int x, int y, char *p)
+int picture_write(int x, int y, const char *p)
 {
 	int fbfd = 0;
 	struct fb_var_screeninfo vinfo;
@@ -243,7 +243,6 @@ int picture_write(int x, int y, char *p)
 		printf("Error : cannot open framebuffer device .\n");
 		exit(-1);
 	}
-	printf(" /dev/fb0 opend\n");
 
 	if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo)) {
 		printf("Error get varible infor\n");
@@ -259,7 +258,7 @@ int picture_write(int x, int y, char *p)
 	len = vinfo.bits_per_pixel/8;
 
 	screensize = vinfo.xres * vinfo.yres * len;
-	fbp = (unsigned char *)mmap(0,screensize,PROT_READ | PROT_WRITE,MAP_SHARED,fbfd,0);
+	fbp = (unsigned char *)mmap(0,screensize,PROT_READ | PROT_WRITE,MAP_SHARED, fbfd, 0);
 
 	if ((int)fbp == -1){
 		printf("Error failed mmap\n");
