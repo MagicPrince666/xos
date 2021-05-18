@@ -49,7 +49,13 @@
 	model = "FriendlyARM NanoPi NEO";
 	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
 
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+	};
+
 	chosen {
+		stdout-path = "serial0:115200n8";
 		/delete-node/ framebuffer@0;
 	};
 
@@ -114,22 +120,22 @@
 	};
 };
 
+&uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart0_pa_pins>;
+	status = "okay";
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_pins>;
+	status = "okay";
+};
+
 &ehci0 {
 	status = "okay";
 };
-/*
-&ehci1 {
-	status = "okay";
-};
 
-&ehci2 {
-	status = "okay";
-};
-
-&ehci3 {
-	status = "okay";
-};
-*/
 &spi0 {
     pinctrl-names = "default";
     pinctrl-0 = <&spi0_pins>;
@@ -162,19 +168,7 @@
 &ohci0 {
 	status = "okay";
 };
-/*
-&ohci1 {
-	status = "okay";
-};
 
-&ohci2 {
-	status = "okay";
-};
-
-&ohci3 {
-	status = "okay";
-};
-*/
 &usb_otg {
 	status = "okay";
 	dr_mode = "peripheral";
@@ -186,7 +180,12 @@
 
 &pio {
 	spi0_pins: spi0-pins {
-    pins = "PC0", "PC1", "PC2", "PC3";
-    function = "spi0";
+		pins = "PC0", "PC1", "PC2", "PC3";
+		function = "spi0";
    };
+
+   uart1_pins: uart1-pins {
+		pins = "PG6", "PG7";
+		function = "uart1";
+	};
 };
