@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 James Pettigrew <james@innovum.com.au>
+ * Copyright (C) 2016 Milo Kim <woogyom.kim@gmail.com>
  *
  * This file is dual-licensed: you can use it either under the terms
  * of the GPL or the X11 license, at your option. Note that this dual
@@ -40,15 +41,55 @@
  *     OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "sun8i-h3-nanopi.dtsi"
+/dts-v1/;
+#include "sun8i-h3.dtsi"
+#include "sunxi-common-regulators.dtsi"
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
 
 / {
-	model = "Prince NanoPi NEO";
-	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
+	aliases {
+		serial0 = &uart0;
+	};
 
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&leds_npi>, <&leds_r_npi>;
+
+		status {
+			label = "nanopi:blue:status";
+			gpios = <&pio 0 10 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+
+		pwr {
+			label = "nanopi:green:pwr";
+			gpios = <&r_pio 0 10 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+	};
+
+	r_gpio_keys {
+		compatible = "gpio-keys";
+		input-name = "k1";
+		pinctrl-names = "default";
+		pinctrl-0 = <&sw_r_npi>;
+
+		k1 {
+			label = "k1";
+			linux,code = <KEY_POWER>;
+			gpios = <&r_pio 0 3 GPIO_ACTIVE_LOW>;
+		};
+	};
 };
 
-&ehci0 {
+&ehci3 {
 	status = "okay";
 };
 
@@ -59,22 +100,41 @@
 	vmmc-supply = <&reg_vcc3v3>;
 };
 
-&emac {
-	phy-handle = <&int_mii_phy>;
-	phy-mode = "mii";
-	allwinner,leds-active-low;
+&ohci3 {
 	status = "okay";
 };
 
-&ohci0 {
+&pio {
+	leds_npi: led_pins {
+		pins = "PA10";
+		function = "gpio_out";
+	};
+};
+
+&r_pio {
+	leds_r_npi: led_pins {
+		pins = "PL10";
+		function = "gpio_out";
+	};
+
+	sw_r_npi: key_pins {
+		pins = "PL3";
+		function = "gpio_in";
+	};
+};
+
+&uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart0_pins_a>;
 	status = "okay";
 };
 
-&usb_otg {
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_pins>;
 	status = "okay";
-	dr_mode = "peripheral";
 };
 
 &usbphy {
-	usb0_id_det-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>; /* PG12 */
+	status = "okay";
 };
