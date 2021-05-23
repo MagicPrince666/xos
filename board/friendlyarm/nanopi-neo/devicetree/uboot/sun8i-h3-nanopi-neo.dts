@@ -45,18 +45,10 @@
 / {
 	model = "Prince NanoPi NEO";
 	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
-
 };
 
 &ehci0 {
 	status = "okay";
-};
-
-&mmc0 {
-	bus-width = <4>;
-	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>;
-	status = "okay";
-	vmmc-supply = <&reg_vcc3v3>;
 };
 
 &emac {
