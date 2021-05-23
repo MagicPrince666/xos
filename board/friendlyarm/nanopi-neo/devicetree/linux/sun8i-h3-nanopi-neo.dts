@@ -46,7 +46,7 @@
 #include <dt-bindings/input/input.h>
 
 / {
-	model = "FriendlyARM NanoPi NEO";
+	model = "Prince NanoPi NEO";
 	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
 
 	aliases {
