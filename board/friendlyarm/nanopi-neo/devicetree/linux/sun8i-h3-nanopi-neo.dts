@@ -137,8 +137,12 @@
 };
 
 &spi0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
     pinctrl-names = "default";
-    pinctrl-0 = <&spi0_pins>;
+    pinctrl-0 = <&spi0_pins &spi0_pins_cs1>;
+	spi-num-chipselects = <2>;
+	cs-gpios = <&pio 2 3 GPIO_ACTIVE_HIGH>, <&pio 0 3 GPIO_ACTIVE_HIGH>;
     status = "okay";
 
 	ili9341@0 {
@@ -154,6 +158,25 @@
 		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>;//PA1
 		debug = <0>;
 		backlight = <&backlight>;
+	};
+
+	tsc2046@1 {
+		reg = <1>;	/* CS1 */
+		compatible = "ti,tsc2046";
+		interrupt-parent = <&pio>;
+		interrupts = <0 2 IRQ_TYPE_LEVEL_LOW>;	//PA2
+		spi-max-frequency = <1000000>;
+		pendown-gpio = <&pio 0 2 GPIO_ACTIVE_LOW>;
+		vcc-supply = <&reg_vcc3v3>;
+
+		ti,x-min = /bits/ 16 <0>;
+		ti,x-max = /bits/ 16 <320>;
+		ti,y-min = /bits/ 16 <0>;
+		ti,y-max = /bits/ 16 <240>;
+		ti,x-plate-ohms = /bits/ 16 <40>;
+		ti,pressure-max = /bits/ 16 <255>;
+
+		wakeup-source;
 	};
 };
 
@@ -183,6 +206,11 @@
 		pins = "PC0", "PC1", "PC2", "PC3";
 		function = "spi0";
    };
+
+   spi0_pins_cs1: spi0_pins_cs1 {
+		pins = "PC3", "PA3";
+		function = "gpio_out";
+	};
 
    uart1_pins: uart1-pins {
 		pins = "PG6", "PG7";
