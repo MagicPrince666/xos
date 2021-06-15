@@ -14,9 +14,9 @@ LIBIMOBILEDEVICE_SITE = https://github.com/libimobiledevice/libimobiledevice/rel
 
 LIBIMOBILEDEVICE_INSTALL_STAGING = YES
 
-LIBIMOBILEDEVICE_CONF_OPTS = 
+LIBIMOBILEDEVICE_CONF_OPTS = --disable-static --without-cython
 
-LIBIMOBILEDEVICE_DEPENDENCIES = libplist libusbmuxd libopenssl readline
+LIBIMOBILEDEVICE_DEPENDENCIES = libplist libusbmuxd libopenssl readline # host-python-cython
 
 LIBIMOBILEDEVICE_LICENSE = LGPL-2.1+
 LIBIMOBILEDEVICE_LICENSE_FILES = $(LIBIMOBILEDEVICE_SUBDIR)/COPYING.LIB
