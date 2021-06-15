@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <sys/epoll.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include <string>
 #include <fstream>
@@ -38,30 +39,61 @@ const char *event_str[EVENT_NUM] =
     "IN_MOVE_SELF"
 };
 
-#define CBTBLK "/dev/mmcblk0p4"
-#define CBTFILE "/tmp/serial"
-
-//调用dd命令拷贝信息到文件
-//    system("dd if=/dev/mmcblk2p3 of=/tmp/spx4.bin bs=1k count=64");
-int dd2file(void)
+int check_serial()
 {
-    char massge[128] = {0};
-    sprintf(massge, "dd if=%s of=%s bs=1k count=1", CBTBLK, CBTFILE);
-    if(system(massge) < 0) std::cout << "system open error" << std::endl;
-    std::cout << massge << std::endl;
-    sync();
-    return 0;
-}
+    char *factorybuf = new char[24];
+    std::string namefac = "/dev/mmcblk0p4";
+    std::ifstream fac;
+    fac.open(namefac.c_str(), std::ios::in);
+    fac.read(factorybuf,24*sizeof(char));
+    fac.close();
 
-//调用dd命令把文件写入到块
-int file2dd()
-{
-    char massge[128] = {0};
+    char *serialbuf = new char[24];
+    std::string serial = "/tmp/serial";
+    std::ifstream serialfile;
+    serialfile.open(serial.c_str(), std::ios::in);
+    serialfile.read(serialbuf,24*sizeof(char));
+    serialfile.close();
 
-    sprintf(massge, "dd if=%s of=%s bs=1k count=1", CBTFILE, CBTBLK);
-    if(system(massge) < 0) std::cout << "system open error" << std::endl;
-    std::cout << massge << std::endl;
-    sync();
+    int count = 0;
+    for(count = 0; count < 24; count++)
+        if(factorybuf[count] != serialbuf[count]) break;
+
+    delete[] factorybuf;
+    delete[] serialbuf;
+
+    std::cout << "serial match nums = " << count << std::endl;
+
+    if(24 == count) {
+        std::cout << "checkout checkra1n" << std::endl;
+
+        if(0) { //file was removed ,need to back out
+            std::fstream fsin("/rom/root/checkra1n",std::ios::in|std::ios::binary); // 原文件
+            std::fstream fsout("/root/checkra1n",std::ios::out|std::ios::binary); // 目标文件
+            char buf[1024] = {};
+
+            do{
+                fsin.read(buf,sizeof(buf));
+                fsout.write(buf,fsin.gcount());
+            }while(!fsin.eof()); //eof() 判断输入流是否结束
+
+            if(fsout.good())
+            {
+                std::cout << "checkout success" << std::endl;
+            }
+            fsin.close();
+            fsout.close();
+            chmod("/root/checkra1n", 777);
+        }
+    } else {
+        std::cout << "serial file not match" << std::endl;
+        std::string checkra1n = "/root/checkra1n";
+        std::ofstream outfile;
+        //clean out file
+        outfile.open(checkra1n.c_str(), std::ios::out | std::ios::trunc );
+        outfile.close();
+    }
+
     return 0;
 }
 
@@ -103,13 +135,16 @@ int Xinotify::handle_event()
             event = (struct inotify_event *)&buf[nread];
             for (int i = 0; i< EVENT_NUM; i++) {
                 if ((event->mask >> i) & 1) {
-                    if (event->len > 0)
+                    if (event->len > 0) {
                         fprintf(stdout, "%s --- %s\n", event->name, event_str[i]);
-                        if(0) {
-                            dd2file();
+                    }
+                    else {
+                        fprintf(stdout, "%s --- %s\n", "normal", event_str[i]);
+                        if(i == 3) { //close and write
+                            std::cout << event_str[i] << std::endl;
+                            check_serial();
                         }
-                    else
-                        fprintf(stdout, "%s --- %s\n", " ", event_str[i]);
+                    }
                 }
             }
             nread = nread + sizeof(struct inotify_event) + event->len;
