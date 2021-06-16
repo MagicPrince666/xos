@@ -1,0 +1,27 @@
+#!/bin/sh
+
+[ -f /usr/bin/factory ] || exit 0
+
+case "$1" in
+	start)
+		printf "Starting factory: "
+		/usr/bin/factory >> /tmp/factory.log &
+		start-stop-daemon -S -x /usr/bin/factory
+		[ $? = 0 ] && echo "OK" || echo "FAIL"
+		;;
+	stop)
+		printf "Stopping factory: "
+		killall -9 factory
+		start-stop-daemon -K -q -x /usr/sbin/factory
+		[ $? = 0 ] && echo "OK" || echo "FAIL"
+		;;
+	restart|reload)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac
+
+exit 0

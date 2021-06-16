@@ -30,8 +30,8 @@ ELSEIF (UNIX)
     add_subdirectory(multiplexing/epoll)
 ENDIF ()
 
-add_subdirectory(arch)
 add_subdirectory(fileutils/inotify)
+add_subdirectory(system/timefd)
 
 set(EXEC_NAME factory)
 
@@ -39,9 +39,8 @@ add_executable(${EXEC_NAME} main.cc
 )
 
 target_link_libraries(${EXEC_NAME} 
-	arch_target
     xepoll
+    timefd
     xinotify
-    pthread
 )
 

@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
     Xepoll xepoll;
 
-    //TimerFd timerfd(&xepoll);
+    TimerFd timerfd(&xepoll);
 
     const std::string name = "/tmp/serial";
     Xinotify xinotify(&xepoll, name);

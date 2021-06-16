@@ -18,6 +18,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 #include "xinotify.h"
 
@@ -41,19 +42,23 @@ const char *event_str[EVENT_NUM] =
 
 int check_serial()
 {
-    char *factorybuf = new char[24];
+    char *factorybuf = new char[25];
     std::string namefac = "/dev/mmcblk0p4";
     std::ifstream fac;
-    fac.open(namefac.c_str(), std::ios::in);
+    fac.open(namefac.c_str(), std::ios::in|std::ios::binary);
     fac.read(factorybuf,24*sizeof(char));
     fac.close();
+    factorybuf[24] = 0;
+    std::cout << "Read factory serial: "<< factorybuf << std::endl;
 
-    char *serialbuf = new char[24];
+    char *serialbuf = new char[25];
     std::string serial = "/tmp/serial";
     std::ifstream serialfile;
-    serialfile.open(serial.c_str(), std::ios::in);
+    serialfile.open(serial.c_str(), std::ios::in|std::ios::binary);
     serialfile.read(serialbuf,24*sizeof(char));
     serialfile.close();
+    serialbuf[24] = 0;
+    std::cout << "Read current serial: "<< serialbuf << std::endl;
 
     int count = 0;
     for(count = 0; count < 24; count++)
@@ -65,9 +70,20 @@ int check_serial()
     std::cout << "serial match nums = " << count << std::endl;
 
     if(24 == count) {
-        std::cout << "checkout checkra1n" << std::endl;
+        std::cout << "serial file match" << std::endl;
 
-        if(0) { //file was removed ,need to back out
+        int size = 0;
+        //方法二 C++流获取
+        std::ifstream fin( "/root/checkra1n" );
+        if( fin.is_open() )
+        {
+            fin.seekg( 0, std::ios::end );
+            size = fin.tellg();
+            fin.close();
+            std::cout << size << std::endl;
+        }
+
+        if(size == 0) { //file was removed ,need to back out
             std::fstream fsin("/rom/root/checkra1n",std::ios::in|std::ios::binary); // 原文件
             std::fstream fsout("/root/checkra1n",std::ios::out|std::ios::binary); // 目标文件
             char buf[1024] = {};

@@ -24,6 +24,7 @@ endef
 
 define FACTORY_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/factory $(TARGET_DIR)/usr/bin
+    $(INSTALL) -D -m 0755 $(@D)/S03cboxfactory $(TARGET_DIR)/etc/init.d
 endef
 
 define FACTORY_PERMISSIONS
@@ -34,4 +35,4 @@ define FACTORY_UNINSTALL_TARGET_CMDS
     $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) uninstall
 endef
 
-$(eval $(cmake-package))
+$(eval $(generic-package))
