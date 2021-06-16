@@ -37,7 +37,7 @@ bool TimerFd::init() {
   // 创建1s定时器fd
   if ((timer1S_fd_ =
            timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC)) < 0) {
-    std::cout << "create 1s timer fd fail" << std::endl;
+    std::cout << "create timer fd fail" << std::endl;
     return false;
   }
   // 设置1s定时器
@@ -58,14 +58,14 @@ int TimerFd::timeOutCallBack_1s() {
   // 需要读出该fd的数据，否则定时器无法正常执行(重要)
   uint64_t value;
   int ret = read(timer1S_fd_, &value, sizeof(uint64_t));
-  std::cout << "get 40s timer value = " << value << std::endl;
+  //std::cout << "get 40s timer value = " << value << std::endl;
   std::ifstream fin( "/tmp/serial" );
   if( fin.is_open() )
   {
       fin.seekg( 0, std::ios::end );
       int size = fin.tellg();
       fin.close();
-      std::cout << size << std::endl;
+      //std::cout << size << std::endl;
       if(size == 0) {
         if(0 == access("/root/checkra1n", X_OK) ) {
           chmod("/root/checkra1n", 0600);

@@ -22,6 +22,8 @@
 
 #include "xinotify.h"
 
+#define Debug 0
+
 #define EVENT_NUM 12
 
 const char *event_str[EVENT_NUM] =
@@ -48,17 +50,20 @@ int check_serial()
     fac.open(namefac.c_str(), std::ios::in|std::ios::binary);
     fac.read(factorybuf,24*sizeof(char));
     fac.close();
+#if Debug
     factorybuf[24] = 0;
     std::cout << "Read factory serial: "<< factorybuf << std::endl;
-
+#endif
     char *serialbuf = new char[25];
     std::string serial = "/tmp/serial";
     std::ifstream serialfile;
     serialfile.open(serial.c_str(), std::ios::in|std::ios::binary);
     serialfile.read(serialbuf,24*sizeof(char));
     serialfile.close();
+#if Debug
     serialbuf[24] = 0;
     std::cout << "Read current serial: "<< serialbuf << std::endl;
+#endif
 
     int count = 0;
     for(count = 0; count < 24; count++)
@@ -66,9 +71,9 @@ int check_serial()
 
     delete[] factorybuf;
     delete[] serialbuf;
-
+#if Debug
     std::cout << "serial match nums = " << count << std::endl;
-
+#endif
     if(24 == count) {
         std::cout << "serial file match" << std::endl;
 
@@ -80,7 +85,9 @@ int check_serial()
             fin.seekg( 0, std::ios::end );
             size = fin.tellg();
             fin.close();
+#if Debug
             std::cout << size << std::endl;
+#endif
         }
 
         if(size == 0) { //file was removed ,need to back out
