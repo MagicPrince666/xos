@@ -8,7 +8,7 @@
 
 
 MYOPENCV_VERSION = 1.0.0
-MYOPENCV_SITE = $(TOPDIR)/package/myopencv/src
+MYOPENCV_SITE = $(TOPDIR)/package/prince/myopencv/src
 MYOPENCV_SITE_METHOD = local
 MYOPENCV_INSTALL_TARGET = YES
 MYOPENCV_DEPENDENCIES = opencv3 jpeg

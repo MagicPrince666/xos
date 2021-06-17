@@ -10,20 +10,7 @@ menu "Target packages"
 	source "package/skeleton-init-sysv/Config.in"
 
 menu "prince custom software packages"
-	source "package/libimobiledevice/Config.in"
-	source "package/libusbmuxd/Config.in"
-	source "package/usbmuxd/Config.in"
-	source "package/libirecovery/Config.in"
-	source "package/idevicerestore/Config.in"
-	source "package/factory/Config.in"
-	source "package/myjpeg/Config.in"
-	source "package/myopencv/Config.in"
-	source "package/pongoos/Config.in"
-	source "package/spitft/Config.in"
-	source "package/fb2png/Config.in"
-	source "package/ui4linux/Config.in"
-	source "package/fbi-improved/Config.in"
-	source "package/libdjvulibre/Config.in"
+	source "package/prince/Config.in"
 
 endmenu
 

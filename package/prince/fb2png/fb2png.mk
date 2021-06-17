@@ -8,7 +8,7 @@
 
 
 FB2PNG_VERSION = 1.0.0
-FB2PNG_SITE = $(TOPDIR)/package/fb2png/src
+FB2PNG_SITE = $(TOPDIR)/package/prince/fb2png/src
 FB2PNG_SITE_METHOD = local
 FB2PNG_INSTALL_TARGET = YES
 FB2PNG_DEPENDENCIES = 

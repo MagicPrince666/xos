@@ -8,7 +8,7 @@
 
 
 MYJPEG_VERSION = 1.0.0
-MYJPEG_SITE = $(TOPDIR)/package/myjpeg/src
+MYJPEG_SITE = $(TOPDIR)/package/prince/myjpeg/src
 MYJPEG_SITE_METHOD = local
 MYJPEG_INSTALL_TARGET = YES
 MYJPEG_DEPENDENCIES = jpeg

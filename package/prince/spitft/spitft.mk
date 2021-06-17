@@ -8,7 +8,7 @@
 
 
 SPITFT_VERSION = 1.0.0
-SPITFT_SITE = $(TOPDIR)/package/spitft/src
+SPITFT_SITE = $(TOPDIR)/package/prince/spitft/src
 SPITFT_SITE_METHOD = local
 SPITFT_INSTALL_TARGET = YES
 SPITFT_DEPENDENCIES = 

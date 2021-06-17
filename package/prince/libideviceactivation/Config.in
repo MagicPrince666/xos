@@ -1,0 +1,9 @@
+config BR2_PACKAGE_LIBIDEVICEACTIVATION
+	bool "libideviceactivation"
+	select BR2_PACKAGE_LIBCURL
+	select BR2_PACKAGE_LIBCURL_OPENSSL
+	select BR2_PACKAGE_LIBXML2
+	help
+	  The libideviceactivation library allows communication with iBoot/iBSS of iOS devices via USB.
+
+	  https://github.com/libimobiledevice/libideviceactivation

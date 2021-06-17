@@ -1,0 +1,7 @@
+config BR2_PACKAGE_IFUSE
+	bool "ifuse"
+	select BR2_PACKAGE_LIBFUSE
+	help
+	  The ifuse library allows communication with iBoot/iBSS of iOS devices via USB.
+
+	  https://github.com/libimobiledevice/ifuse
