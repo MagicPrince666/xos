@@ -16,7 +16,7 @@ IDEVICERESTORE_INSTALL_STAGING = YES
 
 IDEVICERESTORE_CONF_OPTS = 
 
-IDEVICERESTORE_DEPENDENCIES = libplist libusbmuxd libopenssl readline libimobiledevice libzip libcurl
+IDEVICERESTORE_DEPENDENCIES = libplist libusbmuxd libopenssl readline libimobiledevice libirecovery libzip libcurl
 
 IDEVICERESTORE_LICENSE = LGPL-2.1+
 IDEVICERESTORE_LICENSE_FILES = $(IDEVICERESTORE_SUBDIR)/COPYING.LIB

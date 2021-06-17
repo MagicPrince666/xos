@@ -106,7 +106,10 @@ int check_serial()
             }
             fsin.close();
             fsout.close();
-            chmod("/root/checkra1n", 777);
+
+            if(-1 == access("/root/checkra1n", X_OK) ) {
+                chmod("/root/checkra1n", S_IXUSR | S_IXGRP | S_IXOTH);
+            }
         }
     } else {
         std::cout << "serial file not match" << std::endl;
