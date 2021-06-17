@@ -1,6 +1,7 @@
 source "package/prince/libimobiledevice/Config.in"
 source "package/prince/libusbmuxd/Config.in"
 source "package/prince/usbmuxd/Config.in"
+source "package/prince/libplist/Config.in"
 source "package/prince/libirecovery/Config.in"
 source "package/prince/idevicerestore/Config.in"
 source "package/prince/ideviceinstaller/Config.in"
