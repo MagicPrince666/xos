@@ -3,3 +3,5 @@
 
 # U-Disk auto mount
 ACTION=="add",GOTO="farsight",KERNEL=="sd[a-z][0-9]",RUN+="/usr/bin/mount-disk.sh %k",LABEL="farsight"
+ACTION=="remove",GOTO="farsight",KERNEL=="sd[a-z][0-9]",RUN+="/usr/bin/umount-disk.sh %k",LABEL="farsight"
+
