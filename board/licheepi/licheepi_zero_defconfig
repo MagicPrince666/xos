@@ -19,7 +19,7 @@ BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="5.4.113"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/licheepi/linux.defconfig"
 BR2_LINUX_KERNEL_DTS_SUPPORT=y
-BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="board/licheepi/devicetree/linux/sun8i-v3s-prince.dts"
+BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="board/licheepi/devicetree/linux/sun8i-v3s.dtsi board/licheepi/devicetree/linux/sun8i-v3s-prince.dts"
 BR2_LINUX_KERNEL_PATCH="board/licheepi/patch/linux"
 
 # Filesystem images
