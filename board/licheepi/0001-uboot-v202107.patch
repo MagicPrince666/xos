@@ -1,0 +1,1131 @@
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 9fb38682..a86a8e00 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -614,7 +614,10 @@ dtb-$(CONFIG_MACH_SUN8I_R40) += \
+ 	sun8i-v40-bananapi-m2-berry.dtb
+ dtb-$(CONFIG_MACH_SUN8I_V3S) += \
+ 	sun8i-s3-pinecube.dtb \
++	sun8i-v3s-prince.dtb \
+ 	sun8i-v3s-licheepi-zero.dtb
++dtb-$(CONFIG_MACH_SUN8I_S3) += \
++	sun8i-s3-generic.dtb
+ dtb-$(CONFIG_MACH_SUN50I_H5) += \
+ 	sun50i-h5-bananapi-m2-plus.dtb \
+ 	sun50i-h5-emlid-neutis-n5-devboard.dtb \
+diff --git a/arch/arm/dts/sun8i-s3-generic.dts b/arch/arm/dts/sun8i-s3-generic.dts
+new file mode 100644
+index 00000000..c1aac3d5
+--- /dev/null
++++ b/arch/arm/dts/sun8i-s3-generic.dts
+@@ -0,0 +1,135 @@
++/*
++ * Copyright (C) 2020 Aodzip <aodzip@gmail.com>
++ *
++ * This file is dual-licensed: you can use it either under the terms
++ * of the GPL or the X11 license, at your option. Note that this dual
++ * licensing only applies to this file, and not this project as a
++ * whole.
++ *
++ *  a) This file is free software; you can redistribute it and/or
++ *     modify it under the terms of the GNU General Public License as
++ *     published by the Free Software Foundation; either version 2 of the
++ *     License, or (at your option) any later version.
++ *
++ *     This file is distributed in the hope that it will be useful,
++ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *     GNU General Public License for more details.
++ *
++ * Or, alternatively,
++ *
++ *  b) Permission is hereby granted, free of charge, to any person
++ *     obtaining a copy of this software and associated documentation
++ *     files (the "Software"), to deal in the Software without
++ *     restriction, including without limitation the rights to use,
++ *     copy, modify, merge, publish, distribute, sublicense, and/or
++ *     sell copies of the Software, and to permit persons to whom the
++ *     Software is furnished to do so, subject to the following
++ *     conditions:
++ *
++ *     The above copyright notice and this permission notice shall be
++ *     included in all copies or substantial portions of the Software.
++ *
++ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
++ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
++ *     OTHER DEALINGS IN THE SOFTWARE.
++ */
++
++/dts-v1/;
++#include "sun8i-s3.dtsi"
++#include "sunxi-common-regulators.dtsi"
++
++/ {
++    model = "Allwinner S3 Generic Device";
++    compatible = "allwinner,sun8i-s3";
++
++    aliases {
++        serial0 = &uart0;
++    };
++
++    chosen {
++        stdout-path = "serial0:115200n8";
++    };
++
++    backlight: backlight {
++        compatible = "pwm-backlight";
++        pwms = <&pwm 0 50000 0>;
++        brightness-levels = <0 2 4 8 16 32 64 128 255>;
++        default-brightness-level = <8>;
++    };
++
++    panel-rgb@0 {
++        compatible = "simple-panel";
++        backlight = <&backlight>;
++
++        display-timings {
++            timing@0 {
++                clock-frequency = <50000000>;
++                hactive = <480>;
++                vactive = <272>;
++                hfront-porch = <2>;
++                hback-porch = <2>;
++                hsync-len = <41>;
++                vfront-porch = <2>;
++                vback-porch = <2>;
++                vsync-len = <10>;
++                hsync-active = <0>;
++                vsync-active = <0>;
++                de-active = <0>;
++                pixelclk-active = <1>;
++            };
++        };
++    };
++};
++
++&emac {
++    phy-handle = <&int_mii_phy>;
++    phy-mode = "mii";
++    allwinner,use-internal-phy;
++    status = "okay";
++};
++
++&mmc0 {
++    bus-width = <4>;
++    status = "okay";
++};
++
++&mmc2 {
++    non-removable;
++    max-speed = <20000000>;
++    bus-width = <8>;
++    status = "okay";
++};
++
++&spi0 {
++    status = "disabled";
++};
++
++&uart0 {
++    status = "okay";
++};
++
++&usb_otg {
++    status = "okay";
++};
++
++&usbphy {
++    status = "okay";
++};
++
++&ehci0 {
++    status = "okay";
++};
++
++&ohci0 {
++    status = "okay";
++};
++
++&pwm {
++    status = "okay";
++};
+diff --git a/arch/arm/dts/sun8i-s3.dtsi b/arch/arm/dts/sun8i-s3.dtsi
+new file mode 100644
+index 00000000..282aadff
+--- /dev/null
++++ b/arch/arm/dts/sun8i-s3.dtsi
+@@ -0,0 +1,157 @@
++/*
++ * Copyright (C) 2020 Aodzip <aodzip@gmail.com>
++ *
++ * This file is dual-licensed: you can use it either under the terms
++ * of the GPL or the X11 license, at your option. Note that this dual
++ * licensing only applies to this file, and not this project as a
++ * whole.
++ *
++ *  a) This file is free software; you can redistribute it and/or
++ *     modify it under the terms of the GNU General Public License as
++ *     published by the Free Software Foundation; either version 2 of the
++ *     License, or (at your option) any later version.
++ *
++ *     This file is distributed in the hope that it will be useful,
++ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *     GNU General Public License for more details.
++ *
++ * Or, alternatively,
++ *
++ *  b) Permission is hereby granted, free of charge, to any person
++ *     obtaining a copy of this software and associated documentation
++ *     files (the "Software"), to deal in the Software without
++ *     restriction, including without limitation the rights to use,
++ *     copy, modify, merge, publish, distribute, sublicense, and/or
++ *     sell copies of the Software, and to permit persons to whom the
++ *     Software is furnished to do so, subject to the following
++ *     conditions:
++ *
++ *     The above copyright notice and this permission notice shall be
++ *     included in all copies or substantial portions of the Software.
++ *
++ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
++ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
++ *     OTHER DEALINGS IN THE SOFTWARE.
++ */
++/dts-v1/;
++#include "sun8i-v3s.dtsi"
++#include "sunxi-common-regulators.dtsi"
++#include <dt-bindings/input/input.h>
++
++/ {
++    #address-cells = <1>;
++    #size-cells = <1>;
++    interrupt-parent = <&gic>;
++    
++    soc {
++        compatible = "simple-bus";
++        #address-cells = <1>;
++        #size-cells = <1>;
++        ranges;
++
++        syscon: syscon@1c00000 {
++            compatible = "allwinner,sun8i-v3s-system-controller", "allwinner,sun8i-h3-system-control", "syscon";
++            reg = <0x01c00000 0x1000>;
++        };
++
++        emac: ethernet@1c30000 {
++            compatible = "allwinner,sun8i-h3-emac";
++            syscon = <&syscon>;
++            reg = <0x01c30000 0x10000>;
++            interrupts = <GIC_SPI 82 IRQ_TYPE_LEVEL_HIGH>;
++            interrupt-names = "macirq";
++            resets = <&ccu RST_BUS_EMAC>;
++            reset-names = "stmmaceth";
++            clocks = <&ccu CLK_BUS_EMAC>;
++            clock-names = "stmmaceth";
++            status = "disabled";
++
++            mdio: mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++                compatible = "snps,dwmac-mdio";
++            };
++
++            mdio-mux {
++                compatible = "allwinner,sun8i-h3-mdio-mux";
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                mdio-parent-bus = <&mdio>;
++                /* Only one MDIO is usable at the time */
++                internal_mdio: mdio@1 {
++                    compatible = "allwinner,sun8i-h3-mdio-internal";
++                    reg = <1>;
++                    #address-cells = <1>;
++                    #size-cells = <0>;
++
++                    int_mii_phy: ethernet-phy@1 {
++                        compatible = "ethernet-phy-ieee802.3-c22";
++                        reg = <1>;
++                        clocks = <&ccu CLK_BUS_EPHY>;
++                        resets = <&ccu RST_BUS_EPHY>;
++                    };
++                };
++
++                external_mdio: mdio@2 {
++                    reg = <2>;
++                    #address-cells = <1>;
++                    #size-cells = <0>;
++                };
++            };
++        };
++
++        ehci0: usb@01c1a000 {
++            compatible = "allwinner,sun8i-v3s-ehci", "generic-ehci";
++            reg = <0x01c1a000 0x100>;
++            interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>;
++            clocks = <&ccu CLK_BUS_EHCI0>, <&ccu CLK_BUS_OHCI0>;
++            resets = <&ccu RST_BUS_EHCI0>, <&ccu RST_BUS_OHCI0>;
++            status = "disabled";
++        };
++
++        ohci0: usb@01c1a400 {
++            compatible = "allwinner,sun8i-v3s-ohci", "generic-ohci";
++            reg = <0x01c1a400 0x100>;
++            interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
++            clocks = <&ccu CLK_BUS_EHCI0>, <&ccu CLK_BUS_OHCI0>, <&ccu CLK_USB_OHCI0>;
++            resets = <&ccu RST_BUS_EHCI0>, <&ccu RST_BUS_OHCI0>;
++            status = "disabled";
++        };
++
++        spi0: spi@1c68000 {
++            compatible = "allwinner,sun8i-h3-spi";
++            reg = <0x01c68000 0x1000>;
++            interrupts = <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>;
++            clocks = <&ccu CLK_BUS_SPI0>, <&ccu CLK_SPI0>;
++            clock-names = "ahb", "mod";
++            resets = <&ccu RST_BUS_SPI0>;
++            status = "disabled";
++            #address-cells = <1>;
++            #size-cells = <0>;
++        };
++
++        pwm: pwm@1c21400 {
++            compatible = "allwinner,sun5i-a13-pwm";
++            reg = <0x01c21400 0x8>;
++            clocks = <&osc24M>;
++            #pwm-cells = <3>;
++            status = "disabled";
++        };
++    };
++};
++
++&usb_otg {
++    phys = <&usbphy>;
++    extcon = <&usbphy>;
++};
++
++&usbphy {
++    #phy-cells = <0>;
++};
+diff --git a/arch/arm/include/asm/arch-sunxi/clock_sun6i.h b/arch/arm/include/asm/arch-sunxi/clock_sun6i.h
+index ee387127..fbd8faa4 100644
+--- a/arch/arm/include/asm/arch-sunxi/clock_sun6i.h
++++ b/arch/arm/include/asm/arch-sunxi/clock_sun6i.h
+@@ -333,9 +333,14 @@ struct sunxi_ccm_reg {
+ #define AHB_GATE_OFFSET_LCD1		5
+ #define AHB_GATE_OFFSET_LCD0		4
+ #else
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
++#define AHB_GATE_OFFSET_LCD1		5
++#define AHB_GATE_OFFSET_LCD0		4
++#else
+ #define AHB_GATE_OFFSET_LCD1		4
+ #define AHB_GATE_OFFSET_LCD0		3
+ #endif
++#endif
+ 
+ #define CCM_NAND_CTRL_M(x)		((x) - 1)
+ #define CCM_NAND_CTRL_N(x)		((x) << 16)
+@@ -480,9 +485,14 @@ struct sunxi_ccm_reg {
+ #define AHB_RESET_OFFSET_LCD1		5
+ #define AHB_RESET_OFFSET_LCD0		4
+ #else
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
++#define AHB_RESET_OFFSET_LCD1		5
++#define AHB_RESET_OFFSET_LCD0		4
++#else
+ #define AHB_RESET_OFFSET_LCD1		4
+ #define AHB_RESET_OFFSET_LCD0		3
+ #endif
++#endif
+ 
+ /* ahb_reset2 offsets */
+ #define AHB_RESET_OFFSET_EPHY		2
+@@ -508,7 +518,11 @@ struct sunxi_ccm_reg {
+ /* CCM bits common to all Display Engine 2.0 clock ctrl regs */
+ #define CCM_DE2_CTRL_M(n)		((((n) - 1) & 0xf) << 0)
+ #define CCM_DE2_CTRL_PLL_MASK		(3 << 24)
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
++#define CCM_DE2_CTRL_PLL6_2X		(2 << 24)
++#else
+ #define CCM_DE2_CTRL_PLL6_2X		(0 << 24)
++#endif
+ #define CCM_DE2_CTRL_PLL10		(1 << 24)
+ #define CCM_DE2_CTRL_GATE		(0x1 << 31)
+ 
+diff --git a/arch/arm/include/asm/arch-sunxi/cpu.h b/arch/arm/include/asm/arch-sunxi/cpu.h
+index b08f2023..b177513b 100644
+--- a/arch/arm/include/asm/arch-sunxi/cpu.h
++++ b/arch/arm/include/asm/arch-sunxi/cpu.h
+@@ -17,6 +17,7 @@
+ #define SOCID_A64	0x1689
+ #define SOCID_H3	0x1680
+ #define SOCID_V3S	0x1681
++#define SOCID_S3	0x1682
+ #define SOCID_H5	0x1718
+ #define SOCID_R40	0x1701
+ 
+diff --git a/arch/arm/include/asm/arch-sunxi/display2.h b/arch/arm/include/asm/arch-sunxi/display2.h
+index 7202d275..ad3a81db 100644
+--- a/arch/arm/include/asm/arch-sunxi/display2.h
++++ b/arch/arm/include/asm/arch-sunxi/display2.h
+@@ -137,4 +137,12 @@ struct de_csc {
+ 
+ #define SUNXI_DE2_WH(w, h)			(((h - 1) << 16) | (w - 1))
+ 
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
++	#define SUNXI_DE2_MUX_CHAN_SZ_COUNT 2
++	#define SUNXI_DE2_BLD_ROUTE 2
++#else
++	#define SUNXI_DE2_MUX_CHAN_SZ_COUNT 1
++	#define SUNXI_DE2_BLD_ROUTE 1
++#endif
++
+ #endif /* _SUNXI_DISPLAY2_H */
+diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
+index bc8509b7..13edd789 100644
+--- a/arch/arm/mach-sunxi/Kconfig
++++ b/arch/arm/mach-sunxi/Kconfig
+@@ -312,7 +312,18 @@ config MACH_SUN8I_V3S
+ 	select SUNXI_DRAM_DW
+ 	select SUNXI_DRAM_DW_16BIT
+ 	select SUPPORT_SPL
+-	select ARMV7_BOOT_SEC_DEFAULT if OLD_SUNXI_KERNEL_COMPAT
++
++config MACH_SUN8I_S3
++	bool "sun8i (Allwinner S3)"
++	select CPU_V7A
++	select CPU_V7_HAS_NONSEC
++	select CPU_V7_HAS_VIRT
++	select ARCH_SUPPORT_PSCI
++	select SUNXI_GEN_SUN6I
++	select SUNXI_DRAM_DW
++	select SUNXI_DRAM_DW_16BIT
++	select SUPPORT_SPL
++	select SUNXI_DE2
+ 
+ config MACH_SUN9I
+ 	bool "sun9i (Allwinner A80)"
+@@ -375,6 +386,7 @@ config MACH_SUN8I
+ 	default y if MACH_SUNXI_H3_H5
+ 	default y if MACH_SUN8I_R40
+ 	default y if MACH_SUN8I_V3S
++	default y if MACH_SUN8I_S3
+ 
+ config RESERVE_ALLWINNER_BOOT0_HEADER
+ 	bool "reserve space for Allwinner boot0 header"
+@@ -411,8 +423,8 @@ config SUNXI_DRAM_LPDDR3
+ 
+ choice
+ 	prompt "DRAM Type and Timing"
+-	default SUNXI_DRAM_DDR3_1333 if !MACH_SUN8I_V3S
+-	default SUNXI_DRAM_DDR2_V3S if MACH_SUN8I_V3S
++	default SUNXI_DRAM_DDR3_1333 if !(MACH_SUN8I_V3S || MACH_SUN8I_S3)
++	default SUNXI_DRAM_DDR2_V3S if !(MACH_SUN8I_V3S || MACH_SUN8I_S3)
+ 
+ config SUNXI_DRAM_DDR3_1333
+ 	bool "DDR3 1333"
+@@ -452,6 +464,14 @@ config SUNXI_DRAM_DDR2_V3S
+ 	This option is only for the DDR2 memory chip which is co-packaged in
+ 	Allwinner V3s SoC.
+ 
++config SUNXI_DRAM_DDR2_S3
++	bool "DDR2 found in S3 chip"
++	select SUNXI_DRAM_DDR2
++	depends on MACH_SUN8I_S3
++	---help---
++	This option is only for the DDR2 memory chip which is co-packaged in
++	Allwinner S3 SoC.
++
+ endchoice
+ endif
+ 
+@@ -468,7 +488,7 @@ config DRAM_CLK
+ 	default 648 if MACH_SUN8I_R40
+ 	default 312 if MACH_SUN6I || MACH_SUN8I
+ 	default 360 if MACH_SUN4I || MACH_SUN5I || MACH_SUN7I || \
+-		       MACH_SUN8I_V3S
++		       MACH_SUN8I_V3S || MACH_SUN8I_S3
+ 	default 672 if MACH_SUN50I
+ 	default 744 if MACH_SUN50I_H6
+ 	default 720 if MACH_SUN50I_H616
+@@ -492,7 +512,7 @@ config DRAM_ZQ
+ 	default 123 if MACH_SUN4I || MACH_SUN5I || MACH_SUN6I || \
+ 		       MACH_SUN8I_A23 || MACH_SUN8I_A33 || MACH_SUN8I_A83T
+ 	default 127 if MACH_SUN7I
+-	default 14779 if MACH_SUN8I_V3S
++	default 14779 if MACH_SUN8I_V3S || MACH_SUN8I_S3
+ 	default 3881979 if MACH_SUNXI_H3_H5 || MACH_SUN8I_R40 || MACH_SUN50I_H6
+ 	default 4145117 if MACH_SUN9I
+ 	default 3881915 if MACH_SUN50I
+@@ -813,6 +833,7 @@ config VIDEO_SUNXI
+ 	depends on !MACH_SUNXI_H3_H5
+ 	depends on !MACH_SUN8I_R40
+ 	depends on !MACH_SUN8I_V3S
++	depends on !MACH_SUN8I_S3
+ 	depends on !MACH_SUN9I
+ 	depends on !MACH_SUN50I
+ 	depends on !SUN50I_GEN_H6
+diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
+index 9b84132e..d4c5c889 100644
+--- a/arch/arm/mach-sunxi/board.c
++++ b/arch/arm/mach-sunxi/board.c
+@@ -124,7 +124,7 @@ static int gpio_init(void)
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(9), SUN8I_A83T_GPB_UART0);
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(10), SUN8I_A83T_GPB_UART0);
+ 	sunxi_gpio_set_pull(SUNXI_GPB(10), SUNXI_GPIO_PULL_UP);
+-#elif CONFIG_CONS_INDEX == 1 && defined(CONFIG_MACH_SUN8I_V3S)
++#elif CONFIG_CONS_INDEX == 1 && (defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3))
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(8), SUN8I_V3S_GPB_UART0);
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(9), SUN8I_V3S_GPB_UART0);
+ 	sunxi_gpio_set_pull(SUNXI_GPB(9), SUNXI_GPIO_PULL_UP);
+diff --git a/arch/arm/mach-sunxi/cpu_info.c b/arch/arm/mach-sunxi/cpu_info.c
+index ba33ef24..9e0c4ae9 100644
+--- a/arch/arm/mach-sunxi/cpu_info.c
++++ b/arch/arm/mach-sunxi/cpu_info.c
+@@ -91,6 +91,8 @@ int print_cpuinfo(void)
+ 	printf("CPU:   Allwinner R40 (SUN8I %04x)\n", sunxi_get_sram_id());
+ #elif defined CONFIG_MACH_SUN8I_V3S
+ 	printf("CPU:   Allwinner V3s (SUN8I %04x)\n", sunxi_get_sram_id());
++#elif defined CONFIG_MACH_SUN8I_S3
++	printf("CPU:   Allwinner S3 (SUN8I %04x)\n", sunxi_get_sram_id());
+ #elif defined CONFIG_MACH_SUN9I
+ 	puts("CPU:   Allwinner A80 (SUN9I)\n");
+ #elif defined CONFIG_MACH_SUN50I
+diff --git a/arch/arm/mach-sunxi/dram_sunxi_dw.c b/arch/arm/mach-sunxi/dram_sunxi_dw.c
+index 9107b114..614e0744 100644
+--- a/arch/arm/mach-sunxi/dram_sunxi_dw.c
++++ b/arch/arm/mach-sunxi/dram_sunxi_dw.c
+@@ -790,6 +790,22 @@ static void mctl_auto_detect_dram_size(uint16_t socid, struct dram_para *para)
+ 	   0,  0,  0,  0,  0,  0,  0,  0,			\
+ 	   0,  0,  0,  0,  0,  0,  0      }
+ 
++#define SUN8I_S3_DX_READ_DELAYS					\
++	{{  8,  8,  8,  8,  8,  8,  8,  8,  8,  0,  0 },	\
++	 {  7,  7,  7,  7,  7,  7,  7,  7,  7,  0,  0 },	\
++	 {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },	\
++	 {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }}
++#define SUN8I_S3_DX_WRITE_DELAYS				\
++	{{  0,  0,  0,  0,  0,  0,  0,  0,  0,  4,  4 },	\
++	 {  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  2 },	\
++	 {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 },	\
++	 {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }}
++#define SUN8I_S3_AC_DELAYS					\
++	{  0,  0,  0,  0,  0,  0,  0,  0,			\
++	   0,  0,  0,  0,  0,  0,  0,  0,			\
++	   0,  0,  0,  0,  0,  0,  0,  0,			\
++	   0,  0,  0,  0,  0,  0,  0      }
++
+ #define SUN8I_R40_DX_READ_DELAYS				\
+ 	{{ 14, 14, 14, 14, 14, 14, 14, 14, 14,  0,  0 },	\
+ 	 { 14, 14, 14, 14, 14, 14, 14, 14, 14,  0,  0 },	\
+@@ -871,6 +887,10 @@ unsigned long sunxi_dram_init(void)
+ 		.dx_read_delays  = SUN8I_V3S_DX_READ_DELAYS,
+ 		.dx_write_delays = SUN8I_V3S_DX_WRITE_DELAYS,
+ 		.ac_delays	 = SUN8I_V3S_AC_DELAYS,
++#elif defined(CONFIG_MACH_SUN8I_S3)
++		.dx_read_delays  = SUN8I_S3_DX_READ_DELAYS,
++		.dx_write_delays = SUN8I_S3_DX_WRITE_DELAYS,
++		.ac_delays	 = SUN8I_S3_AC_DELAYS,
+ #elif defined(CONFIG_MACH_SUN8I_R40)
+ 		.dx_read_delays  = SUN8I_R40_DX_READ_DELAYS,
+ 		.dx_write_delays = SUN8I_R40_DX_WRITE_DELAYS,
+@@ -896,6 +916,8 @@ unsigned long sunxi_dram_init(void)
+ 	uint16_t socid = SOCID_R40;
+ #elif defined(CONFIG_MACH_SUN8I_V3S)
+ 	uint16_t socid = SOCID_V3S;
++#elif defined(CONFIG_MACH_SUN8I_S3)
++	uint16_t socid = SOCID_S3;
+ #elif defined(CONFIG_MACH_SUN50I)
+ 	uint16_t socid = SOCID_A64;
+ #elif defined(CONFIG_MACH_SUN50I_H5)
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 21651a1b..2b061c3e 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -46,6 +46,7 @@
+ #include <spl.h>
+ #include <sy8106a.h>
+ #include <asm/setup.h>
++#include <splash.h>
+ 
+ #if defined CONFIG_VIDEO_LCD_PANEL_I2C && !(defined CONFIG_SPL_BUILD)
+ /* So that we can use pin names in Kconfig and sunxi_name_to_gpio() */
+@@ -104,7 +105,8 @@ void i2c_init_board(void)
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPH(14), SUN6I_GPH_TWI0);
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPH(15), SUN6I_GPH_TWI0);
+ 	clock_twi_onoff(0, 1);
+-#elif defined(CONFIG_MACH_SUN8I_V3S)
++#elif defined(CONFIG_MACH_SUN8I_V3S) || \
++	  defined(CONFIG_MACH_SUN8I_S3)
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(6), SUN8I_V3S_GPB_TWI0);
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(7), SUN8I_V3S_GPB_TWI0);
+ 	clock_twi_onoff(0, 1);
+@@ -1055,3 +1057,41 @@ int board_fit_config_name_match(const char *name)
+ 	return ret;
+ }
+ #endif
++
++#ifdef CONFIG_SPLASH_SCREEN
++static struct splash_location sunxi_splash_locations[] = {
++	{
++		.name = "mmc0_fs",
++		.storage = SPLASH_STORAGE_MMC,
++		.flags = SPLASH_STORAGE_FS,
++		.devpart = "0:1",
++	},
++	{
++		.name = "mmc1_fs",
++		.storage = SPLASH_STORAGE_MMC,
++		.flags = SPLASH_STORAGE_FS,
++		.devpart = "1:1",
++	},
++};
++
++int splash_screen_prepare(void)
++{
++	return splash_source_load(sunxi_splash_locations,
++				  ARRAY_SIZE(sunxi_splash_locations));
++}
++
++int initr_env_dynamic_default(void)
++{
++	uint boot = sunxi_get_boot_device();
++	switch (boot) {
++		case BOOT_DEVICE_MMC1:
++			env_set("splashsource", "mmc0_fs");
++			break;
++		case BOOT_DEVICE_MMC2:
++			env_set("splashsource", "mmc1_fs");
++			break;
++	}
++	return 0;
++}
++
++#endif
+diff --git a/common/board_r.c b/common/board_r.c
+index 3f824047..51caa72d 100644
+--- a/common/board_r.c
++++ b/common/board_r.c
+@@ -709,6 +709,9 @@ static init_fnc_t init_sequence_r[] = {
+ 	initr_pvblock,
+ #endif
+ 	initr_env,
++#ifdef CONFIG_ENV_DYNAMIC_DEFAULT
++	initr_env_dynamic_default,
++#endif
+ #ifdef CONFIG_SYS_BOOTPARAMS_LEN
+ 	initr_malloc_bootparams,
+ #endif
+diff --git a/configs/allwinner_s3_generic_defconfig b/configs/allwinner_s3_generic_defconfig
+new file mode 100644
+index 00000000..7ff342ae
+--- /dev/null
++++ b/configs/allwinner_s3_generic_defconfig
+@@ -0,0 +1,54 @@
++CONFIG_ARM=y
++CONFIG_ARCH_SUNXI=y
++CONFIG_MACH_SUN8I_S3=y
++
++CONFIG_DEFAULT_DEVICE_TREE="sun8i-s3-generic"
++CONFIG_SPL=y
++CONFIG_CMD_BOOTMENU=y
++CONFIG_CMD_MEMINFO=y
++CONFIG_BOOTDELAY=0
++
++CONFIG_NETDEVICES=y
++CONFIG_SUN8I_EMAC=y
++CONFIG_NET_RANDOM_ETHADDR=y
++
++CONFIG_DM_SPI=y
++CONFIG_SUNXI_SPI=y
++
++CONFIG_MMC=y
++CONFIG_MMC_SUNXI_SLOT_EXTRA=2
++CONFIG_MMC0_CD_PIN="PF6"
++
++CONFIG_CMD_BMP=y
++CONFIG_VIDEO_BPP8=y
++CONFIG_VIDEO_SIMPLE=y
++CONFIG_VIDEO_DT_SIMPLEFB=y
++
++CONFIG_DM_REGULATOR=y
++CONFIG_REGULATOR_PWM=y
++CONFIG_DM_PWM=y
++CONFIG_PWM_SUNXI=y
++CONFIG_BACKLIGHT_PWM=y
++
++CONFIG_USB_GADGET_VBUS_DRAW=250
++
++CONFIG_USB_MUSB_GADGET=y
++CONFIG_USB_MUSB_SUNXI=y
++CONFIG_USB_MUSB_DISABLE_BULK_COMBINE_SPLIT=y
++CONFIG_USB_MUSB_PIO_ONLY=y
++CONFIG_USB_STORAGE=y
++
++CONFIG_PHY=y
++CONFIG_PHY_SUN4I_USB=y
++
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_OHCI_GENERIC=y
++
++CONFIG_CMD_USB_MASS_STORAGE=y
++
++CONFIG_CMD_FASTBOOT=y
++CONFIG_FASTBOOT_FLASH_MMC=y
++CONFIG_FASTBOOT_FLASH_MMC_DEV=1
++CONFIG_FASTBOOT_CMD_OEM_FORMAT=y
+\ No newline at end of file
+diff --git a/drivers/clk/sunxi/Kconfig b/drivers/clk/sunxi/Kconfig
+index bf084fa7..e5466f67 100644
+--- a/drivers/clk/sunxi/Kconfig
++++ b/drivers/clk/sunxi/Kconfig
+@@ -52,11 +52,11 @@ config CLK_SUN8I_R40
+ 	  on Allwinner R40 SoC.
+ 
+ config CLK_SUN8I_V3S
+-	bool "Clock driver for Allwinner V3S"
+-	default MACH_SUN8I_V3S
++	bool "Clock driver for Allwinner V3S/S3"
++	default MACH_SUN8I_V3S || MACH_SUN8I_S3
+ 	help
+ 	  This enables common clock driver support for platforms based
+-	  on Allwinner V3S SoC.
++	  on Allwinner V3S/S3 SoC.
+ 
+ config CLK_SUN9I_A80
+ 	bool "Clock driver for Allwinner A80"
+diff --git a/drivers/clk/sunxi/clk_v3s.c b/drivers/clk/sunxi/clk_v3s.c
+index 29622199..931108df 100644
+--- a/drivers/clk/sunxi/clk_v3s.c
++++ b/drivers/clk/sunxi/clk_v3s.c
+@@ -17,16 +17,22 @@ static struct ccu_clk_gate v3s_gates[] = {
+ 	[CLK_BUS_MMC0]		= GATE(0x060, BIT(8)),
+ 	[CLK_BUS_MMC1]		= GATE(0x060, BIT(9)),
+ 	[CLK_BUS_MMC2]		= GATE(0x060, BIT(10)),
++	[CLK_BUS_EMAC]		= GATE(0x060, BIT(17)),
+ 	[CLK_BUS_SPI0]		= GATE(0x060, BIT(20)),
+ 	[CLK_BUS_OTG]		= GATE(0x060, BIT(24)),
++	[CLK_BUS_EHCI0]		= GATE(0x060, BIT(26)),
++	[CLK_BUS_OHCI0]		= GATE(0x060, BIT(29)),
+ 
+ 	[CLK_BUS_UART0]		= GATE(0x06c, BIT(16)),
+ 	[CLK_BUS_UART1]		= GATE(0x06c, BIT(17)),
+ 	[CLK_BUS_UART2]		= GATE(0x06c, BIT(18)),
+ 
++	[CLK_BUS_EPHY]		= GATE(0x070, BIT(0)),
++
+ 	[CLK_SPI0]		= GATE(0x0a0, BIT(31)),
+ 
+-	[CLK_USB_PHY0]          = GATE(0x0cc, BIT(8)),
++	[CLK_USB_PHY0] 		= GATE(0x0cc, BIT(8)),
++	[CLK_USB_OHCI0]		= GATE(0x0cc, BIT(16)),
+ };
+ 
+ static struct ccu_reset v3s_resets[] = {
+@@ -35,8 +41,13 @@ static struct ccu_reset v3s_resets[] = {
+ 	[RST_BUS_MMC0]		= RESET(0x2c0, BIT(8)),
+ 	[RST_BUS_MMC1]		= RESET(0x2c0, BIT(9)),
+ 	[RST_BUS_MMC2]		= RESET(0x2c0, BIT(10)),
++	[RST_BUS_EMAC]		= RESET(0x2c0, BIT(17)),
+ 	[RST_BUS_SPI0]		= RESET(0x2c0, BIT(20)),
+ 	[RST_BUS_OTG]		= RESET(0x2c0, BIT(24)),
++	[RST_BUS_EHCI0]		= RESET(0x2c0, BIT(26)),
++	[RST_BUS_OHCI0]		= RESET(0x2c0, BIT(29)),
++
++	[RST_BUS_EPHY]		= RESET(0x2c8, BIT(2)),
+ 
+ 	[RST_BUS_UART0]		= RESET(0x2d8, BIT(16)),
+ 	[RST_BUS_UART1]		= RESET(0x2d8, BIT(17)),
+diff --git a/drivers/mmc/sunxi_mmc.c b/drivers/mmc/sunxi_mmc.c
+index 3503ccdb..8d3a1058 100644
+--- a/drivers/mmc/sunxi_mmc.c
++++ b/drivers/mmc/sunxi_mmc.c
+@@ -632,7 +632,7 @@ static int sunxi_mmc_probe(struct udevice *dev)
+ 	cfg->b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
+ 
+ 	cfg->f_min = 400000;
+-	cfg->f_max = 52000000;
++	cfg->f_max = dev_read_u32_default(dev, "max-speed", 52000000);
+ 
+ 	priv->reg = (void *)dev_read_addr(dev);
+ 
+diff --git a/drivers/net/sun8i_emac.c b/drivers/net/sun8i_emac.c
+index d7553fe1..9fd40c8a 100644
+--- a/drivers/net/sun8i_emac.c
++++ b/drivers/net/sun8i_emac.c
+@@ -10,6 +10,8 @@
+  *
+ */
+ 
++#define DEBUG
++
+ #include <cpu_func.h>
+ #include <log.h>
+ #include <asm/cache.h>
+@@ -63,6 +65,7 @@
+ #define RX_TOTAL_BUFSIZE	(CONFIG_ETH_BUFSIZE * CONFIG_RX_DESCR_NUM)
+ 
+ #define H3_EPHY_DEFAULT_VALUE	0x58000
++#define V3S_EPHY_DEFAULT_VALUE  0x38000
+ #define H3_EPHY_DEFAULT_MASK	GENMASK(31, 15)
+ #define H3_EPHY_ADDR_SHIFT	20
+ #define REG_PHY_ADDR_MASK	GENMASK(4, 0)
+@@ -145,6 +148,7 @@ enum emac_variant {
+ 	A64_EMAC,
+ 	R40_GMAC,
+ 	H6_EMAC,
++	V3S_EMAC,
+ };
+ 
+ struct emac_dma_desc {
+@@ -311,7 +315,7 @@ static u32 sun8i_emac_set_syscon_ephy(struct emac_eth_dev *priv, u32 reg)
+ 		 * needs to be configured and powered up before use
+ 		*/
+ 		reg &= ~H3_EPHY_DEFAULT_MASK;
+-		reg |=  H3_EPHY_DEFAULT_VALUE;
++		reg |=  ((priv->variant == V3S_EMAC) ? V3S_EPHY_DEFAULT_VALUE :  H3_EPHY_DEFAULT_VALUE);
+ 		reg |= priv->phyaddr << H3_EPHY_ADDR_SHIFT;
+ 		reg &= ~H3_EPHY_SHUTDOWN;
+ 		return reg | H3_EPHY_SELECT;
+@@ -347,6 +351,7 @@ static int sun8i_emac_set_syscon(struct sun8i_eth_pdata *pdata,
+ 	reg &= ~(SC_ETCS_MASK | SC_EPIT);
+ 	if (priv->variant == H3_EMAC ||
+ 	    priv->variant == A64_EMAC ||
++		priv->variant == V3S_EMAC ||
+ 	    priv->variant == H6_EMAC)
+ 		reg &= ~SC_RMII_EN;
+ 
+@@ -363,6 +368,7 @@ static int sun8i_emac_set_syscon(struct sun8i_eth_pdata *pdata,
+ 	case PHY_INTERFACE_MODE_RMII:
+ 		if (priv->variant == H3_EMAC ||
+ 		    priv->variant == A64_EMAC ||
++			priv->variant == V3S_EMAC ||
+ 		    priv->variant == H6_EMAC) {
+ 			reg |= SC_RMII_EN | SC_ETCS_EXT_GMII;
+ 		break;
+@@ -570,6 +576,8 @@ static int parse_phy_pins(struct udevice *dev)
+ 		iomux = SUN8I_IOMUX;
+ 	else if (IS_ENABLED(CONFIG_MACH_SUN50I))
+ 		iomux = SUN8I_IOMUX;
++	else if (IS_ENABLED(CONFIG_MACH_SUN8I_V3S) || IS_ENABLED(CONFIG_MACH_SUN8I_S3))
++		iomux = SUN8I_IOMUX;
+ 	else
+ 		BUILD_BUG_ON_MSG(1, "missing pinmux value for Ethernet pins");
+ 
+@@ -960,7 +968,7 @@ static int sun8i_emac_eth_of_to_plat(struct udevice *dev)
+ 		return -EINVAL;
+ 	}
+ 
+-	if (priv->variant == H3_EMAC) {
++	if (priv->variant == H3_EMAC || priv->variant == V3S_EMAC) {
+ 		ret = sun8i_handle_internal_phy(dev, priv);
+ 		if (ret)
+ 			return ret;
+@@ -1011,6 +1019,8 @@ static const struct udevice_id sun8i_emac_eth_ids[] = {
+ 		.data = (uintptr_t)A83T_EMAC },
+ 	{.compatible = "allwinner,sun8i-r40-gmac",
+ 		.data = (uintptr_t)R40_GMAC },
++	{.compatible = "allwinner,sun8i-v3s-emac",
++	    .data = (uintptr_t)V3S_EMAC },
+ 	{.compatible = "allwinner,sun50i-h6-emac",
+ 		.data = (uintptr_t)H6_EMAC },
+ 	{ }
+diff --git a/drivers/pwm/sunxi_pwm.c b/drivers/pwm/sunxi_pwm.c
+index e3d5ee45..745d6d56 100644
+--- a/drivers/pwm/sunxi_pwm.c
++++ b/drivers/pwm/sunxi_pwm.c
+@@ -49,6 +49,9 @@ static int sunxi_pwm_config_pinmux(void)
+ {
+ #ifdef CONFIG_MACH_SUN50I
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPD(22), SUNXI_GPD_PWM);
++#endif
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
++	sunxi_gpio_set_cfgpin(SUNXI_GPB(4), SUN4I_GPB_PWM);
+ #endif
+ 	return 0;
+ }
+diff --git a/drivers/usb/musb-new/musb_core.c b/drivers/usb/musb-new/musb_core.c
+index 22811a5e..6101449e 100644
+--- a/drivers/usb/musb-new/musb_core.c
++++ b/drivers/usb/musb-new/musb_core.c
+@@ -1880,6 +1880,7 @@ allocate_instance(struct device *dev,
+ 
+ 	musb->controller = dev;
+ 
++	musb->dyn_fifo = config->dyn_fifo;
+ 	return musb;
+ }
+ 
+diff --git a/drivers/video/sunxi/sunxi_de2.c b/drivers/video/sunxi/sunxi_de2.c
+index e02d359c..0effde79 100644
+--- a/drivers/video/sunxi/sunxi_de2.c
++++ b/drivers/video/sunxi/sunxi_de2.c
+@@ -24,12 +24,21 @@
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
++enum {
++	/* Maximum LCD size we support */
++	LCD_MAX_WIDTH		= 1024,
++	LCD_MAX_HEIGHT		= 768,
++	LCD_MAX_LOG2_BPP	= VIDEO_BPP32,
++};
++#else
+ enum {
+ 	/* Maximum LCD size we support */
+ 	LCD_MAX_WIDTH		= 3840,
+ 	LCD_MAX_HEIGHT		= 2160,
+ 	LCD_MAX_LOG2_BPP	= VIDEO_BPP32,
+ };
++#endif
+ 
+ static void sunxi_de2_composer_init(void)
+ {
+@@ -45,12 +54,19 @@ static void sunxi_de2_composer_init(void)
+ 	writel(reg_value, SUNXI_SRAMC_BASE + 0x04);
+ #endif
+ 
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
++	unsigned int hz = 300000000;
++	int pll = clock_get_pll6() * 2;
++	int div = 1;
++	while ((pll / div) > hz)
++		div++;
++	writel(CCM_DE2_CTRL_GATE | CCM_DE2_CTRL_PLL6_2X | CCM_DE2_CTRL_M(div), &ccm->de_clk_cfg);
++#else
+ 	clock_set_pll10(432000000);
+-
+ 	/* Set DE parent to pll10 */
+ 	clrsetbits_le32(&ccm->de_clk_cfg, CCM_DE2_CTRL_PLL_MASK,
+ 			CCM_DE2_CTRL_PLL10);
+-
++#endif
+ 	/* Set ahb gating to pass */
+ 	setbits_le32(&ccm->ahb_reset1_cfg, 1 << AHB_RESET_OFFSET_DE);
+ 	setbits_le32(&ccm->ahb_gate1, 1 << AHB_GATE_OFFSET_DE);
+@@ -75,7 +91,7 @@ static void sunxi_de2_mode_set(int mux, const struct display_timing *mode,
+ 	struct de_ui * const de_ui_regs =
+ 		(struct de_ui *)(de_mux_base +
+ 				 SUNXI_DE2_MUX_CHAN_REGS +
+-				 SUNXI_DE2_MUX_CHAN_SZ * 1);
++				 SUNXI_DE2_MUX_CHAN_SZ * SUNXI_DE2_MUX_CHAN_SZ_COUNT);
+ 	struct de_csc * const de_csc_regs =
+ 		(struct de_csc *)(de_mux_base +
+ 				  SUNXI_DE2_MUX_DCSC_REGS);
+@@ -109,7 +125,7 @@ static void sunxi_de2_mode_set(int mux, const struct display_timing *mode,
+ 
+ 	writel(0x00000101, &de_bld_regs->fcolor_ctl);
+ 
+-	writel(1, &de_bld_regs->route);
++	writel(SUNXI_DE2_BLD_ROUTE, &de_bld_regs->route);
+ 
+ 	writel(0, &de_bld_regs->premultiply);
+ 	writel(0xff000000, &de_bld_regs->bkcolor);
+diff --git a/drivers/video/sunxi/sunxi_dw_hdmi.c b/drivers/video/sunxi/sunxi_dw_hdmi.c
+index 19ed80b4..06d065e3 100644
+--- a/drivers/video/sunxi/sunxi_dw_hdmi.c
++++ b/drivers/video/sunxi/sunxi_dw_hdmi.c
+@@ -378,6 +378,8 @@ U_BOOT_DRIVER(sunxi_dw_hdmi) = {
+ 	.priv_auto	= sizeof(struct sunxi_dw_hdmi_priv),
+ };
+ 
++#if !defined(CONFIG_MACH_SUN8I_V3S) && !defined(CONFIG_MACH_SUN8I_S3)
+ U_BOOT_DRVINFO(sunxi_dw_hdmi) = {
+ 	.name = "sunxi_dw_hdmi"
+ };
++#endif
+diff --git a/drivers/video/sunxi/sunxi_lcd.c b/drivers/video/sunxi/sunxi_lcd.c
+index 7a9eba1e..8ebd60ab 100644
+--- a/drivers/video/sunxi/sunxi_lcd.c
++++ b/drivers/video/sunxi/sunxi_lcd.c
+@@ -26,7 +26,7 @@ struct sunxi_lcd_priv {
+ 
+ static void sunxi_lcdc_config_pinmux(void)
+ {
+-#ifdef CONFIG_MACH_SUN50I
++#if defined(CONFIG_MACH_SUN50I) || defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
+ 	int pin;
+ 
+ 	for (pin = SUNXI_GPD(0); pin <= SUNXI_GPD(21); pin++) {
+@@ -146,7 +146,7 @@ U_BOOT_DRIVER(sunxi_lcd) = {
+ 	.priv_auto	= sizeof(struct sunxi_lcd_priv),
+ };
+ 
+-#ifdef CONFIG_MACH_SUN50I
++#if defined(CONFIG_MACH_SUN50I) || defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
+ U_BOOT_DRVINFO(sunxi_lcd) = {
+ 	.name = "sunxi_lcd"
+ };
+diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
+index 9e37e996..e08a6666 100644
+--- a/include/configs/sunxi-common.h
++++ b/include/configs/sunxi-common.h
+@@ -137,12 +137,12 @@
+ #define CONFIG_SYS_MMC_MAX_DEVICE	4
+ #endif
+ 
+-#ifndef CONFIG_MACH_SUN8I_V3S
+-/* 64MB of malloc() pool */
+-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (64 << 20))
+-#else
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
+ /* 2MB of malloc() pool */
+ #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (2 << 20))
++#else
++/* 64MB of malloc() pool */
++#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (64 << 20))
+ #endif
+ 
+ /*
+@@ -252,20 +252,8 @@ extern int soft_i2c_gpio_scl;
+ #define RAMDISK_ADDR_R    __stringify(SDRAM_OFFSET(FF00000))
+ 
+ #else
+-/*
+- * 160M RAM (256M minimum minus 64MB heap + 32MB for u-boot, stack, fb, etc.
+- * 32M uncompressed kernel, 16M compressed kernel, 1M fdt,
+- * 1M script, 1M pxe, 1M dt overlay and the ramdisk at the end.
+- */
+-#ifndef CONFIG_MACH_SUN8I_V3S
+-#define BOOTM_SIZE        __stringify(0xa000000)
+-#define KERNEL_ADDR_R     __stringify(SDRAM_OFFSET(2000000))
+-#define FDT_ADDR_R        __stringify(SDRAM_OFFSET(3000000))
+-#define SCRIPT_ADDR_R     __stringify(SDRAM_OFFSET(3100000))
+-#define PXEFILE_ADDR_R    __stringify(SDRAM_OFFSET(3200000))
+-#define FDTOVERLAY_ADDR_R __stringify(SDRAM_OFFSET(3300000))
+-#define RAMDISK_ADDR_R    __stringify(SDRAM_OFFSET(3400000))
+-#else
++
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
+ /*
+  * 64M RAM minus 2MB heap + 16MB for u-boot, stack, fb, etc.
+  * 16M uncompressed kernel, 8M compressed kernel, 1M fdt,
+@@ -278,6 +266,18 @@ extern int soft_i2c_gpio_scl;
+ #define PXEFILE_ADDR_R    __stringify(SDRAM_OFFSET(1A00000))
+ #define FDTOVERLAY_ADDR_R __stringify(SDRAM_OFFSET(1B00000))
+ #define RAMDISK_ADDR_R    __stringify(SDRAM_OFFSET(1C00000))
++#else
++/*
++ * 160M RAM (256M minimum minus 64MB heap + 32MB for u-boot, stack, fb, etc.
++ * 32M uncompressed kernel, 16M compressed kernel, 1M fdt,
++ * 1M script, 1M pxe and the ramdisk at the end.
++ */
++#define BOOTM_SIZE     __stringify(0xa000000)
++#define KERNEL_ADDR_R  __stringify(SDRAM_OFFSET(2000000))
++#define FDT_ADDR_R     __stringify(SDRAM_OFFSET(3000000))
++#define SCRIPT_ADDR_R  __stringify(SDRAM_OFFSET(3100000))
++#define PXEFILE_ADDR_R __stringify(SDRAM_OFFSET(3200000))
++#define RAMDISK_ADDR_R __stringify(SDRAM_OFFSET(3300000))
+ #endif
+ #endif
+ 
+@@ -393,6 +393,14 @@ extern int soft_i2c_gpio_scl;
+ 
+ #include <config_distro_bootcmd.h>
+ 
++#ifdef CONFIG_CMD_FASTBOOT
++#define FASTBOOT_SETTINGS \
++	"boot_targets=fel mmc_auto usb0 fastboot\0" \
++	"bootcmd_fastboot=fastboot usb 0\0" 
++#else
++#define FASTBOOT_SETTINGS
++#endif
++
+ #ifdef CONFIG_USB_KEYBOARD
+ #define CONSOLE_STDIN_SETTINGS \
+ 	"stdin=serial,usbkbd\0"
+@@ -402,6 +410,19 @@ extern int soft_i2c_gpio_scl;
+ #endif
+ 
+ #ifdef CONFIG_DM_VIDEO
++#define CONFIG_VIDEO_BMP_RLE8
++#define CONFIG_BMP_16BPP
++#define CONFIG_BMP_24BPP
++#define CONFIG_BMP_32BPP
++#define CONFIG_SPLASH_SCREEN
++#define CONFIG_SPLASH_SOURCE
++#define SPLASHIMAGE_ENV_SETTINGS "splashimage=" __stringify(SDRAM_OFFSET(2000000)) "\0"
++#define CONFIG_ENV_DYNAMIC_DEFAULT
++#else
++#define SPLASHIMAGE_ENV_SETTINGS
++#endif
++
++#if CONFIG_DM_VIDEO && !defined(CONFIG_SPLASH_SCREEN)
+ #define CONSOLE_STDOUT_SETTINGS \
+ 	"stdout=serial,vidconsole\0" \
+ 	"stderr=serial,vidconsole\0"
+@@ -425,11 +446,18 @@ extern int soft_i2c_gpio_scl;
+ #define SUNXI_MTDPARTS_DEFAULT
+ #endif
+ 
++#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
++#define PARTS_DEFAULT \
++	"name=loader,start=8k,size=1024k;" \
++	"name=esp,size=16M,bootable,uuid=${uuid_gpt_esp};" \
++	"name=system,size=-,uuid=${uuid_gpt_system};"
++#else
+ #define PARTS_DEFAULT \
+ 	"name=loader1,start=8k,size=32k,uuid=${uuid_gpt_loader1};" \
+ 	"name=loader2,size=984k,uuid=${uuid_gpt_loader2};" \
+ 	"name=esp,size=128M,bootable,uuid=${uuid_gpt_esp};" \
+ 	"name=system,size=-,uuid=${uuid_gpt_system};"
++#endif
+ 
+ #define UUID_GPT_ESP "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
+ 
+@@ -451,6 +479,7 @@ extern int soft_i2c_gpio_scl;
+ 
+ #define CONFIG_EXTRA_ENV_SETTINGS \
+ 	CONSOLE_ENV_SETTINGS \
++	SPLASHIMAGE_ENV_SETTINGS \
+ 	MEM_LAYOUT_ENV_SETTINGS \
+ 	MEM_LAYOUT_ENV_EXTRA_SETTINGS \
+ 	DFU_ALT_INFO_RAM \
+@@ -462,7 +491,8 @@ extern int soft_i2c_gpio_scl;
+ 	"uuid_gpt_system=" UUID_GPT_SYSTEM "\0" \
+ 	"partitions=" PARTS_DEFAULT "\0" \
+ 	BOOTCMD_SUNXI_COMPAT \
+-	BOOTENV
++	BOOTENV \
++	FASTBOOT_SETTINGS
+ 
+ #else /* ifndef CONFIG_SPL_BUILD */
+ #define CONFIG_EXTRA_ENV_SETTINGS
+diff --git a/include/init.h b/include/init.h
+index fd51d7f9..80af2fca 100644
+--- a/include/init.h
++++ b/include/init.h
+@@ -270,6 +270,7 @@ int set_cpu_clk_info(void);
+ int update_flash_size(int flash_size);
+ int arch_early_init_r(void);
+ int misc_init_r(void);
++int initr_env_dynamic_default(void);
+ #if defined(CONFIG_VID)
+ int init_func_vid(void);
+ #endif
+diff --git a/scripts/config_whitelist.txt b/scripts/config_whitelist.txt
+index 3dbcc042..7a087750 100644
+--- a/scripts/config_whitelist.txt
++++ b/scripts/config_whitelist.txt
+@@ -370,6 +370,7 @@ CONFIG_ENV_ADDR_FLEX
+ CONFIG_ENV_CALLBACK_LIST_DEFAULT
+ CONFIG_ENV_CALLBACK_LIST_STATIC
+ CONFIG_ENV_COMMON_BOOT
++CONFIG_ENV_DYNAMIC_DEFAULT
+ CONFIG_ENV_EEPROM_IS_ON_I2C
+ CONFIG_ENV_FLAGS_LIST_DEFAULT
+ CONFIG_ENV_FLAGS_LIST_STATIC

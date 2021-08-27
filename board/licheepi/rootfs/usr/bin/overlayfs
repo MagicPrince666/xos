@@ -2,17 +2,17 @@
 #
 # Mounting OverlayFS...
 #
-
+blok = /dev/mmcblk0p3
 init_sys()
 {
-    mount -n -t ext4 /dev/mmcblk0p3 -o rw,noatime /overlay
+    mount -n -t ext4 $blok -o rw,noatime /overlay
     ret=$?
     echo "ret:$ret"
     if [ $ret -ne 0 ];then
-        echo "Start format /dev/mmcblk0p3"
-        mkfs.ext4 /dev/mmcblk0p3
-        mount -n -t ext4 /dev/mmcblk0p3 -o rw,noatime /overlay
-        echo "Format & mount /dev/mmcblk0p3 success"
+        echo "Start format $blok"
+        mkfs.ext4 $blok
+        mount -n -t ext4 $blok -o rw,noatime /overlay
+        echo "Format & mount $blok success"
     fi
 
         mkdir -p /overlay/upper /overlay/work

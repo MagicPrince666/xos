@@ -404,7 +404,7 @@
 &mmc0 {
 	pinctrl-0 = <&mmc0_pins_a>;
 	pinctrl-names = "default";
-	broken-cd;
+	cd-gpios = <&pio 5 6 GPIO_ACTIVE_LOW>; /* PF6 */
 	bus-width = <4>;
 	vmmc-supply = <&reg_vcc3v3>;
 	status = "okay";
@@ -465,21 +465,83 @@
     pinctrl-0 = <&spi0_pins>;
     status = "okay";
 
-	flash: spinand@0 {
+	spi-nor@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "winbond,w25q128", "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
+		status = "disabled";
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x70000>;
+				read-only;
+			};
+
+			partition@1 {
+				label = "kernel";
+				reg = <0x70000 0x590000>;
+				read-only;
+			};
+
+			partition@2 {
+				label = "rom";
+				reg = <0x600000 0x700000>;
+				read-only;
+			};
+
+			partition@3 {
+				label = "overlay";
+				reg = <0xd00000 0x300000>;
+			};
+		};
+	};
+
+	spi-nand@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "spi-nand";
 		reg = <0>;
-		spi-max-frequency = <100000000>;
+		spi-max-frequency = <50000000>;
 
-		boot@0 {
-			label = "boot";
-			reg = <0x0000000 0x0100000>;
-		};
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
 
-		ubi0@100000 {
-			label = "ubi0";
-			reg = <0x0100000 0x0000000>;
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x100000>;
+				read-only;
+			};
+
+			partition@1 {
+				label = "kernel";
+				reg = <0x100000 0x500000>;
+				read-only;
+			};
+
+			partition@2 {
+				label = "rom";
+				reg = <0x600000 0x2a00000>;
+				read-only;
+			};
+
+			partition@3 {
+				label = "vendor";
+				reg = <0x3000000 0x1000000>;
+			};
+
+			partition@4 {
+				label = "overlay";
+				reg = <0x4000000 0x3000000>;
+			};
 		};
 	};
 };
@@ -561,4 +623,37 @@
 	"MIC1",
 	"Mic",
 	"HBIAS";
+};
+
+&lradc {
+	vref-supply = <&reg_vcc3v0>;
+	status = "okay";
+
+	button-200 {
+		label = "Volume Up";
+		linux,code = <KEY_VOLUMEUP>;
+		channel = <0>;
+		voltage = <200000>;
+	};
+
+	button-400 {
+		label = "Volume Down";
+		linux,code = <KEY_VOLUMEDOWN>;
+		channel = <0>;
+		voltage = <400000>;
+	};
+
+	button-600 {
+		label = "Select";
+		linux,code = <KEY_SELECT>;
+		channel = <0>;
+		voltage = <600000>;
+	};
+
+	button-800 {
+		label = "Start";
+		linux,code = <KEY_OK>;
+		channel = <0>;
+		voltage = <800000>;
+	};
 };
