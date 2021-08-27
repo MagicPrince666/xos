@@ -197,11 +197,14 @@
 };
 
 &usb_otg {
+	phys = <&usbphy>;
+    extcon = <&usbphy>;
 	dr_mode = "otg";
 	status = "okay";
 };
 
 &usbphy {
+	#phy-cells = <0>;
 	usb0_id_det-gpio = <&pio 5 6 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 };
