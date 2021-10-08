@@ -222,12 +222,11 @@
 };
 
 &pio {
-
 	spi0_pins: spi0-pins {
 		pins = "PC0", "PC1", "PC2", "PC3";
 		function = "spi0";
 		drive-strength = <10>;
 		bias-disable;
 	};
-	
+
 };
