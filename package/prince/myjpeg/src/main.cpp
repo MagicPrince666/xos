@@ -236,8 +236,10 @@ int main(int argc, char **argv)
 	/* 4.设置解压参数，比如放大、缩小(需要设置连个参数：scale_num, scale_denom)
 	 * 缩放因子：scale_num/scale_denom，下面的设置为缩小1/2
 	 */
-	printf("enter M/N:\n");
-	scanf("%d/%d",&cinfo.scale_num, &cinfo.scale_denom);
+	// printf("enter M/N:\n");
+	// scanf("%d/%d",&cinfo.scale_num, &cinfo.scale_denom);
+       cinfo.scale_num = 1;
+       cinfo.scale_denom = 7;
 	printf("scale to : %d/%d\n", cinfo.scale_num, cinfo.scale_denom);
 
 	/*  5.启动解压：jpeg_start_decompress(...) */
