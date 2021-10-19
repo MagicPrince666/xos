@@ -25,4 +25,4 @@ cd "${STARTDIR}/"
 board/widora/mangopi/card/scripts/mknanduboot.sh ${1}/${2} ${1}/u-boot-sunxi-with-nand-spl.bin
 support/scripts/genimage.sh ${1} -c board/widora/mangopi/card/genimage-sdcard.cfg
 support/scripts/genimage.sh ${1} -c board/widora/mangopi/card/genimage-nor.cfg
-support/scripts/genimage.sh ${1} -c board/widora/mangopi/card/genimage-nand-hx8347.cfg
+support/scripts/genimage.sh ${1} -c board/widora/mangopi/card/genimage-nand.cfg

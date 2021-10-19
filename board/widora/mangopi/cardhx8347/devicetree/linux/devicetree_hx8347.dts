@@ -34,6 +34,8 @@
 
 		brightness-levels = <0 4 8 16 32 64 128 255>;
 		default-brightness-level = <6>;
+		post-pwm-on-delay-ms = <10>;
+		pwm-off-delay-ms = <10>;
 		status = "okay";
 	};
 };

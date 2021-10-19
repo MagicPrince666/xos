@@ -36,8 +36,8 @@ BR2_TARGET_UBOOT_USE_CUSTOM_CONFIG=y
 BR2_TARGET_UBOOT_SPL_NAME="u-boot-sunxi-with-spl.bin"
 BR2_TARGET_UBOOT_PATCH="board/allwinner/suniv-f1c100s/patch/u-boot"
 
-BR2_TARGET_UBOOT_CUSTOM_CONFIG_FILE="board/widora/mangopi/card/uboot.defconfig"
-BR2_TARGET_UBOOT_CUSTOM_DTS_PATH="board/allwinner/suniv-f1c100s/devicetree/uboot/suniv-f1c100s.dtsi board/widora/mangopi/card/devicetree/uboot/suniv-f1c100s-generic.dts"
+BR2_TARGET_UBOOT_CUSTOM_CONFIG_FILE="board/widora/mangopi/cardhx8347/uboot.defconfig"
+BR2_TARGET_UBOOT_CUSTOM_DTS_PATH="board/allwinner/suniv-f1c100s/devicetree/uboot/suniv-f1c100s.dtsi board/widora/mangopi/cardhx8347/devicetree/uboot/suniv-f1c100s-generic.dts"
 
 # Kernel
 BR2_LINUX_KERNEL=y
@@ -48,8 +48,8 @@ BR2_LINUX_KERNEL_DTS_SUPPORT=y
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_PATCH="board/allwinner/suniv-f1c100s/patch/linux"
 
-BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/widora/mangopi/card/linux.defconfig"
-BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="board/allwinner/suniv-f1c100s/devicetree/linux/suniv-f1c100s.dtsi board/widora/mangopi/card/devicetree/linux/devicetree_hx8347.dts"
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="board/widora/mangopi/cardhx8347/linux.defconfig"
+BR2_LINUX_KERNEL_CUSTOM_DTS_PATH="board/allwinner/suniv-f1c100s/devicetree/linux/suniv-f1c100s.dtsi board/widora/mangopi/cardhx8347/devicetree/linux/devicetree_hx8347.dts"
 
 # Filesystem
 BR2_TARGET_ROOTFS_CPIO=y
@@ -59,10 +59,10 @@ BR2_TARGET_ROOTFS_SQUASHFS4_GZIP=y
 BR2_PACKAGE_HOST_DOSFSTOOLS=y
 BR2_PACKAGE_HOST_GENIMAGE=y
 BR2_PACKAGE_HOST_MTOOLS=y
-BR2_ROOTFS_POST_IMAGE_SCRIPT="board/widora/mangopi/card/scripts/genimage.sh"
+BR2_ROOTFS_POST_IMAGE_SCRIPT="board/widora/mangopi/cardhx8347/scripts/genimage.sh"
 BR2_ROOTFS_POST_SCRIPT_ARGS="${BR2_TARGET_UBOOT_SPL_NAME}"
 
-BR2_ROOTFS_OVERLAY="board/allwinner/generic/rootfs board/allwinner/suniv-f1c100s/rootfs board/widora/mangopi/card/rootfs"
+BR2_ROOTFS_OVERLAY="board/allwinner/generic/rootfs board/allwinner/suniv-f1c100s/rootfs board/widora/mangopi/cardhx8347/rootfs"
 
 # Target Config
 BR2_PACKAGE_UTIL_LINUX_UUIDD=y
