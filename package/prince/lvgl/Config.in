@@ -1,0 +1,5 @@
+config BR2_PACKAGE_LVGL
+	bool "lvgl"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  LVGL configured to work with /dev/fb0 on Linux.
