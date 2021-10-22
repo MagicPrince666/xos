@@ -239,7 +239,7 @@ int main(int argc, char **argv)
 	// printf("enter M/N:\n");
 	// scanf("%d/%d",&cinfo.scale_num, &cinfo.scale_denom);
        cinfo.scale_num = 1;
-       cinfo.scale_denom = 7;
+       cinfo.scale_denom = 18;
 	printf("scale to : %d/%d\n", cinfo.scale_num, cinfo.scale_denom);
 
 	/*  5.启动解压：jpeg_start_decompress(...) */
