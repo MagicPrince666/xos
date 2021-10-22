@@ -9,7 +9,7 @@
 #include <string.h>
 #include <linux/fb.h>
 #include <stdlib.h>
-
+#include <unistd.h>
 
 #define FB_DEVICE_NAME  "/dev/fb0"
 #define DBG_PRINTF      printf
@@ -204,10 +204,10 @@ int main(int argc, char **argv)
 	unsigned char *buffer;
 
 	/* fb 设备初始化 */
-	if (0 != FBDeviceInit())
+	while (0 != FBDeviceInit())
 	{
 		DBG_PRINTF("FBDeviceInit error\n");
-		return -1;
+		sleep(1);
 	}
 
 	/* 清屏 */
@@ -239,7 +239,7 @@ int main(int argc, char **argv)
 	// printf("enter M/N:\n");
 	// scanf("%d/%d",&cinfo.scale_num, &cinfo.scale_denom);
        cinfo.scale_num = 1;
-       cinfo.scale_denom = 18;
+       cinfo.scale_denom = 1;
 	printf("scale to : %d/%d\n", cinfo.scale_num, cinfo.scale_denom);
 
 	/*  5.启动解压：jpeg_start_decompress(...) */

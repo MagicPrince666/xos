@@ -147,6 +147,7 @@ static void fill_screen(struct fb_info *fb_info)
 	fb_put_string(fb_info, w / 3 * 2, 30, "RED", 3, 0xffffff, 1, 3);
 	fb_put_string(fb_info, w / 3, 30, "GREEN", 5, 0xffffff, 1, 5);
 	fb_put_string(fb_info, 20, 30, "BLUE", 4, 0xffffff, 1, 4);
+	fb_put_string(fb_info, 20, 50, "Huangliquan", 4, 0xffffff, 1, 4);
 }
 
 void fill_screen_solid(struct fb_info *fb_info, unsigned int color)

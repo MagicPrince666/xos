@@ -3,7 +3,7 @@ TARGET	= mp4player
 DIR		= . 
 INC		= -I. 
 CFLAGS	= -Wall
-LDFLAGS = -lpthread -lSDL2 -lavformat -lavcodec -lavutil -lswscale -lswresample
+LDFLAGS = -lpthread -lavformat -lavcodec -lavutil -lswscale -lswresample
 
 OBJPATH	= .
 

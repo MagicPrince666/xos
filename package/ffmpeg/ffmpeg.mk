@@ -250,6 +250,13 @@ else
 FFMPEG_CONF_OPTS += --disable-libopenh264
 endif
 
+ifeq ($(BR2_PACKAGE_LIBCEDARC_DECODER),y)
+FFMPEG_CONF_OPTS += --enable-omx
+FFMPEG_DEPENDENCIES += libcedarc
+else
+FFMPEG_CONF_OPTS += --disable-omx
+endif
+
 ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
 FFMPEG_DEPENDENCIES += libvorbis
 FFMPEG_CONF_OPTS += \
