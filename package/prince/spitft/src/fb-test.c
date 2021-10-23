@@ -34,8 +34,6 @@
 
 #include "common.h"
 
-static struct fb_info fb_info;
-
 static void draw_pixel(struct fb_info *fb_info, int x, int y, unsigned color)
 {
 	void *fbmem;
@@ -199,6 +197,7 @@ void show_help(void)
 
 int main(int argc, char **argv)
 {
+	struct fb_info fb_info;
 	int opt;
 	int req_fb = 0;
 	int req_pattern = 0;
