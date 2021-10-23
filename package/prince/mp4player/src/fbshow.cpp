@@ -9,7 +9,7 @@
 #include <linux/fb.h>
 #include <stdlib.h>
 
-#include "fbrgb565.h"
+#include "fbshow.h"
 
 #define FB_DEVICE_NAME  "/dev/fb0"
 #define DBG_PRINTF      printf
@@ -182,43 +182,4 @@ static int FBShowLine(u_int32_t iXStart, u_int32_t iXEnd, u_int32_t iY, unsigned
 
 	return 0;
 }
-
-void Yuv420p2Rgb32(const u_int8_t *yuvBuffer_in, const u_int8_t *rgbBuffer_out, int width, int height)
-{
-    u_int8_t *yuvBuffer = (u_int8_t *)yuvBuffer_in;
-    u_int8_t *rgb32Buffer = (u_int8_t *)rgbBuffer_out;
-
-    int channels = 3;
-
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            int index = y * width + x;
-
-            int indexY = y * width + x;
-            int indexU = width * height + y / 2 * width / 2 + x / 2;
-            int indexV = width * height + width * height / 4 + y / 2 * width / 2 + x / 2;
-
-            u_int8_t Y = yuvBuffer[indexY];
-            u_int8_t U = yuvBuffer[indexU];
-            u_int8_t V = yuvBuffer[indexV];
-
-            int R = Y + 1.402 * (V - 128);
-            int G = Y - 0.34413 * (U - 128) - 0.71414*(V - 128);
-            int B = Y + 1.772*(U - 128);
-            R = (R < 0) ? 0 : R;
-            G = (G < 0) ? 0 : G;
-            B = (B < 0) ? 0 : B;
-            R = (R > 255) ? 255 : R;
-            G = (G > 255) ? 255 : G;
-            B = (B > 255) ? 255 : B;
-
-            rgb32Buffer[(y*width + x)*channels + 2] = u_int8_t(R);
-            rgb32Buffer[(y*width + x)*channels + 1] = u_int8_t(G);
-            rgb32Buffer[(y*width + x)*channels + 0] = u_int8_t(B);
-        }
-    }
-}
-
 

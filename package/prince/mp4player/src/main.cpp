@@ -24,7 +24,7 @@ extern "C"
 };
 #endif
 
-#include "fbrgb565.h"
+#include "fbshow.h"
 
 #define FF_INPUT_BUFFER_PADDING_SIZE 16
 
