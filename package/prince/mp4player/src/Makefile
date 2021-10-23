@@ -1,8 +1,8 @@
 TARGET	= mp4player
 
 DIR		= . 
-INC		= -I. 
-CFLAGS	= -Wall
+INC		= -I. -I./include
+CFLAGS	= -Wall -O2
 LDFLAGS = -lpthread -lavformat -lavcodec -lavutil -lswscale -lswresample
 
 OBJPATH	= .

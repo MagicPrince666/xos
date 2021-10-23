@@ -40,12 +40,12 @@
 LcdRgb::LcdRgb(int fb_num)
 {
 	char str[64];
-	int fd,tty;
+	int fd = -1;
 	fb_info_ = new fb_info;
-	tty = open("/dev/tty1", O_RDWR);
+	//int tty = open("/dev/tty1", O_RDWR);
 
-	if(ioctl(tty, KDSETMODE, KD_GRAPHICS) == -1)
-		printf("Failed to set graphics mode on tty1\n");
+	// if(ioctl(tty, KDSETMODE, KD_GRAPHICS) == -1)
+	// 	printf("Failed to set graphics mode on tty1\n");
 
 	sprintf(str, "/dev/fb%d", fb_num);
 	fd = open(str, O_RDWR);
@@ -96,9 +96,9 @@ void LcdRgb::fb_put_char(int x, int y, char c,
 		unsigned color)
 {
 	int i, j, bits, loc;
-	unsigned char *p8;
-	unsigned short *p16;
-	unsigned int *p32;
+	uint8_t *p8;
+	uint16_t *p16;
+	uint32_t *p32;
 	struct fb_var_screeninfo *var = &fb_info_->var;
 	struct fb_fix_screeninfo *fix = &fb_info_->fix;
 
@@ -150,61 +150,51 @@ void LcdRgb::draw_pixel(int x, int y, unsigned color)
 	void *fbmem;
 
 	fbmem = fb_info_->ptr;
-	if (fb_info_->var.bits_per_pixel == 8) {
-		uint8_t *p;
-
-		fbmem += fb_info_->fix.line_length * y;
-
-		p = (uint8_t*)fbmem;
-
-		p += x;
-
-		*p = color;
-	} else if (fb_info_->var.bits_per_pixel == 16) {
-		unsigned short c;
-		unsigned r = (color >> 16) & 0xff;
-		unsigned g = (color >> 8) & 0xff;
-		unsigned b = (color >> 0) & 0xff;
-		uint16_t *p;
-
-		r = r * 32 / 256;
-		g = g * 64 / 256;
-		b = b * 32 / 256;
-
-		c = (r << 11) | (g << 5) | (b << 0);
-
-		fbmem += fb_info_->fix.line_length * y;
-
-		p = (uint16_t*)fbmem;
-
-		p += x;
-
-		*p = c;
-	} else if (fb_info_->var.bits_per_pixel == 24) {
-		 unsigned char *p;
-
-		p = (unsigned char *)fbmem + fb_info_->fix.line_length * y + 3 * x;
-		*p++ = color;
-		*p++ = color >> 8;
-		*p = color >> 16;
-	} else {
-		uint32_t *p;
-
-		fbmem += fb_info_->fix.line_length * y;
-
-		p = (uint32_t*)fbmem;
-
-		p += x;
-
-		*p = color;
+	switch(fb_info_->var.bits_per_pixel) {
+		case 8 : {
+			uint8_t *p;
+			fbmem += fb_info_->fix.line_length * y;
+			p = (uint8_t*)fbmem;
+			p += x;
+			*p = color;
+		} break;
+		case 16 : {
+			unsigned short c;
+			unsigned r = (color >> 16) & 0xff;
+			unsigned g = (color >> 8) & 0xff;
+			unsigned b = (color >> 0) & 0xff;
+			uint16_t *p;
+			r = r * 32 / 256;
+			g = g * 64 / 256;
+			b = b * 32 / 256;
+			c = (r << 11) | (g << 5) | (b << 0);
+			fbmem += fb_info_->fix.line_length * y;
+			p = (uint16_t*)fbmem;
+			p += x;
+			*p = c;
+		} break;
+		case 24 : {
+			unsigned char *p;
+			p = (unsigned char *)fbmem + fb_info_->fix.line_length * y + 3 * x;
+			*p++ = color;
+			*p++ = color >> 8;
+			*p = color >> 16;
+		} break;
+		default: {
+			uint32_t *p;
+			fbmem += fb_info_->fix.line_length * y;
+			p = (uint32_t*)fbmem;
+			p += x;
+			*p = color;
+		} break;
 	}
 }
 
-void LcdRgb::fill_screen_solid(unsigned int color)
+void LcdRgb::fill_screen_solid(uint32_t color)
 {
-	unsigned x, y;
-	unsigned h = fb_info_->var.yres;
-	unsigned w = fb_info_->var.xres;
+	uint32_t x, y;
+	uint32_t h = fb_info_->var.yres;
+	uint32_t w = fb_info_->var.xres;
 
 	for (y = 0; y < h; y++) {
 		for (x = 0; x < w; x++)

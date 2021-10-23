@@ -21,6 +21,7 @@
 #define __COMMON_H__
 
 #include <stdio.h>
+#include <stdint.h>
 #include <linux/fb.h>
 
 #define STRINGIFY(x) #x
@@ -46,7 +47,7 @@ struct fb_info
 
 	struct fb_var_screeninfo var;
 	struct fb_fix_screeninfo fix;
-	unsigned bytespp;
+	uint32_t bytespp;
 };
 
 class LcdRgb {
@@ -55,15 +56,15 @@ public:
 	~LcdRgb();
 	void fb_update_window(int fd, short x, short y, short w, short h);
 	void fb_sync_gfx(int fd);
-	void fill_screen_solid(unsigned int color);
+	void fill_screen_solid(uint32_t color);
 	int fb_put_string(int x, int y, char *s, int maxlen,
 			int color, int clear, int clearlen);
 
 private:
-	void draw_pixel(int x, int y, unsigned color);
+	void draw_pixel(int x, int y, uint32_t color);
 	void fb_clear_area(int x, int y, int w, int h);
 	void fb_put_char(int x, int y, char c,
-		unsigned color);
+		uint32_t color);
 
 	struct fb_info* fb_info_;
 };

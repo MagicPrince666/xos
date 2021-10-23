@@ -12,7 +12,7 @@ extern "C"
 
 #include "decoder.h"
 
-void Decoder::H264ToRGB(unsigned char* data, unsigned int dataSize, unsigned char* outBuffer)
+void Decoder::H264ToRGB(uint8_t *data, uint32_t dataSize, uint8_t *outBuffer)
 {
     // 1. 将元数据装填到packet
     AVPacket* avPkt = av_packet_alloc();
@@ -218,7 +218,7 @@ int Decoder::Yuv2Rgb(FILE *yuvFile,FILE * rgbFile) {
 	return 0;
 }
 
-void Decoder::Mjpeg2RGB(unsigned char *data, unsigned int dataSize, unsigned char *outBuffer)
+void Decoder::Mjpeg2RGB(uint8_t *data, uint32_t dataSize, uint8_t *outBuffer)
 {   
     // 1. 将元数据装填到packet
     AVPacket *avPkt = av_packet_alloc();
