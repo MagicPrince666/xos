@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
 	LcdRgb lcd(0);
 	lcd.fill_screen_solid(0x0000ff);
-	lcd.fb_put_string(0, 0, (char*)title.c_str(), title.size(), 0xffffff, 1, title.size());
+	lcd.fb_put_string(30, 0, (char*)title.c_str(), title.size(), 0xffffff, 0, title.size());
 
 	//Decoder::H264ToRGB(buff, fsize, outBuffer);
 

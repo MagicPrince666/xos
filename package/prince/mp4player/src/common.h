@@ -58,7 +58,7 @@ public:
 	void fb_sync_gfx(int fd);
 	void fill_screen_solid(uint32_t color);
 	int fb_put_string(int x, int y, char *s, int maxlen,
-			int color, int clear, int clearlen);
+			int color, bool clear, int clearlen);
 
 private:
 	void draw_pixel(int x, int y, uint32_t color);

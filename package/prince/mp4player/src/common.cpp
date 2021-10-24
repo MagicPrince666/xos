@@ -129,7 +129,7 @@ void LcdRgb::fb_put_char(int x, int y, char c,
 }
 
 int LcdRgb::fb_put_string(int x, int y, char *s, int maxlen,
-		int color, int clear, int clearlen)
+		int color, bool clear, int clearlen)
 {
 	int i;
 	int w = 0;
