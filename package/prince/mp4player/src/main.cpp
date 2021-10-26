@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
 	ConverterRGB24 converter;
 	disable_logging();
 	std::FILE* fp = nullptr;
-	if (argc > 2) {
+	if (argc >= 2) {
 		fp = std::fopen(argv[1], "rb");
 		if (!fp) {
 			fprintf(stderr, "cannot open file %s\n", argv[1]);

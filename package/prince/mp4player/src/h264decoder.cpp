@@ -99,7 +99,7 @@ const AVFrame& H264Decoder::decode_frame()
   int got_picture = 0;
   int nread = avcodec_decode_video2(context, frame, &got_picture, pkt);
   if (nread < 0 || got_picture == 0)
-    throw H264DecodeFailure("error decoding frame\n");
+    throw H264DecodeFailure("error decoding frame");
   return *frame;
 #endif
 }
