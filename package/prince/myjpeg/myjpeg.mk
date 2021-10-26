@@ -25,6 +25,7 @@ endef
 define MYJPEG_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/myjpeg $(TARGET_DIR)/usr/bin
     $(INSTALL) -D -m 0755 $(@D)/S82showpic $(TARGET_DIR)/etc/init.d
+    $(INSTALL) -D -m 0755 $(@D)/pictrue.jpg $(TARGET_DIR)/root
 endef
 
 define MYJPEG_PERMISSIONS
