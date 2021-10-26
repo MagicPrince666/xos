@@ -91,6 +91,7 @@
 		compatible = "spi-nand";
 		reg = <0>;
 		spi-max-frequency = <50000000>;
+		status = "okay";
 
 		partitions {
 			compatible = "fixed-partitions";
@@ -116,13 +117,13 @@
 			};
 
 			partition@3 {
-				label = "vendor";
+				label = "overlay";
 				reg = <0x3000000 0x1000000>;
 			};
 
 			partition@4 {
-				label = "overlay";
-				reg = <0x4000000 0x3000000>;
+				label = "udisk";
+				reg = <0x4000000 0x4000000>;
 			};
 		};
 	};
@@ -159,35 +160,6 @@
 &ion {
 	status = "okay";
 };
-
-// &de {
-// 	status = "okay";
-// };
-
-// &fe0 {
-// 	status = "okay";
-// };
-
-// &be0 {
-// 	status = "okay";
-// };
-
-// &tve0 {
-// 	status = "okay";
-// };
-
-// &tcon0 {
-// 	pinctrl-names = "default";
-// 	pinctrl-0 = <&lcd_rgb565_pins>;
-// 	status = "okay";
-// };
-
-// &tcon0_out {
-// 	tcon0_out_lcd: endpoint@0 {
-// 		reg = <0>;
-// 		remote-endpoint = <&panel_input>;
-// 	};
-// };
 
 &codec {
 	allwinner,audio-routing =
