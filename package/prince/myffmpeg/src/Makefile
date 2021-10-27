@@ -1,4 +1,4 @@
-TARGET	= mp4player
+TARGET	= mp4play
 
 DIR		= . 
 INC		= -I. -I./include
