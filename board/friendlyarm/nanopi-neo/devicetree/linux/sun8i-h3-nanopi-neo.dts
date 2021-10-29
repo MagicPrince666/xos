@@ -55,7 +55,7 @@
 	};
 
 	chosen {
-		stdout-path = "serial1:115200n8";
+		stdout-path = "serial0:115200n8";
 		/delete-node/ framebuffer@0;
 	};
 
@@ -74,6 +74,12 @@
 			default-state = "on";
 			linux,default-trigger = "timer";
 		};
+
+		blk {
+			label = "backlight";
+			gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
 	};
 
 	gpio-keys {
@@ -82,21 +88,7 @@
 		#size-cells = <0>;
 		autorepeat;
 
-		switch@1 {
-			label = "key1";
-			linux,code = <101>;
-			interrupt-parent = <&pio>;
-			interrupts = <0 2 IRQ_TYPE_EDGE_BOTH>;//PA2
-		};
-
-		switch@2 {
-			label = "key2";
-			linux,code = <102>;
-			interrupt-parent = <&pio>;
-			interrupts = <0 3 IRQ_TYPE_EDGE_BOTH>;//PA3
-		};
-
-		switch@3 {
+		switch@0 {
 			label = "key3";
 			linux,code = <103>;
 			interrupt-parent = <&pio>;
@@ -105,18 +97,12 @@
 	};
 
 	backlight: backlight {
-/*
-		compatible = "pwm-backlight";
-		pwms = <&pwm 0 50000 PWM_POLARITY_INVERTED>;
-		enable-gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>;
-
-		brightness-levels = <0 1 2 4 8 16 32 64 128 255>;
-		default-brightness-level = <9>;
-*/
 		compatible = "gpio-backlight";
-		gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>;
-		default-on;
-		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&backlight_pins>;
+
+		gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>; /* PG 9 */
+		backlight-boot-on;
 	};
 };
 
@@ -150,23 +136,25 @@
 		reg = <0>;
 		status = "okay";
 		spi-max-frequency = <50000000>;
-		rotate = <270>;
+		rotate = <90>;
 		bgr;
 		fps = <30>;
 		buswidth = <8>;
 		reset-gpios = <&pio 6 8 GPIO_ACTIVE_LOW>; //PG8
 		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>;//PA1
 		debug = <0>;
-		backlight = <&backlight>;
+//		backlight = <&backlight>;
 	};
 
 	tsc2046@1 {
 		reg = <1>;	/* CS1 */
 		compatible = "ti,tsc2046";
+		pinctrl-names = "default";
+		pinctrl-0 = <&t_irq>;
 		interrupt-parent = <&pio>;
-		interrupts = <0 2 IRQ_TYPE_LEVEL_LOW>;	//PA2
-		spi-max-frequency = <1000000>;
-		pendown-gpio = <&pio 0 2 GPIO_ACTIVE_LOW>;
+		interrupts = <0 2 IRQ_TYPE_EDGE_FALLING>;	//PA2
+		spi-max-frequency = <2500000>;
+		pendown-gpio = <&pio 0 2 GPIO_ACTIVE_HIGH>;
 		vcc-supply = <&reg_vcc3v3>;
 
 		ti,x-min = /bits/ 16 <0>;
@@ -184,7 +172,7 @@
 	phy-handle = <&int_mii_phy>;
 	phy-mode = "mii";
 	allwinner,leds-active-low;
-	local-mac-address = [a4 51 29 00 00 06];
+	local-mac-address = [a4 51 29 00 00 07];
 	status = "okay";
 };
 
@@ -207,13 +195,23 @@
 		function = "spi0";
    };
 
-   spi0_pins_cs1: spi0_pins_cs1 {
+	spi0_pins_cs1: spi0_pins_cs1 {
 		pins = "PC3", "PA3";
 		function = "gpio_out";
 	};
 
-   uart1_pins: uart1-pins {
+	uart1_pins: uart1-pins {
 		pins = "PG6", "PG7";
 		function = "uart1";
+	};
+
+	backlight_pins: backlight-pins {
+		pins = "PG9";
+		function = "gpio_out";
+	};
+
+	t_irq: t_irq-pins {
+		pins = "PA2";
+		function = "gpio_in";
 	};
 };
