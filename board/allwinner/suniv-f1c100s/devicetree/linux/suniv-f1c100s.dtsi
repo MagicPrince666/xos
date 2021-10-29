@@ -44,6 +44,7 @@
 			compatible = "arm,arm926ej-s";
 			reg = <0x0>;
 			clocks = <&ccu CLK_CPU>;
+			assigned-clock-rates = <528000000>;
 		};
 	};
 

@@ -63,21 +63,21 @@ CONFIG_LZO=y
 CONFIG_LZMA=y
 
 # ENV
-CONFIG_ENV_IS_IN_FAT=y
-# CONFIG_ENV_IS_IN_UBI=n
-# CONFIG_ENV_UBI_PART="ubi0"
-# CONFIG_ENV_UBI_VOLUME="ubootenv"
-# CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
+CONFIG_ENV_IS_IN_FAT=n
+CONFIG_ENV_IS_IN_UBI=y
+CONFIG_ENV_UBI_PART="ubi0"
+CONFIG_ENV_UBI_VOLUME="ubootenv"
+CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
 CONFIG_ENV_IS_NOWHERE=y
 CONFIG_USE_DEFAULT_ENV_FILE=n
 CONFIG_DEFAULT_ENV_FILE="../../../board/licheepi/uboot.env"
 
 # BOOT
-# CONFIG_MTDIDS_DEFAULT="spi-nand0=0"
-# CONFIG_MTDPARTS_DEFAULT="mtdparts=0:1M(boot),-(ubi0)"
-# CONFIG_BOOTCOMMAND="ubifsmount ubi0:kernel; ubifsload $kernel_addr_r uImage; ubifsload $fdt_addr_r dtb; bootm 0x41000000 - 0x41800000"
-# CONFIG_USE_BOOTARGS=y
-# CONFIG_BOOTARGS="console=ttyS0,115200 earlyprintk panic=5 rootwait ubi.mtd=1,2048 rootfstype=ubifs root=ubi0:rootfs rw"
+CONFIG_MTDIDS_DEFAULT="spi-nand0=0"
+CONFIG_MTDPARTS_DEFAULT="mtdparts=0:1M(boot),-(ubi0)"
+CONFIG_BOOTCOMMAND="ubifsmount ubi0:kernel; ubifsload $kernel_addr_r zImage; ubifsload $fdt_addr_r dtb; bootz 0x41000000 - 0x41800000"
+CONFIG_USE_BOOTARGS=y
+CONFIG_BOOTARGS="console=ttyS1,115200 earlyprintk panic=5 rootwait ubi.mtd=1,2048 rootfstype=ubifs root=ubi0:rootfs rw"
 
 ### NOR
 ## SPI
