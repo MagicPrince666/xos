@@ -3,7 +3,7 @@ TARGET	= mp4play
 DIR		= . 
 INC		= -I. -I./include
 CFLAGS	= -Wall -O2
-LDFLAGS = -lpthread -lavformat -lavcodec -lavutil -lswscale -lswresample #-lavdevice -lavfilter -lavresample
+LDFLAGS = -lpthread -lavformat -lavcodec -lavutil -lswscale
 
 OBJPATH	= .
 
