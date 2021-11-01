@@ -516,31 +516,8 @@
 			#size-cells = <1>;
 
 			partition@0 {
-				label = "u-boot";
-				reg = <0x000000 0x100000>;
-				read-only;
-			};
-
-			partition@1 {
-				label = "kernel";
-				reg = <0x100000 0x500000>;
-				read-only;
-			};
-
-			partition@2 {
-				label = "rom";
-				reg = <0x600000 0x2a00000>;
-				read-only;
-			};
-
-			partition@3 {
-				label = "vendor";
-				reg = <0x3000000 0x1000000>;
-			};
-
-			partition@4 {
-				label = "overlay";
-				reg = <0x4000000 0x3000000>;
+				label = "spi-nand";
+				reg = <0x000000 0x8000000>;
 			};
 		};
 	};
