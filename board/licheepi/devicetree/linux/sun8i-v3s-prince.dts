@@ -296,7 +296,7 @@
 };
 
 &panel {
-	compatible = "urt,umsh-8596md-t", "simple-panel";
+	compatible = "qiaodian,qd43003c0-40", "simple-panel";
 	status = "okay";
 };
 
@@ -531,12 +531,6 @@
 	rtp@48 {
 		compatible = "ti,tsc2007";
 		reg = <0x48>;
-		interrupt-parent = <&pio>;
-		interrupts = <4 12 IRQ_TYPE_EDGE_FALLING>;
-		gpios = <&pio 4 12 GPIO_ACTIVE_LOW>;
-		pendown-gpio = <&pio 4 12 GPIO_ACTIVE_LOW>;
-		ti,x-plate-ohms = <660>;
-		wakeup-source;
 		status = "okay";
 	};
 
@@ -547,6 +541,7 @@
 		interrupts = <4 12 IRQ_TYPE_EDGE_FALLING>; // PE12
 		irq-gpios = <&pio 4 12 GPIO_ACTIVE_HIGH>; // PE12
 		reset-gpios = <&pio 0 0 GPIO_ACTIVE_HIGH>; // PA0
+		status = "disabled";
 	};
 };
 
