@@ -1,0 +1,26 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		printf "Init pwm "
+		echo 1 > /sys/class/pwm/pwmchip0/export
+		echo 200000 > /sys/class/pwm/pwmchip0/pwm1/period
+		echo 100000 > /sys/class/pwm/pwmchip0/pwm1/duty_cycle
+		echo 1 > /sys/class/pwm/pwmchip0/pwm1/enable
+		echo 0 > /sys/class/leds/en/brightness
+		echo 0 > /sys/class/leds/dir/brightness
+		;;
+	stop)
+		printf "Stop moto"
+		echo 1 > /sys/class/leds/en/brightness
+		;;
+	restart|reload)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac
+
+exit 0
