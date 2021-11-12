@@ -62,16 +62,7 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
-
-//		simplefb_lcd: framebuffer-lcd0 {
-//			compatible = "allwinner,simple-framebuffer",
-//				     "simple-framebuffer";
-//			allwinner,pipeline = "de_be0-lcd0";
-//			clocks = <&ccu CLK_BUS_DE_BE>, <&ccu CLK_DE_BE>,
-//				 <&ccu CLK_DRAM_DE_BE>, <&ccu CLK_BUS_LCD>,
-//				 <&ccu CLK_TCON>;
-//			status = "disabled";
-//		};
+		/delete-node/ framebuffer@0;
 	};
 
 	leds {

@@ -101,6 +101,19 @@
 		};
 	};
 
+	soc {
+		r_pwm: pwm@1f03800 {
+			compatible = "allwinner,sun50i-a64-pwm",
+				     "allwinner,sun5i-a13-pwm";
+			reg = <0x01f03800 0x400>;
+			clocks = <&osc24M>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&r_pwm_pin>;
+			#pwm-cells = <3>;
+			status = "disabled";
+		};
+	};
+
 	r-gpio-keys {
 		compatible = "gpio-keys";
 
@@ -129,6 +142,41 @@
 		enable-active-high;
 		gpio = <&r_pio 0 2 GPIO_ACTIVE_HIGH>; /* PL2 */
 		status = "okay";
+	};
+
+	i2c {
+		compatible = "i2c-gpio";
+		sda-gpios = <&pio 4 13 GPIO_ACTIVE_HIGH>;
+		scl-gpios = <&pio 4 12 GPIO_ACTIVE_HIGH>;
+		i2c-gpio,delay-us = <5>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ov5640: camera@3c {
+			compatible = "ovti,ov5640";
+			reg = <0x3c>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&csi_mclk_pin>;
+			clocks = <&ccu CLK_CSI_MCLK>;
+			clock-names = "xclk";
+
+			//AVDD-supply = <&reg_aldo1>;
+			//DOVDD-supply = <&reg_dldo3>;
+			//DVDD-supply = <&reg_eldo3>;
+			reset-gpios = <&pio 4 14 GPIO_ACTIVE_LOW>; /* CSI-RST-R: PE14 */
+			powerdown-gpios = <&pio 4 15 GPIO_ACTIVE_HIGH>; /* CSI-STBY-R: PE15 */
+
+			port {
+				ov5640_ep: endpoint {
+					remote-endpoint = <&csi_ep>;
+					bus-width = <8>;
+					hsync-active = <1>; /* Active high */
+					vsync-active = <0>; /* Active low */
+					data-active = <1>;  /* Active high */
+					pclk-sample = <1>;  /* Rising */
+				};
+			};
+		};
 	};
 /*
 	backlight: backlight {
@@ -324,11 +372,44 @@
 		function = "pwm0";
 	};
 
+	r_pwm_pin: r-pwm-pin {
+		pins = "PL10";
+		function = "s_pwm";
+	};
+
 	backlight_pins: backlight_pins {
 		pins = "PC4";
 		function = "gpio_out";
 	};
+
+	csi_pins: csi-pins {
+		pins = "PE0", "PE2", "PE3", "PE4", "PE5", "PE6",
+				"PE7", "PE8", "PE9", "PE10", "PE11";
+		function = "csi";
+	};
+
+	/omit-if-no-ref/
+	csi_mclk_pin: csi-mclk-pin {
+		pins = "PE1";
+		function = "csi";
+	};
 };
+
+&csi {
+	status = "okay";
+
+	port {
+		csi_ep: endpoint {
+			remote-endpoint = <&ov5640_ep>;
+			bus-width = <8>;
+			hsync-active = <1>; /* Active high */
+			vsync-active = <0>; /* Active low */
+			data-active = <1>;  /* Active high */
+			pclk-sample = <1>;  /* Rising */
+		};
+	};
+};
+
 /*
 &pwm {
 	pinctrl-names = "default";
@@ -346,12 +427,10 @@
 	status = "okay";
 
 	spidev@0 {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		status = "okay";
-		compatible = "rohm,dh2228fv";
+		compatible = "spidev";
 		reg = <0>;
 		spi-max-frequency = <1000000>;
+		status = "okay";
 	};
 
 	ili9341@0 {
