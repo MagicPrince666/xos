@@ -6,19 +6,12 @@
 #include <getopt.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <linux/types.h>
-#include <linux/spi/spidev.h>
+#include <iostream>
 
 #include "spi.h"
 
-#include <iostream>
-
-static const char *device = "/dev/spidev1.0";
-static uint8_t mode = 0; /* SPI通信使用全双工，设置CPOL＝0，CPHA＝0。 */
-static uint8_t bits = 8; /* 8ｂiｔｓ读写，MSB first。*/
-static uint32_t speed = 2 * 1000 * 1000;/* 设置12M传输速度 */
-
-Spi::Spi(void)
+Spi::Spi(std::string dev, uint8_t mode, uint8_t bits, uint32_t speed)
+    : spi_dev_(dev), spi_mode_(mode), spi_bits_(bits), spi_speed_(speed)
 {
     std::cout << "spi init" << std::endl;
     SPIOpen();
@@ -46,7 +39,7 @@ static void pabort(const char *s)
 */
 int Spi::SPIWrite(uint8_t *TxBuf, int len)
 {
-    int ret = write(g_SPI_Fd, TxBuf, len);
+    int ret = write(g_SPI_Fd_, TxBuf, len);
 
     if (ret < 0)
         printf("SPI Write error\n");
@@ -65,7 +58,7 @@ int Spi::SPIWrite(uint8_t *TxBuf, int len)
 */
 int Spi::SPIRead(uint8_t *RxBuf, int len)
 {
-    int ret = read(g_SPI_Fd, RxBuf, len);
+    int ret = read(g_SPI_Fd_, RxBuf, len);
 
     if (ret < 0)
         printf("SPI Read errorn\n");
@@ -81,58 +74,58 @@ int Spi::SPIRead(uint8_t *RxBuf, int len)
 * 返回值：0 表示已打开 0XF1 表示SPI已打开 其它出错
 * 开发人员：Lzy 2013－5－22
 */
-int Spi::SPIOpen(void)
+int Spi::SPIOpen()
 {
     int fd;
     int ret = 0;
 
-    if (g_SPI_Fd != 0) /* 设备已打开 */
+    if (g_SPI_Fd_ > 0) /* 设备已打开 */
         return 0xF1;
 
-    fd = open(device, O_RDWR);
+    fd = open(spi_dev_.c_str(), O_RDWR);
 
     if (fd < 0)
         pabort("can't open device");
     else
-        printf("SPI %s - Open Succeed. Start Init SPI...\n",device);
+        printf("SPI %s - Open Succeed. Start Init SPI...\n", spi_dev_.c_str());
 
-    g_SPI_Fd = fd;
+    g_SPI_Fd_ = fd;
     /*
     * spi mode
     */
-    ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
+    ret = ioctl(fd, SPI_IOC_WR_MODE, &spi_mode_);
     if (ret == -1)
         pabort("can't set spi mode");
 
-    ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
+    ret = ioctl(fd, SPI_IOC_RD_MODE, &spi_mode_);
     if (ret == -1)
         pabort("can't get spi mode");
 
     /*
     * bits per word
     */
-    ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
+    ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &spi_bits_);
     if (ret == -1)
         pabort("can't set bits per word");
 
-    ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
+    ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &spi_bits_);
     if (ret == -1)
         pabort("can't get bits per word");
 
     /*
     * max speed hz
     */
-    ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+    ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &spi_speed_);
     if (ret == -1)
         pabort("can't set max speed hz");
 
-    ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
+    ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &spi_speed_);
     if (ret == -1)
         pabort("can't get max speed hz");
 
-    printf("spi mode: %d\n", mode);
-    printf("bits per word: %d\n", bits);
-    printf("max speed: %d KHz (%d MHz)\n", speed / 1000, speed / 1000 / 1000);
+    printf("spi mode: 0x%02X\n", spi_mode_);
+    printf("bits per word: %d\n", spi_bits_);
+    printf("max speed: %d KHz (%d MHz)\n", spi_speed_ / 1000, spi_speed_ / 1000 / 1000);
 
     return ret;
 }
@@ -143,10 +136,10 @@ int Spi::SPIOpen(void)
 */
 int Spi::SPIClose(void)
 {
-    if (g_SPI_Fd == 0) /* SPI是否已经打开*/
+    if (g_SPI_Fd_ == 0) /* SPI是否已经打开*/
         return 0;
 
-    close(g_SPI_Fd);
+    close(g_SPI_Fd_);
 
     return 0;
 }

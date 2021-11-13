@@ -31,15 +31,14 @@ int main(int argc, char *argv[]) {
 
 	signal(SIGINT, sigint_handler);//信号处理
 
-	std::cout << "--- version 1.1 ---" << std::endl;
+	std::cout << "--- version 1.2 ---" << std::endl;
 
 	while(1) {
-
 		key = ps2.PS2_DataKey();
-		if(key != 0)               
-		{
-			if(key > 1)
-				std::cout << "key = " << key << std::endl;
+		if(key != 0) {
+			if(key > 0) {
+				//std::cout << "key = "  << std::hex << key << std::endl;
+			}
 
 			if(key == 12) {
 				ps2.PS2_Vibration(0xFF,0x00);
@@ -50,8 +49,7 @@ int main(int argc, char *argv[]) {
 			} else
 				ps2.PS2_Vibration(0x00,0x00);
 
-			switch(key)
-			{
+			switch(key) {
 				case 5:
 				break;
 				case 7: //moto.servo(1500000);
@@ -72,30 +70,29 @@ int main(int argc, char *argv[]) {
 			speed = (128 - ry)/128 * 1000000;
 			//std::cout << "Speed " << speed << std::endl;
 			//moto.go(speed);
-		}
-		else if(ry > 135) {
+		} else if(ry > 135) {
 			speed = (ry -128)/128 * 1000000;
 			//std::cout << "Speed " << speed << std::endl;
 			//moto.back(speed);
 		} else {
 			//moto.stop();
-			std::cout << "Stop " << std::endl;
+//			std::cout << "Stop " << std::endl;
 		}
 		if(l_lx != lx) {
 			l_lx = lx;
-			std::cout << "LX = "<< lx << std::endl;
+//			std::cout << "LX = " << lx << std::endl;
 		}
 		if(l_ly != ly) {
 			l_ly = ly;
-			std::cout << "LY = "<< ly << std::endl;
+//			std::cout << "LY = " << ly << std::endl;
 		}
 		if(l_rx != rx) {
 			l_rx = rx;
-			std::cout << "RX = "<< rx << std::endl;
+//			std::cout << "RX = " << rx << std::endl;
 		}
 		if(l_ry != ry) {
 			l_ry = ry;
-			std::cout << "RY = "<< ry << std::endl;
+//			std::cout << "RY = " << ry << std::endl;
 		}
 
 		usleep(200000);

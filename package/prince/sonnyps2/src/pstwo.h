@@ -2,14 +2,7 @@
 #define __PSTWO_H
 
 #include <sys/types.h>
-
-#define _USE_GPIO 0
-
-#if _USE_GPIO
-#include "gpio.h"
-#else
 #include "spi.h"
-#endif
 
 //#define PS2_JOYPAD_ACK        gpio_get_value(F1C100S_GPIOA0)
 //#define PS2_JOYPAD_DATA       gpio_get_value(F1C100S_GPIOE10)     //E10 MISO
@@ -63,7 +56,7 @@ public:
 private:
     u_int8_t PS2_RedLight(void);
     void PS2_ReadData(void);
-    void PS2_Cmd(u_int8_t CMD);
+    void PS2_Cmd(uint8_t *cmd, int len);
     void PS2_ClearData(void);
     void PS2_EnterConfing(void);
     void PS2_TurnOnAnalogMode(void);
@@ -77,11 +70,7 @@ private:
     int ps2_att = -1;
     int ps2_clk = -1;
     u_int8_t data;
-#if _USE_GPIO
-    Gpio *gpio_ps2;
-#else
     Spi *spidev;
-#endif
 };
 
 #endif
