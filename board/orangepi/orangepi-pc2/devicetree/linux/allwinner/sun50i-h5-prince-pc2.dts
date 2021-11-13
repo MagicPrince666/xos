@@ -65,6 +65,7 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+		/delete-node/ framebuffer@0;
 	};
 
 	connector {
@@ -110,6 +111,18 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&r_pwm_pin>;
 			#pwm-cells = <3>;
+			status = "disabled";
+		};
+
+		spi1: spi@1c69000 {
+			compatible = "allwinner,sun8i-h3-spi";
+			reg = <0x01c69000 0x1000>;
+			interrupts = <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&ccu CLK_BUS_SPI1>, <&ccu CLK_SPI1>;
+			clock-names = "ahb", "mod";
+			dmas = <&dma 24>, <&dma 24>;
+			dma-names = "rx", "tx";
+			resets = <&ccu RST_BUS_SPI1>;
 			status = "disabled";
 		};
 	};
@@ -417,6 +430,7 @@
 	status = "okay";
 };
 */
+
 &spi1 {
     #address-cells = <1>;
 	#size-cells = <0>;
@@ -427,12 +441,23 @@
 	status = "okay";
 
 	spidev@0 {
-		compatible = "spidev";
 		reg = <0>;
-		spi-max-frequency = <1000000>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <20000000>;
+		spi-cpha;
+		spi-cpol;
 		status = "okay";
 	};
 
+	spidev@1 {
+		reg = <1>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <20000000>;
+		spi-cpha;
+		spi-cpol;
+		status = "okay";
+	};
+/*
 	ili9341@0 {
 		compatible = "ilitek,ili9341";
 		reg = <0>;
@@ -449,7 +474,7 @@
 	};
 
 	tsc2046@1 {
-			reg = <1>;	/* CS1 */
+			reg = <1>;	// CS1
 			status = "disabled";
 			compatible = "ti,tsc2046";
 			interrupt-parent = <&pio>;
@@ -467,4 +492,5 @@
 
 			wakeup-source;
 		};
+*/
 };
