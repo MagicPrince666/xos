@@ -461,8 +461,6 @@
 	status = "okay";
 
 	spidev@0 {
-		#address-cells = <1>;
-		#size-cells = <1>;
 		reg = <0>;
 		compatible = "rohm,dh2228fv";
 		spi-max-frequency = <20000000>;
@@ -472,8 +470,6 @@
 	};
 
 	spidev@1 {
-		#address-cells = <1>;
-		#size-cells = <1>;
 		reg = <1>;
 		compatible = "rohm,dh2228fv";
 		spi-max-frequency = <20000000>;
@@ -481,7 +477,7 @@
 		spi-cpol;
 		status = "okay";
 	};
-/*
+
 	ili9341@0 {
 		compatible = "ilitek,ili9341";
 		reg = <0>;
@@ -498,23 +494,22 @@
 	};
 
 	tsc2046@1 {
-			reg = <1>;	// CS1
-			status = "disabled";
-			compatible = "ti,tsc2046";
-			interrupt-parent = <&pio>;
-			interrupts = <2 7 IRQ_TYPE_LEVEL_LOW>;	//PC7
-			spi-max-frequency = <1000000>;
-			pendown-gpio = <&pio 2 7 GPIO_ACTIVE_LOW>;
-			vcc-supply = <&reg_vcc3v3>;
+		reg = <1>;	// CS1
+		status = "disabled";
+		compatible = "ti,tsc2046";
+		interrupt-parent = <&pio>;
+		interrupts = <2 7 IRQ_TYPE_LEVEL_LOW>;	//PC7
+		spi-max-frequency = <1000000>;
+		pendown-gpio = <&pio 2 7 GPIO_ACTIVE_LOW>;
+		vcc-supply = <&reg_vcc3v3>;
 
-			ti,x-min = /bits/ 16 <0>;
-			ti,x-max = /bits/ 16 <320>;
-			ti,y-min = /bits/ 16 <0>;
-			ti,y-max = /bits/ 16 <240>;
-			ti,x-plate-ohms = /bits/ 16 <40>;
-			ti,pressure-max = /bits/ 16 <255>;
+		ti,x-min = /bits/ 16 <0>;
+		ti,x-max = /bits/ 16 <320>;
+		ti,y-min = /bits/ 16 <0>;
+		ti,y-max = /bits/ 16 <240>;
+		ti,x-plate-ohms = /bits/ 16 <40>;
+		ti,pressure-max = /bits/ 16 <255>;
 
-			wakeup-source;
-		};
-*/
+		wakeup-source;
+	};
 };

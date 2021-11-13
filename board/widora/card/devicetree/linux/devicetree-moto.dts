@@ -26,6 +26,18 @@
 			gpios = <&pio 4 4 GPIO_ACTIVE_HIGH>; /* PE4 */
 			linux,default-trigger = "heartbeat";
 		};
+
+		dir {
+			label = "dir";
+			gpios = <&pio 4 5 GPIO_ACTIVE_HIGH>; /* PE5 */
+			default-state = "off";
+		};
+
+		en {
+			label = "en";
+			gpios = <&pio 4 7 GPIO_ACTIVE_HIGH>; /* PE7 */
+			default-state = "off";
+		};
 	};
 
 };
@@ -116,11 +128,6 @@
 };
 
 &pio {
-	spi1_pins: spi1-pins-pa {
-		pins = "PE7", "PE8", "PE9", "PE10";
-		function = "spi1";
-	};
-
 	pwm1_pin: pwm1@0 {
 		pins = "PE6";
 		function = "pwm1";
@@ -183,35 +190,4 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c0_pd_pins>;
 	status = "okay";
-};
-
-&spi1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&spi1_pins>;
-	status = "okay";
-
-	spidev@0 {
-		reg = <0>;
-		compatible = "rohm,dh2228fv";
-		spi-max-frequency = <20000000>;
-		spi-cpha;
-		spi-cpol;
-		status = "okay";
-	};
-
-	display@0 {
-		compatible = "ilitek,ili9341";
-		reg = <0>;
-		status = "disabled";
-		spi-max-frequency = <50000000>;
-		rotate = <270>;
-		bgr;
-		fps = <30>;
-		buswidth = <8>;
-		dc-gpios = <&pio 4 5 GPIO_ACTIVE_HIGH>; //PE5
-		debug = <0>;
-		backlight = <&backlight>;
-	};
 };
