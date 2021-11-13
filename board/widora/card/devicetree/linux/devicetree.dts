@@ -28,6 +28,22 @@
 		};
 	};
 
+	gpio_keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+//		pinctrl-names = "default";
+//		pinctrl-0 = <&ps2ack>;
+		autorepeat;
+
+		switch0 {
+			label = "PS2ACK";
+			linux,code = <115>;
+			gpios = <&pio 4 5 GPIO_ACTIVE_LOW>;
+			gpio-key,wakeup;
+			gpio-key,level-trigger;
+		};
+	};
 };
 
 &spi0 {
@@ -121,6 +137,11 @@
 		function = "spi1";
 	};
 
+	ps2ack: ps2ack-pins {
+		pins = "PE5";
+		function = "gpio_in";
+	};
+
 	pwm1_pin: pwm1@0 {
 		pins = "PE6";
 		function = "pwm1";
@@ -199,19 +220,5 @@
 		spi-cpha;
 		spi-cpol;
 		status = "okay";
-	};
-
-	display@0 {
-		compatible = "ilitek,ili9341";
-		reg = <0>;
-		status = "disabled";
-		spi-max-frequency = <50000000>;
-		rotate = <270>;
-		bgr;
-		fps = <30>;
-		buswidth = <8>;
-		dc-gpios = <&pio 4 5 GPIO_ACTIVE_HIGH>; //PE5
-		debug = <0>;
-		backlight = <&backlight>;
 	};
 };

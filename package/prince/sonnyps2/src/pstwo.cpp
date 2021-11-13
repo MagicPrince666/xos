@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "pstwo.h"
+#include "key.h"
 
 uint16_t Handkey;
 uint8_t Comd[2] = {0x01, 0x42};
@@ -39,8 +40,8 @@ Ps2Remote::Ps2Remote()
 {
 	spidev = new Spi("/dev/spidev1.0", SPI_MODE_3, 0x01, 8, 1000000);
 
-	uint32_t buf = 0xFFFFFFFF;
-	spidev->TransferSpiBuffers(&buf, &buf, 4, 4);
+//	uint32_t buf = 0xFFFFFFFF;
+//	spidev->TransferSpiBuffers(&buf, &buf, 4, 4);
 
 	PS2_SetInit();
 }

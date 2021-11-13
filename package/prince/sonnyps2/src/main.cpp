@@ -11,7 +11,9 @@
 #include <signal.h>
 #include <iostream>
 
-#include "pstwo.h"
+#include "xepoll.h"
+#include "key.h"
+#include "timerfd.h"
 
 static void sigint_handler(int sig)
 {
@@ -21,38 +23,13 @@ static void sigint_handler(int sig)
 
 int main(int argc, char *argv[]) {
 	std::cout << "--- version 1.2 ---" << std::endl;
-
 	signal(SIGINT, sigint_handler);//信号处理
 
-	uint8_t key = 0;
-	uint8_t lx,ly,rx,ry;
-	Ps2Remote ps2;
+	Xepoll xepoll;//初始化事件模型
+	Key key(&xepoll);
+    TimerFd timerfd(&xepoll); //初始化定时器事件并加入事件列表
 
-	while(1) {
-		key = ps2.PS2_DataKey();
-
-		if(key != 0) {
-			if(key > 0) {
-				//std::cout << "key = "  << std::hex << key << std::endl;
-			}
-
-			if(key == 12) {
-				ps2.PS2_Vibration(0xFF,0x00);
-				usleep(500000);
-			} else if(key == 11) {
-				ps2.PS2_Vibration(0x00,0xFF);
-				usleep(500000);
-			} else
-				ps2.PS2_Vibration(0x00,0x00);
-		}
-
-		lx = ps2.PS2_AnologData(PSS_LX);
-		ly = ps2.PS2_AnologData(PSS_LY);
-		rx = ps2.PS2_AnologData(PSS_RX);
-		ry = ps2.PS2_AnologData(PSS_RY);
-
-		usleep(200000);
-	}
+    return xepoll.loop();//等待事件触发
 
 	return 0;
 }
