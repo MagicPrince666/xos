@@ -14,9 +14,6 @@
 #include "pstwo.h"
 #include "key.h"
 
-uint16_t Handkey;
-uint8_t Comd[2] = {0x01, 0x42};
-uint8_t Data[9] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 uint16_t MASK[] = {
 	PSB_SELECT,
 	PSB_L3,
@@ -38,10 +35,7 @@ uint16_t MASK[] = {
 
 Ps2Remote::Ps2Remote()
 {
-	spidev = new Spi("/dev/spidev1.0", SPI_MODE_3, 0x01, 8, 1000000);
-
-//	uint32_t buf = 0xFFFFFFFF;
-//	spidev->TransferSpiBuffers(&buf, &buf, 4, 4);
+	spidev = new Spi("/dev/spidev1.0", SPI_MODE_3, 0x80, 8, 1000000);
 
 	PS2_SetInit();
 }
@@ -56,7 +50,6 @@ void Ps2Remote::PS2_Cmd(uint8_t *cmd, int len)
 	// spidev->SPIWrite(cmd, len);
 	// for(uint32_t i = 0; i < len; i++) {
 	// 	spidev->TransferSpiBuffers(cmd + i, Data + i, 1, 1);
-	// 	usleep(30);
 	// }
 	spidev->TransferSpiBuffers(cmd, Data, len, 2);
 }
@@ -82,7 +75,6 @@ void Ps2Remote::PS2_ReadData(void)
 	// spidev->SPIRead(Data + 2, 7);
 	// for(uint32_t i = 0; i < 9; i++) {
 	// 	spidev->TransferSpiBuffers(Comd + i, Data + i, 1, 1);
-	// 	usleep(30);
 	// }
 	spidev->TransferSpiBuffers(Comd, Data, sizeof(Comd), 9);
 }
@@ -104,7 +96,7 @@ uint8_t Ps2Remote::PS2_DataKey()
 	
 	printf("Data[ ");
 	for( uint8_t i = 0; i < 9; i++) {
-		printf("%02x ", Data[i]);
+		printf("%02X ", Data[i]);
 	}
 	printf("]\n");
 

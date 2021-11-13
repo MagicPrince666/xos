@@ -18,9 +18,8 @@ class Xepoll {
  public:
   Xepoll();
   ~Xepoll();
-  int xepoll_add(int fd);
+
   int add(int fd, std::function<void()> handler);
-  int xepoll_del(int fd);
   int del(int fd);
   int loop();
 

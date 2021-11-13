@@ -30,6 +30,4 @@ int main(int argc, char *argv[]) {
     TimerFd timerfd(&xepoll); //初始化定时器事件并加入事件列表
 
     return xepoll.loop();//等待事件触发
-
-	return 0;
 }

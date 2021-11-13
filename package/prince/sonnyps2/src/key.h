@@ -13,5 +13,5 @@ public:
 
 private:
     Xepoll *epoll_;
-    int key_input_fd{-1};
+    int key_input_fd_{-1};
 };

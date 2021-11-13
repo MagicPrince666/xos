@@ -17,29 +17,29 @@ TimerFd::TimerFd(Xepoll *epoll)
 
 TimerFd::~TimerFd()
 {
-    if (timer1S_fd_) {
-        close(timer1S_fd_);
+    if (timer_fd_) {
+        close(timer_fd_);
     }
     delete ps2;
 }
 
 bool TimerFd::init() {
     // 创建1s定时器fd
-    if ((timer1S_fd_ =
+    if ((timer_fd_ =
             timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC)) < 0) {
         std::cout << "create timer fd fail" << std::endl;
         return false;
     }
     // 设置1s定时器
     struct itimerspec time_intv;
-    time_intv.it_value.tv_sec = 0;  //设定超时
-    time_intv.it_value.tv_nsec = 100000000;
+    time_intv.it_value.tv_sec = 1;  //设定超时
+    time_intv.it_value.tv_nsec = 0; // 100000000;
     time_intv.it_interval.tv_sec = time_intv.it_value.tv_sec;  //间隔超时
     time_intv.it_interval.tv_nsec = time_intv.it_value.tv_nsec;
     // 启动定时器
-    timerfd_settime(timer1S_fd_, 0, &time_intv, NULL);
+    timerfd_settime(timer_fd_, 0, &time_intv, NULL);
     // 绑定回调函数
-    epoll_->add(timer1S_fd_, std::bind(&TimerFd::timeOutCallBack, this));
+    epoll_->add(timer_fd_, std::bind(&TimerFd::timeOutCallBack, this));
 
     return true;
 }
@@ -49,7 +49,7 @@ int TimerFd::timeOutCallBack() {
     uint64_t value;
     uint8_t key = 0;
     uint8_t lx,ly,rx,ry;
-    int ret = read(timer1S_fd_, &value, sizeof(uint64_t));
+    int ret = read(timer_fd_, &value, sizeof(uint64_t));
   
     key = ps2->PS2_DataKey();
 
@@ -71,6 +71,13 @@ int TimerFd::timeOutCallBack() {
     ly = ps2->PS2_AnologData(PSS_LY);
     rx = ps2->PS2_AnologData(PSS_RX);
     ry = ps2->PS2_AnologData(PSS_RY);
+
+    if(0) {
+        std::cout << "x.left = "  << lx << std::endl;
+        std::cout << "x.right = "  << ly << std::endl;
+        std::cout << "y.left = "  << rx << std::endl;
+        std::cout << "y.right = "  << ry << std::endl;
+    }
 
     return ret;
 }

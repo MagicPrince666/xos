@@ -71,6 +71,9 @@ private:
     int ps2_clk = -1;
     uint8_t data;
     Spi *spidev;
+    uint16_t Handkey;
+    uint8_t Comd[2] = {0x01, 0x42};
+    uint8_t Data[9] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 };
 
 #endif

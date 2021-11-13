@@ -13,9 +13,6 @@
 Spi::Spi(std::string dev, uint8_t mode, uint8_t lsb, uint8_t bits, uint32_t speed)
     : spi_dev_(dev), spi_mode_(mode), spi_lsb_(lsb),spi_bits_(bits), spi_speed_(speed)
 {
-    spi_mode_ = SPI_MODE_3;
-    spi_speed_ = 1000000;
-    spi_lsb_ = 1;
     SPIOpen();
 }
 
@@ -79,14 +76,13 @@ int Spi::TransferSpiBuffers(void *tx_buffer, void *rx_buffer, uint32_t tx_length
 	xfer[0].len = tx_length;
     xfer[0].bits_per_word   = spi_bits_;	
     xfer[0].speed_hz        = spi_speed_;
-    xfer[0].delay_usecs     = 16;
+    xfer[0].delay_usecs     = 20;
 
 	xfer[1].rx_buf = (uint64_t)rx_buffer;
 	xfer[1].len = rx_length;
     xfer[1].bits_per_word   = spi_bits_;	
     xfer[1].speed_hz        = spi_speed_;
-    xfer[1].delay_usecs     = 16;
-
+    xfer[1].delay_usecs     = 20;
 
 	if (ioctl(spi_Fd_, SPI_IOC_MESSAGE(2), &xfer) < 0) {
         perror("SPI_IOC_MESSAGE");
@@ -177,7 +173,7 @@ int Spi::SPIOpen()
 
     printf("spi mode: 0x%02X\n", spi_mode_);
     if(spi_lsb_) {
-        printf("lsb first\n");
+        printf("lsb first %02X\n", spi_lsb_);
     }
     printf("bits per word: %d\n", spi_bits_);
     printf("max speed: %d KHz\n", spi_speed_ / 1000);
