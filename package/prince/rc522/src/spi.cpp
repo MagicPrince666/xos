@@ -13,9 +13,6 @@
 Spi::Spi(std::string dev, uint8_t mode, uint8_t lsb, uint8_t bits, uint32_t speed)
     : spi_dev_(dev), spi_mode_(mode), spi_lsb_(lsb),spi_bits_(bits), spi_speed_(speed)
 {
-    spi_mode_ = SPI_MODE_3;
-    spi_speed_ = 1000000;
-    spi_lsb_ = 1;
     SPIOpen();
 }
 

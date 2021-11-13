@@ -1,5 +1,4 @@
-#ifndef __SPI_H__
-#define __SPI_H__
+#pragma once
 
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
@@ -29,5 +28,3 @@ private:
     uint8_t spi_bits_;
     uint32_t spi_speed_;
 };
-
-#endif

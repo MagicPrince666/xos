@@ -37,7 +37,7 @@ uint16_t MASK[] = {
 
 Ps2Remote::Ps2Remote()
 {
-	spidev = new Spi("/dev/spidev1.0", SPI_MODE_3, 0x01, 8, 1000000);
+	spidev = new Spi();
 
 	uint32_t buf = 0xFFFFFFFF;
 	spidev->TransferSpiBuffers(&buf, &buf, 4, 4);

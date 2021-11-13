@@ -1,5 +1,4 @@
-#ifndef __PSTWO_H
-#define __PSTWO_H
+#pragma once
 
 #include <sys/types.h>
 #include "spi.h"
@@ -72,5 +71,3 @@ private:
     uint8_t data;
     Spi *spidev;
 };
-
-#endif

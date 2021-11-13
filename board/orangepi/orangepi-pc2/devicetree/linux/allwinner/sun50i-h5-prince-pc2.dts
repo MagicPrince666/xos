@@ -95,6 +95,12 @@
 			linux,default-trigger = "timer";
 		};
 
+		rc522rst {
+			label = "rc522rst";
+			gpios = <&pio 2 7 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+
 		backlight {
 			label = "backlight";
 			gpios = <&pio 2 4 GPIO_ACTIVE_HIGH>;
@@ -124,6 +130,20 @@
 			dma-names = "rx", "tx";
 			resets = <&ccu RST_BUS_SPI1>;
 			status = "disabled";
+		};
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		autorepeat;
+
+		switch0 {
+			label = "rc522irq";
+			linux,code = <115>;
+			gpios = <&pio 2 4 GPIO_ACTIVE_LOW>;
+			wakeup-source;
 		};
 	};
 
@@ -441,6 +461,8 @@
 	status = "okay";
 
 	spidev@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
 		reg = <0>;
 		compatible = "rohm,dh2228fv";
 		spi-max-frequency = <20000000>;
@@ -450,6 +472,8 @@
 	};
 
 	spidev@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
 		reg = <1>;
 		compatible = "rohm,dh2228fv";
 		spi-max-frequency = <20000000>;

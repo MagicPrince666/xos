@@ -24,12 +24,13 @@ int main(int argc, char *argv[]) {
 
 	signal(SIGINT, sigint_handler);//信号处理
 
-	u_int8_t key = 0;
-	u_int8_t lx,ly,rx,ry;
+	uint8_t key = 0;
+	uint8_t lx,ly,rx,ry;
 	Ps2Remote ps2;
 
 	while(1) {
 		key = ps2.PS2_DataKey();
+
 		if(key != 0) {
 			if(key > 0) {
 				//std::cout << "key = "  << std::hex << key << std::endl;
