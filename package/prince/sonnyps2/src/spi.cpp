@@ -83,27 +83,18 @@ int Spi::SPIRead(uint8_t *RxBuf, int len)
     return ret;
 }
 
-int Spi::TransferSpiBuffers(void *tx_buffer, void *rx_buffer, uint32_t tx_length, uint32_t rx_length)
+int Spi::TransferSpiBuffers(void *tx_buffer, void *rx_buffer, uint32_t length)
 {
-    struct spi_ioc_transfer	xfer[2];
+    struct spi_ioc_transfer	xfer;
 
-    memset(xfer, 0, sizeof(xfer));
+    memset(&xfer, 0, sizeof(xfer));
 
-    xfer[0].tx_buf = (uint64_t)tx_buffer;
-	xfer[0].len = tx_length;
-    xfer[0].bits_per_word   = spi_bits_;
-    xfer[0].speed_hz        = spi_speed_;
-    xfer[0].delay_usecs     = 20;
-    xfer[0].cs_change = 1;
+    xfer.tx_buf = (uint64_t)tx_buffer;
+    xfer.rx_buf = (uint64_t)rx_buffer;
+	xfer.len = length;
+    xfer.cs_change = 1;
 
-	xfer[1].rx_buf = (uint64_t)rx_buffer;
-	xfer[1].len = rx_length;
-    xfer[1].bits_per_word   = spi_bits_;
-    xfer[1].speed_hz        = spi_speed_;
-    xfer[1].delay_usecs     = 20;
-    xfer[1].cs_change = 1;
-
-	if (ioctl(spi_Fd_, SPI_IOC_MESSAGE(2), &xfer) < 0) {
+	if (ioctl(spi_Fd_, SPI_IOC_MESSAGE(1), &xfer) < 0) {
         perror("SPI_IOC_MESSAGE");
         return -1;
     }

@@ -9,7 +9,7 @@
 
 #include "key.h"
 
-#define DEV_PATH "/dev/input/event1"
+#define DEV_PATH "/dev/input/event2"
 
 Key::Key(Xepoll *epoll, Interface *interface)
 : epoll_(epoll), m_interface_(interface)

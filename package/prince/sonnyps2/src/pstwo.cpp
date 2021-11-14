@@ -35,7 +35,7 @@ uint16_t MASK[] = {
 
 Ps2Remote::Ps2Remote()
 {
-	spidev = new Spi("/dev/spidev1.0", SPI_MODE_3, 0x80, 8, 1000000);
+	spidev = new Spi("/dev/spidev1.0", SPI_MODE_3, 0x0, 8, 125000);
 	PS2_SetInit();
 }
 
@@ -46,11 +46,7 @@ Ps2Remote::~Ps2Remote()
 
 void Ps2Remote::PS2_Cmd(uint8_t *cmd, int len)
 {
-	// spidev->SPIWrite(cmd, len);
-	// for(uint32_t i = 0; i < len; i++) {
-	// 	spidev->TransferSpiBuffers(cmd + i, Data + i, 1, 1);
-	// }
-	spidev->TransferSpiBuffers(cmd, Data, len, 2);
+	spidev->TransferSpiBuffers(cmd, Data, len);
 }
 
 // 判断是否为红灯模式，0x41=模拟绿灯，0x73=模拟红灯 
@@ -70,12 +66,8 @@ uint8_t Ps2Remote::PS2_RedLight(void)
 // 读取手柄数据 
 void Ps2Remote::PS2_ReadData(void)
 {
-	// PS2_Cmd(Comd, sizeof(Comd));
-	// spidev->SPIRead(Data + 2, 7);
-	// for(uint32_t i = 0; i < 9; i++) {
-	// 	spidev->TransferSpiBuffers(Comd + i, Data + i, 1, 1);
-	// }
-	spidev->TransferSpiBuffers(Comd, Data, sizeof(Comd), 9);
+	uint8_t cmd[9]={0x01,0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	spidev->TransferSpiBuffers(cmd, Data, sizeof(Data));
 }
 
 /*
@@ -189,5 +181,5 @@ void Ps2Remote::PS2_SetInit(void)
 	PS2_ExitConfing();
 	std::cout << "Sonny PS2 set init" << std::endl;
 	// 震动测试
-	PS2_Vibration(0xFF,0xFF);
+	// PS2_Vibration(0x00,0xFF);
 }

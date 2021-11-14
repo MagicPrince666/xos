@@ -17,7 +17,7 @@ public:
     ~Spi();
     int SPIWrite(uint8_t *TxBuf, int len);
     int SPIRead(uint8_t *RxBuf, int len);
-    int TransferSpiBuffers(void *tx_buffer, void *rx_buffer, uint32_t tx_length, uint32_t rx_length);
+    int TransferSpiBuffers(void *tx_buffer, void *rx_buffer, uint32_t length);
 
 private:
     int SPIOpen();

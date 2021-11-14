@@ -1,0 +1,8 @@
+config BR2_PACKAGE_PSXPAD
+	bool "psxpad"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  Test spi interface with sonny ps2
+
+comment "sonny ps2 needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP

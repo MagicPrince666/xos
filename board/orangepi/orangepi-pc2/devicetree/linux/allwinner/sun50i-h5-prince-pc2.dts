@@ -142,9 +142,10 @@
 		switch0 {
 			label = "rc522irq";
 			linux,code = <115>;
-			gpios = <&pio 2 4 GPIO_ACTIVE_LOW>;
-			wakeup-source;
+			interrupt-parent = <&pio>;
+			interrupts = <2 5 IRQ_TYPE_EDGE_BOTH>;	//PC4
 		};
+
 	};
 
 	r-gpio-keys {
@@ -154,6 +155,8 @@
 			label = "sw4";
 			linux,code = <BTN_0>;
 			gpios = <&r_pio 0 3 GPIO_ACTIVE_LOW>;
+			//interrupt-parent = <&pio>;
+			//interrupts = <0 3 IRQ_TYPE_EDGE_BOTH>;	//PL4
 		};
 	};
 
@@ -278,6 +281,7 @@
 &ir {
 	pinctrl-names = "default";
 	pinctrl-0 = <&r_ir_rx_pin>;
+	linux,rc-map-name = "rc-tevii-nec";
 	status = "okay";
 };
 
@@ -471,7 +475,7 @@
 
 	spidev@1 {
 		reg = <1>;
-		compatible = "rohm,dh2228fv";
+		compatible = "psxpad-spi";
 		spi-max-frequency = <20000000>;
 		spi-cpha;
 		spi-cpol;
