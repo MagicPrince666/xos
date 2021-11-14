@@ -81,3 +81,9 @@ int TimerFd::timeOutCallBack() {
 
     return ret;
 }
+
+void TimerFd::Transfer(bool flag) {
+    if(flag) {
+        ps2->PS2_SetInit();
+    }
+}

@@ -37,8 +37,16 @@ static void pabort(const char *s)
 */
 int Spi::SPIWrite(uint8_t *TxBuf, int len)
 {
+#if 0
     int ret = write(spi_Fd_, TxBuf, len);
-
+#else
+    struct spi_ioc_transfer	xfer;
+    memset(&xfer, 0, sizeof(xfer));
+    xfer.tx_buf = (uint64_t)TxBuf;
+	xfer.len = len;
+    xfer.cs_change = 1;
+    int ret = ioctl(spi_Fd_, SPI_IOC_MESSAGE(1), &xfer);
+#endif
     if (ret < 0) {
         printf("SPI Write error\n");
     }
@@ -57,8 +65,17 @@ int Spi::SPIWrite(uint8_t *TxBuf, int len)
 */
 int Spi::SPIRead(uint8_t *RxBuf, int len)
 {
+#if 0
     int ret = read(spi_Fd_, RxBuf, len);
-
+#else
+    struct spi_ioc_transfer	xfer;
+    memset(&xfer, 0, sizeof(xfer));
+    xfer.tx_buf = (uint64_t)RxBuf;
+	xfer.len = len;
+    xfer.cs_change = 1;
+    int ret = ioctl(spi_Fd_, SPI_IOC_MESSAGE(1), &xfer);
+#endif
+    
     if (ret < 0) {
         printf("SPI Read errorn\n");
     }
@@ -74,15 +91,17 @@ int Spi::TransferSpiBuffers(void *tx_buffer, void *rx_buffer, uint32_t tx_length
 
     xfer[0].tx_buf = (uint64_t)tx_buffer;
 	xfer[0].len = tx_length;
-    xfer[0].bits_per_word   = spi_bits_;	
+    xfer[0].bits_per_word   = spi_bits_;
     xfer[0].speed_hz        = spi_speed_;
     xfer[0].delay_usecs     = 20;
+    xfer[0].cs_change = 1;
 
 	xfer[1].rx_buf = (uint64_t)rx_buffer;
 	xfer[1].len = rx_length;
-    xfer[1].bits_per_word   = spi_bits_;	
+    xfer[1].bits_per_word   = spi_bits_;
     xfer[1].speed_hz        = spi_speed_;
     xfer[1].delay_usecs     = 20;
+    xfer[1].cs_change = 1;
 
 	if (ioctl(spi_Fd_, SPI_IOC_MESSAGE(2), &xfer) < 0) {
         perror("SPI_IOC_MESSAGE");

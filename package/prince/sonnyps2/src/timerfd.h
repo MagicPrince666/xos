@@ -4,14 +4,17 @@
 #include <sys/timerfd.h>
 #include "xepoll.h"
 #include "pstwo.h"
+#include "interface.h"
 
-class TimerFd {
+class TimerFd : public Interface {
 public:
     TimerFd(Xepoll *epoll);
     ~TimerFd();
     
     bool init();
     int timeOutCallBack();
+
+    void Transfer(bool flag);
 
 private:
     Xepoll *epoll_;

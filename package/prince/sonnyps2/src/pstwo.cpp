@@ -36,7 +36,6 @@ uint16_t MASK[] = {
 Ps2Remote::Ps2Remote()
 {
 	spidev = new Spi("/dev/spidev1.0", SPI_MODE_3, 0x80, 8, 1000000);
-
 	PS2_SetInit();
 }
 
@@ -128,7 +127,6 @@ void Ps2Remote::PS2_ClearData()
 Data[7]、 Data[8]。 
 */
 
-
 // 手柄配置初始化：
 void Ps2Remote::PS2_ShortPoll(void)
 {
@@ -189,7 +187,7 @@ void Ps2Remote::PS2_SetInit(void)
 	PS2_TurnOnAnalogMode();
 	PS2_VibrationMode();
 	PS2_ExitConfing();
-
+	std::cout << "Sonny PS2 set init" << std::endl;
 	// 震动测试
 	PS2_Vibration(0xFF,0xFF);
 }

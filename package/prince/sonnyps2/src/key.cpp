@@ -11,8 +11,8 @@
 
 #define DEV_PATH "/dev/input/event0"
 
-Key::Key(Xepoll *epoll)
-: epoll_(epoll)
+Key::Key(Xepoll *epoll, Interface *interface)
+: epoll_(epoll), m_interface_(interface)
 {
     std::cout << "Init gpio key " << std::endl;
     key_input_fd_ = open(DEV_PATH, O_RDONLY);
@@ -33,9 +33,15 @@ int Key::GpioKey(void)
 {
     struct input_event key;
     int ret = read(key_input_fd_, &key, sizeof(key));
-
-    std::cout << "Read Code " << key.code << std::endl;
-    std::cout << "Read Value " << key.value << std::endl;
+    if(key.code) {
+        std::cout << "Read Code " << key.code << std::endl;
+        std::cout << "Read Value " << key.value << std::endl;
+        if(key.value == 0) {
+            if(nullptr != m_interface_){
+                m_interface_->Transfer(true);
+            }
+        }
+    }
     return ret;
 }
 

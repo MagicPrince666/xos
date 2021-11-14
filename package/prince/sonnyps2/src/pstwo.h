@@ -52,6 +52,7 @@ public:
     uint8_t PS2_DataKey(void);
     uint8_t PS2_AnologData(uint8_t button);
     void PS2_Vibration(uint8_t motor1, uint8_t motor2);
+    void PS2_SetInit(void);
 
 private:
     uint8_t PS2_RedLight(void);
@@ -62,13 +63,8 @@ private:
     void PS2_TurnOnAnalogMode(void);
     void PS2_VibrationMode(void);
     void PS2_ExitConfing(void);
-    void PS2_SetInit(void);
     void PS2_ShortPoll(void);
 
-    int ps2_data = -1;
-    int ps2_cmd = -1;
-    int ps2_att = -1;
-    int ps2_clk = -1;
     uint8_t data;
     Spi *spidev;
     uint16_t Handkey;
