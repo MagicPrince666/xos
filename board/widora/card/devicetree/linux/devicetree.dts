@@ -212,7 +212,7 @@
 
 	spidev@0 {
 		reg = <0>;
-		compatible = "rohm,dh2228fv";
+		compatible = "psxpad-spi";
 		spi-max-frequency = <20000000>;
 		spi-cpha;
 		spi-cpol;
