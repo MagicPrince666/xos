@@ -9,12 +9,26 @@
 
 #include "key.h"
 
-#define DEV_PATH "/dev/input/event2"
+#define DEV_PATH "/dev/input/event0"
 
 Key::Key(Xepoll *epoll, Interface *interface)
 : epoll_(epoll), m_interface_(interface)
 {
     std::cout << "Init gpio key " << std::endl;
+
+    char          name[64];           /* RATS: Use ok, but could be better */
+    char          buf[256] = { 0, };  /* RATS: Use ok */
+    int           fd = -1;
+    int           i;
+    for (i = 0; i < 32; i++) {
+        sprintf(name, "/dev/input/event%d", i);
+        if ((fd = open(name, O_RDONLY, 0)) >= 0) {
+            ioctl(fd, EVIOCGNAME(sizeof(buf)), buf);
+            std::cout << "Device name "<< buf << std::endl;
+            close(fd);
+        }
+    }
+
     key_input_fd_ = open(DEV_PATH, O_RDONLY);
     if(key_input_fd_ <= 0) {
         std::cout << "open "<< DEV_PATH <<" device error!" << std::endl;
