@@ -4,8 +4,8 @@ case "$1" in
 	start)
 		printf "Init pwm "
 		echo 1 > /sys/class/pwm/pwmchip0/export
-		echo 300000 > /sys/class/pwm/pwmchip0/pwm1/period
-		echo 150000 > /sys/class/pwm/pwmchip0/pwm1/duty_cycle
+		echo 200000 > /sys/class/pwm/pwmchip0/pwm1/period
+		echo 100000 > /sys/class/pwm/pwmchip0/pwm1/duty_cycle
 		echo 1 > /sys/class/pwm/pwmchip0/pwm1/enable
 		echo 0 > /sys/class/leds/en/brightness
 		echo 0 > /sys/class/leds/dir/brightness

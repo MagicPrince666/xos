@@ -12,7 +12,7 @@
 #include <iostream>
 
 #include "xepoll.h"
-#include "key.h"
+#include "psxpad.h"
 #include "interface.h"
 
 static void sigint_handler(int sig)
@@ -22,7 +22,7 @@ static void sigint_handler(int sig)
 }
 
 int main(int argc, char *argv[]) {
-	std::cout << "--- version 1.3 ---" << std::endl;
+	std::cout << "--- version 1.4 ---" << std::endl;
 	signal(SIGINT, sigint_handler);//信号处理
 
 	Xepoll xepoll;//初始化事件模型

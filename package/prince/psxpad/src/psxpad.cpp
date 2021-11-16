@@ -10,8 +10,9 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <string.h>
+#include <linux/joystick.h>
 
-#include "key.h"
+#include "psxpad.h"
 
 Key::Key(Xepoll *epoll, Interface *interface)
 : epoll_(epoll), m_interface_(interface)
@@ -20,22 +21,27 @@ Key::Key(Xepoll *epoll, Interface *interface)
     int           fd = -1;
     std::string dev = "";
     std::vector<std::string> events;
-    getFiles("/dev/input", events);
+    getFiles("/dev/input/", events);
     for (auto iter : events) {
+        std::cout << "Device name "<< iter << std::endl;
         if ((fd = open(iter.c_str(), O_RDONLY, 0)) >= 0) {
             ioctl(fd, EVIOCGNAME(sizeof(buf)), buf);
-            close(fd);
             dev = buf;
-            std::cout << "Device name "<< dev << std::endl;
-            if(dev == "PlayStation 1/2 joypad") break;
+            std::cout << "Device info "<< dev << std::endl;
+            if(dev == "PlayStation 1/2 joypad") {
+                key_input_fd_ = fd;
+                break;
+            }
+            close(fd);
         }
     }
 
-    key_input_fd_ = open(dev.c_str(), O_RDONLY);
-    if(key_input_fd_ <= 0) {
-        exit(0);
-        //assert(1);
-    }
+    // key_input_fd_ = open(dev.c_str(), O_RDONLY);
+    // if(key_input_fd_ <= 0) {
+    //     std::cout << "key_input_fd_ "<< key_input_fd_ << std::endl;
+    //     exit(0);
+    //     //assert(1);
+    // }
     init();
 }
 
@@ -72,8 +78,13 @@ void Key::getFiles(std::string path, std::vector<std::string>& files)
 		if( strcmp( filename->d_name , "." ) == 0 ||
 			strcmp( filename->d_name , "..") == 0 )
 			continue;
-        files.push_back(filename->d_name);
-		//cout<<filename ->d_name <<endl;
+        std::string full_path = path + filename->d_name;
+        struct stat s;
+        lstat( full_path.c_str(), &s );
+        if( S_ISDIR( s.st_mode ) ) {
+            continue;
+        }
+        files.push_back(full_path);
 	}
 }
 
@@ -81,10 +92,14 @@ int Key::GpioKey(void)
 {
     struct input_event key;
     int ret = read(key_input_fd_, &key, sizeof(key));
-    if(key.code) {
-        std::cout << "Read Code " << key.code << std::endl;
-        std::cout << "Read Value " << key.value << std::endl;
-        if(key.value == 0) {
+    if(ret > 0) {
+        std::cout << "Type " << key.type << std::endl;
+        std::cout << "Code " << key.code << std::endl;
+        std::cout << "Value " << key.value << std::endl;
+        std::cout << "time sec " << key.time.tv_sec << std::endl;
+        std::cout << "time usec " << key.time.tv_usec << std::endl;
+
+        if(key.type == BTN_DPAD_UP) {
             if(nullptr != m_interface_){
                 m_interface_->Transfer(true);
             }
