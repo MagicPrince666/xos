@@ -60,7 +60,7 @@ void Key::getFiles(std::string path, std::vector<std::string>& files)
 	}
 
 	struct dirent * filename;    // return value for readdir()
- 	DIR * dir;                   // return value for opendir()
+	DIR * dir;                   // return value for opendir()
 	dir = opendir( path.c_str() );
 	if( NULL == dir ) {
 		return;
@@ -69,7 +69,7 @@ void Key::getFiles(std::string path, std::vector<std::string>& files)
 	/* read all the files in the dir ~ */
 	while( ( filename = readdir(dir) ) != NULL ) {
 		// get rid of "." and ".."
-		if( strcmp( filename->d_name , "." ) == 0 || 
+		if( strcmp( filename->d_name , "." ) == 0 ||
 			strcmp( filename->d_name , "..") == 0 )
 			continue;
         files.push_back(filename->d_name);
