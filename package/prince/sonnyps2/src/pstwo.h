@@ -57,7 +57,7 @@ public:
 private:
     uint8_t PS2_RedLight(void);
     void PS2_ReadData(void);
-    void PS2_Cmd(uint8_t *cmd, int len);
+    void PS2_Cmd(const uint8_t *cmd, int len);
     void PS2_ClearData(void);
     void PS2_EnterConfing(void);
     void PS2_TurnOnAnalogMode(void);

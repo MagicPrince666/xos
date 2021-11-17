@@ -1,37 +1,54 @@
+#include <stdint.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <strings.h>
-#include <string.h>
-#include <sys/types.h>
-#include <assert.h>
-#include <errno.h>
+#include <getopt.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <signal.h>
+#include <linux/types.h>
+#include <linux/spi/spidev.h>
 #include <iostream>
-
+#include <cstring>
+#include <stdint.h>
+#include <unistd.h>
 #include "pstwo.h"
 #include "key.h"
 
 uint16_t MASK[] = {
-	PSB_SELECT,
-	PSB_L3,
-	PSB_R3 ,
-	PSB_START,
-	PSB_PAD_UP,
-	PSB_PAD_RIGHT,
-	PSB_PAD_DOWN,
-	PSB_PAD_LEFT,
-	PSB_L2,
-	PSB_R2,
-	PSB_L1,
-	PSB_R1 ,
-	PSB_GREEN,
-	PSB_RED,
-	PSB_BLUE,
-	PSB_PINK
+       PSB_SELECT,
+       PSB_L3,
+       PSB_R3 ,
+       PSB_START,
+       PSB_PAD_UP,
+       PSB_PAD_RIGHT,
+       PSB_PAD_DOWN,
+       PSB_PAD_LEFT,
+       PSB_L2,
+		PSB_R2,
+       PSB_L1,
+       PSB_R1 ,
+       PSB_GREEN,
+       PSB_RED,
+       PSB_BLUE,
+       PSB_PINK
 };
+
+//const uint8_t PSX_CMD_INIT_PRESSURE[]	= {0x01, 0x40, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00};
+const uint8_t PSX_CMD_INIT_PRESSURE[] = {0x80, 0x02, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00};
+//const uint8_t PSX_CMD_POLL[]		= 	{0x01, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+const uint8_t PSX_CMD_POLL[]	=		{0x80, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+//const uint8_t PSX_CMD_ENTER_CFG[]	= 	{0x01, 0x43, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
+const uint8_t PSX_CMD_ENTER_CFG[]	= 	{0x80, 0xC2, 0X00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00};
+//const uint8_t PSX_CMD_EXIT_CFG[]	= 	{0x01, 0x43, 0x00, 0x00, 0x5A, 0x5A, 0x5A, 0x5A, 0x5A};
+const uint8_t PSX_CMD_EXIT_CFG[] = 		{0x80, 0xc2, 0X00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a};
+//const uint8_t PSX_CMD_ENABLE_MOTOR[]	= {0x01, 0x4D, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+const uint8_t PSX_CMD_ENABLE_MOTOR[] = 	{0x80, 0xB2, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+const uint8_t PSX_ANALOGMODE[] = 		{0x80, 0x22, 0X00, 0x80, 0x77, 0x00, 0x00, 0x00, 0x00};
+const uint8_t PSX_CMD_ALL_PRESSURE[]	= {0x01, 0x4F, 0x00, 0xFF, 0xFF, 0x03, 0x00, 0x00, 0x00};
+const uint8_t PSX_CMD_AD_MODE[]		= {0x01, 0x44, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+
+#define REVERSE_BIT(x) ((((x) & 0x80) >> 7) | (((x) & 0x40) >> 5) | (((x) & 0x20) >> 3) | (((x) & 0x10) >> 1) | (((x) & 0x08) << 1) | (((x) & 0x04) << 3) | (((x) & 0x02) << 5) | (((x) & 0x01) << 7))
 
 Ps2Remote::Ps2Remote()
 {
@@ -45,7 +62,7 @@ Ps2Remote::~Ps2Remote()
 	delete spidev;
 }
 
-void Ps2Remote::PS2_Cmd(uint8_t *cmd, int len)
+void Ps2Remote::PS2_Cmd(const uint8_t *cmd, int len)
 {
 	spidev->TransferSpiBuffers(cmd, Data, len);
 }
@@ -57,7 +74,7 @@ uint8_t Ps2Remote::PS2_RedLight(void)
 {
 	PS2_Cmd(Comd, sizeof(Comd));
 
-	if( Data[1] == 0X73) {
+	if( Data[1] == 0x73) {
 		return 0 ;
 	} else {
 		return 1;
@@ -67,8 +84,7 @@ uint8_t Ps2Remote::PS2_RedLight(void)
 // 读取手柄数据 
 void Ps2Remote::PS2_ReadData(void)
 {
-	uint8_t cmd[9]={0x80, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	spidev->TransferSpiBuffers(cmd, Data, sizeof(Data));
+	spidev->TransferSpiBuffers(PSX_CMD_POLL, Data, sizeof(Data));
 }
 
 /*
@@ -85,6 +101,8 @@ uint8_t Ps2Remote::PS2_DataKey()
 
 	PS2_ClearData();
 	PS2_ReadData();
+	for(int i = 0; i < 9; i++)
+		Data[i] = REVERSE_BIT(Data[i]);
 	
 	printf("Data[ ");
 	for( uint8_t i = 0; i < 9; i++) {
@@ -123,36 +141,31 @@ Data[7]、 Data[8]。
 // 手柄配置初始化：
 void Ps2Remote::PS2_ShortPoll(void)
 {
-	uint8_t comd[] = {0x80, 0x42, 0X00, 0x00, 0x00};
-	PS2_Cmd(comd, sizeof(comd));
+	PS2_Cmd(PSX_CMD_INIT_PRESSURE, sizeof(PSX_CMD_INIT_PRESSURE));
 }
 
 // 进入配置
 void Ps2Remote::PS2_EnterConfing(void)
 {
-	uint8_t comd[] = {0x80, 0xc2, 0X00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00};
-	PS2_Cmd(comd, sizeof(comd));
+	PS2_Cmd(PSX_CMD_ENTER_CFG, sizeof(PSX_CMD_ENTER_CFG));
 }
 
 
 void Ps2Remote::PS2_TurnOnAnalogMode(void)
 {
-	uint8_t comd[] = {0x80, 0x22, 0X00, 0x80, 0x77, 0x00, 0x00, 0x00, 0x00};
-	PS2_Cmd(comd, sizeof(comd));
+	PS2_Cmd(PSX_ANALOGMODE, sizeof(PSX_ANALOGMODE));
 }
 
 // 振动设置
 void Ps2Remote::PS2_VibrationMode(void)
 {
-	uint8_t comd[] = {0x80, 0xB2, 0x00, 0x00, 0x80, 0xFF, 0xFF, 0xFF, 0xFF};
-	PS2_Cmd(comd, sizeof(comd));
+	PS2_Cmd(PSX_CMD_ENABLE_MOTOR, sizeof(PSX_CMD_ENABLE_MOTOR));
 }
 
 // 完成并保存配置
 void Ps2Remote::PS2_ExitConfing(void)
 {
-	uint8_t comd[] = {0x80, 0xc2, 0X00, 0x00, 0x5a, 0x5a, 0x5a, 0x5a, 0x5a};
-	PS2_Cmd(comd, sizeof(comd));
+	PS2_Cmd(PSX_CMD_EXIT_CFG, sizeof(PSX_CMD_EXIT_CFG));
 }
 
 /*
@@ -163,10 +176,10 @@ void Ps2Remote::PS2_ExitConfing(void)
 
 void Ps2Remote::PS2_Vibration(uint8_t motor1, uint8_t motor2)
 {
-	uint8_t comd[] = {0x80, 0x42, 0X00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	comd[3] = motor1;
-	comd[4] = motor2;
-	PS2_Cmd(comd, sizeof(comd));
+	uint8_t cmd[] = {0x80, 0x42, 0X00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	cmd[3] = motor1;
+	cmd[4] = motor2;
+	PS2_Cmd(cmd, sizeof(cmd));
 }
 
 // 只有在初始化函数void PS2_SetInit(void)中，对震动电机进行了初始化（PS2_VibrationMode();
@@ -175,12 +188,12 @@ void Ps2Remote::PS2_SetInit(void)
 {
 	PS2_ShortPoll();
 	PS2_ShortPoll();
-	PS2_ShortPoll();
 	PS2_EnterConfing();
+	PS2_ShortPoll();
 	PS2_TurnOnAnalogMode();
 	PS2_VibrationMode();
 	PS2_ExitConfing();
 	std::cout << "Sonny PS2 set init" << std::endl;
 	// 震动测试
-	// PS2_Vibration(0x00,0xFF);
+	PS2_Vibration(0x00,0xFF);
 }

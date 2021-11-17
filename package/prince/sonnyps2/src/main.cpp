@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 	Xepoll xepoll;//初始化事件模型
 	
     TimerFd timerfd(&xepoll); //初始化定时器事件并加入事件列表
-    Key key(&xepoll, &timerfd);
+    // Key key(&xepoll, &timerfd);
 
     return xepoll.loop();//等待事件触发
 }

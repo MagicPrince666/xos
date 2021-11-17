@@ -32,8 +32,8 @@ bool TimerFd::init() {
     }
     // 设置1s定时器
     struct itimerspec time_intv;
-    time_intv.it_value.tv_sec = 1;  //设定超时
-    time_intv.it_value.tv_nsec = 0; // 100000000;
+    time_intv.it_value.tv_sec = 0;  //设定超时
+    time_intv.it_value.tv_nsec = 100000000;
     time_intv.it_interval.tv_sec = time_intv.it_value.tv_sec;  //间隔超时
     time_intv.it_interval.tv_nsec = time_intv.it_value.tv_nsec;
     // 启动定时器
@@ -50,7 +50,8 @@ int TimerFd::timeOutCallBack() {
     uint8_t key = 0;
     uint8_t lx,ly,rx,ry;
     int ret = read(timer_fd_, &value, sizeof(uint64_t));
-  
+//    ps2->Ps2_Test();
+
     key = ps2->PS2_DataKey();
 
     if(key != 0) {

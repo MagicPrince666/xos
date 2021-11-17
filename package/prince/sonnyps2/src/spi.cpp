@@ -44,7 +44,6 @@ int Spi::SPIWrite(uint8_t *TxBuf, int len)
     memset(&xfer, 0, sizeof(xfer));
     xfer.tx_buf = (uint64_t)TxBuf;
 	xfer.len = len;
-    xfer.cs_change = 1;
     int ret = ioctl(spi_Fd_, SPI_IOC_MESSAGE(1), &xfer);
 #endif
     if (ret < 0) {
@@ -72,7 +71,6 @@ int Spi::SPIRead(uint8_t *RxBuf, int len)
     memset(&xfer, 0, sizeof(xfer));
     xfer.tx_buf = (uint64_t)RxBuf;
 	xfer.len = len;
-    xfer.cs_change = 1;
     int ret = ioctl(spi_Fd_, SPI_IOC_MESSAGE(1), &xfer);
 #endif
     
@@ -83,7 +81,7 @@ int Spi::SPIRead(uint8_t *RxBuf, int len)
     return ret;
 }
 
-int Spi::TransferSpiBuffers(void *tx_buffer, void *rx_buffer, uint32_t length)
+int Spi::TransferSpiBuffers(const void *tx_buffer, void *rx_buffer, uint32_t length)
 {
     struct spi_ioc_transfer	xfer;
 
@@ -92,7 +90,8 @@ int Spi::TransferSpiBuffers(void *tx_buffer, void *rx_buffer, uint32_t length)
     xfer.tx_buf = (uint64_t)tx_buffer;
     xfer.rx_buf = (uint64_t)rx_buffer;
 	xfer.len = length;
-    xfer.cs_change = 1;
+    xfer.delay_usecs = 100;
+//    xfer.cs_change = 1;
 
 	if (ioctl(spi_Fd_, SPI_IOC_MESSAGE(1), &xfer) < 0) {
         perror("SPI_IOC_MESSAGE");
@@ -184,6 +183,8 @@ int Spi::SPIOpen()
     printf("spi mode: 0x%02X\n", spi_mode_);
     if(spi_lsb_) {
         printf("lsb first %02X\n", spi_lsb_);
+    } else {
+        printf("msb first %02X\n", spi_lsb_);
     }
     printf("bits per word: %d\n", spi_bits_);
     printf("max speed: %d KHz\n", spi_speed_ / 1000);
