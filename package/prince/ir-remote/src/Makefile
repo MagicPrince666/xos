@@ -1,7 +1,7 @@
 TARGET	= ir-remote
 
 DIR		= . 
-INC		= -I. 
+INC		= -I. -I./include
 CFLAGS	= -Os -Wall
 LDFLAGS =
 

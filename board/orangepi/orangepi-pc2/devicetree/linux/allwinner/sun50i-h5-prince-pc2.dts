@@ -475,7 +475,7 @@
 
 	spidev@1 {
 		reg = <1>;
-		compatible = "psxpad-spi";
+		compatible = "sony,psxpad-spi";
 		spi-max-frequency = <20000000>;
 		spi-cpha;
 		spi-cpol;

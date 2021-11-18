@@ -37,10 +37,16 @@ IrRemote::~IrRemote(void)
 
 int IrRemote::IRKey(void)
 {
-    struct input_event key;
-    int ret = read(key_input_fd_, &key, sizeof(key));
+    // struct input_event key;
+    uint8_t buff[1024];
+    // int ret = read(key_input_fd_, &key, sizeof(key));
+    int ret = read(key_input_fd_, buff, 1024);
     if(ret > 0) {
-        std::cout << "Ret " << ret << std::endl;
+        std::cout << "Ret len = " << ret << std::endl;
+        for(int i = 0; i < ret; i++) {
+            printf("%02x ", buff[i]);
+        }
+        printf("\n");
 
         if(0) {
             if(nullptr != m_interface_){
