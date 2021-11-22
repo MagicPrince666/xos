@@ -446,9 +446,16 @@
 &mmc1 {
 	broken-cd;
 	bus-width = <4>;
+	non-removable;
 	vmmc-supply = <&reg_vcc3v3>;
 	max-frequency = <12500000>;
 	status = "okay";
+
+	esp8089: sdio_wifi@1 {
+		compatible = "esp,esp8089";
+		reg = <1>;
+		esp,crystal-26M-en = <2>;
+	};
 };
 
 &spi0 {
