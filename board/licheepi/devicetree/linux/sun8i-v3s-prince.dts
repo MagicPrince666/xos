@@ -585,14 +585,11 @@
 
 &codec {
     allwinner,audio-routing =
-	"Headphone",
-	"HP",
-	"Headphone",
-	"HPCOM",
-	"Mic",
-	"MIC1",
-	"Mic",
-	"HBIAS";
+	"Headphone", "HP",
+	"Headphone","HPCOM",
+	"MIC1", "Mic",
+	"Mic", "HBIAS";
+	status = "okay";
 };
 
 &lradc {

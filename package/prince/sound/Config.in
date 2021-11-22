@@ -1,0 +1,9 @@
+config BR2_PACKAGE_SOUND_PLAY
+	bool "sound play"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_ALSA_LIB
+	help
+	  Test sound display
+
+comment "sonny ps2 needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
