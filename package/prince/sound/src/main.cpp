@@ -161,7 +161,7 @@ void *decode(void *pthread_arg)
 	unsigned char			*OutputPtr = OutputBuffer;
 	unsigned char *const	OutputBufferEnd = OutputBuffer + OUTPUT_BUFFER_SIZE;
 	int						i, err;
-	int						fd = (int)pthread_arg;
+	int						fd = *((int*)pthread_arg);
 
 	/* libmad初始化 */
 	mad_stream_init(&Stream);

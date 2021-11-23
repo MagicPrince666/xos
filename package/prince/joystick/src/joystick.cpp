@@ -29,7 +29,9 @@ Joystick::Joystick(Xepoll *epoll, std::string devicePath)
     printf("open failed.\n");
     exit(1);
   }
-  epoll_->add(_fd, std::bind(&Joystick::JoystickRead, this));
+  if(_fd > 0) {
+    epoll_->add(_fd, std::bind(&Joystick::JoystickRead, this));
+  }
 }
 
 Joystick::Joystick(std::string devicePath, bool blocking)
