@@ -1,235 +1,374 @@
-#define ALSA_PCM_NEW_HW_PARAMS_API
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <mad.h>
+#include <id3tag.h>
 #include <alsa/asoundlib.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <pthread.h>
 
-#define u32 unsigned int
-#define u8   unsigned char
-#define u16 unsigned short
+#define INPUT_BUFFER_SIZE	(5 * 8192)
+#define OUTPUT_BUFFER_SIZE	(1152 * 8)	
+//#define OUTPUT_BUFFER_SIZE	(1152 * 4)	
 
-#pragma pack(push) 
-#pragma pack(1)     //1字节对齐
+snd_pcm_t			*handle;
+snd_pcm_uframes_t	frames;
+pthread_mutex_t		lock;
+pthread_cond_t		empty;
+pthread_cond_t		full;
+int					finished;
+uint32_t					rate;
+unsigned char		OutputBuffer[OUTPUT_BUFFER_SIZE];
 
-typedef  struct	{
-	u32 	dwSize;
-	u16		wFormatTag;
-	u16		wChannels;
-	u32 	dwSamplesPerSec;
-	u32 	dwAvgBytesPerSec;
-	u16		wBlockAlign;
-	u16		wBitsPerSample;
-} WAVEFORMAT;
-
-typedef  struct	{
-	u8    	RiffID [4];
-	u32     RiffSize;
-	u8    	WaveID[4];
-	u8    	FmtID[4];
-	u32     FmtSize;
-	u16   	wFormatTag;
-	u16   	nChannels;
-	u32 	nSamplesPerSec;  /*采样频率*/
-	u32 	nAvgBytesPerSec; /*每秒所需字节数*/
-	u16		nBlockAlign; /*数据块对齐单位,每个采样需要的字节数*/
-	u16		wBitsPerSample;/*每个采样需要的bit数*/
-	u8		DataID[4];
-	u32 	nDataBytes;
-} WAVE_HEADER;
-
-#pragma pack(pop) /* 恢复先前的pack设置 */
-
-WAVE_HEADER g_wave_header;
-snd_pcm_t *gp_handle;  //调用snd_pcm_open打开PCM设备返回的文件句柄，后续的操作都使用是、这个句柄操作这个PCM设备
-snd_pcm_hw_params_t *gp_params;  //设置流的硬件参数
-snd_pcm_uframes_t g_frames;    //snd_pcm_uframes_t其实是unsigned long类型
-char *gp_buffer;
-u32 g_bufsize;
-
-FILE * open_and_print_file_params(char *file_name)
+static unsigned short MadFixedToUshort(mad_fixed_t Fixed)
 {
-	FILE * fp = fopen(file_name, "r");
-	if (fp == NULL)
-	{
-		printf("can't open wav file\n");
-		return NULL;
-	}
-
-	memset(&g_wave_header, 0, sizeof(g_wave_header));
-	fread(&g_wave_header, 1, sizeof(g_wave_header), fp);
-
-	printf("RiffID:%c%c%c%c\n", g_wave_header.RiffID[0], g_wave_header.RiffID[1], g_wave_header.RiffID[2], g_wave_header.RiffID[3]);
-	printf("RiffSize:%d\n", g_wave_header.RiffSize);
-	printf("WaveID:%c%c%c%c\n", g_wave_header.WaveID[0], g_wave_header.WaveID[1], g_wave_header.WaveID[2], g_wave_header.WaveID[3]);
-	printf("FmtID:%c%c%c%c\n", g_wave_header.FmtID[0], g_wave_header.FmtID[1], g_wave_header.FmtID[2], g_wave_header.FmtID[3]);
-	printf("FmtSize:%d\n", g_wave_header.FmtSize);
-	printf("wFormatTag:%d\n", g_wave_header.wFormatTag);
-	printf("nChannels:%d\n", g_wave_header.nChannels);
-	printf("nSamplesPerSec:%d\n", g_wave_header.nSamplesPerSec);
-	printf("nAvgBytesPerSec:%d\n", g_wave_header.nAvgBytesPerSec);
-	printf("nBlockAlign:%d\n", g_wave_header.nBlockAlign);
-	printf("wBitsPerSample:%d\n", g_wave_header.wBitsPerSample);
-	printf("DataID:%c%c%c%c\n", g_wave_header.DataID[0], g_wave_header.DataID[1], g_wave_header.DataID[2], g_wave_header.DataID[3]);
-	printf("nDataBytes:%d\n", g_wave_header.nDataBytes);
-
-	return fp;
+	Fixed = Fixed >> (MAD_F_FRACBITS - 15);
+	return((unsigned short)Fixed);
 }
 
-int set_hardware_params()
+void set_volume(long volume)
 {
-	int rc;
-	/* Open PCM device for playback */
-	rc = snd_pcm_open(&gp_handle, "hw:0,0", SND_PCM_STREAM_PLAYBACK, 0);
-	if (rc < 0) 
-	{
-		printf("unable to open pcm device\n");
+  snd_mixer_t *mixerFd;
+  snd_mixer_elem_t *elem;
+  long minVolume = 0,maxVolume = 100;
+  int result;
+  // 打开混音器
+   if ((result = snd_mixer_open( &mixerFd, 0)) < 0)
+   {
+        printf("snd_mixer_open error!\n");
+        mixerFd = NULL;
+   }
+  //将HCTL连接到打开的混音器
+   if ((result = snd_mixer_attach( mixerFd, "default")) < 0)
+   {
+        printf("snd_mixer_attach error!\n");
+        snd_mixer_close(mixerFd);
+        mixerFd = NULL;
+   }
+  // 注册混音器
+   if ((result = snd_mixer_selem_register( mixerFd, NULL, NULL)) < 0)
+  {
+        printf("snd_mixer_selem_register error!\n");
+        snd_mixer_close(mixerFd);
+        mixerFd = NULL;
+  }
+  // 加载混音器
+  if ((result = snd_mixer_load( mixerFd)) < 0)
+  {
+        printf("snd_mixer_load error!\n");
+        snd_mixer_close(mixerFd);
+        mixerFd = NULL;
+  }
+   // 遍历混音器元素
+    for(elem=snd_mixer_first_elem(mixerFd); elem; elem=snd_mixer_elem_next(elem))
+    {
+        if (snd_mixer_elem_get_type(elem) == SND_MIXER_ELEM_SIMPLE &&
+             snd_mixer_selem_is_active(elem)) // 找到可以用的, 激活的elem
+        {
+            snd_mixer_selem_get_playback_volume_range(elem, &minVolume, &maxVolume);
+            snd_mixer_selem_set_playback_volume_all(elem, volume);
+        }
+    }
+	snd_mixer_close(mixerFd);
+}
+
+int snd_init(void)
+{
+	int err;
+	snd_pcm_hw_params_t *params;
+	printf("mad mp3 player %s\n", __TIME__);
+	
+	/* open the pcm device */
+	if ((err = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+		printf("failed to open pcm device \"default\" (%s)\n", snd_strerror(err));
 		return -1;
 	}
 
-	/* Allocate a hardware parameters object */
-	snd_pcm_hw_params_alloca(&gp_params);
-
-	/* Fill it in with default values. */
-	rc = snd_pcm_hw_params_any(gp_handle, gp_params);
-	if (rc < 0)
-	{
-		printf("unable to Fill it in with default values.\n");
-//		goto err1;
+	/* alloc memory space for hardware parameter structure*/
+	if ((err = snd_pcm_hw_params_malloc(&params)) < 0) {
+		printf("cannot allocate hardware parameter structure (%s)\n", snd_strerror(err));
+		return -1;
 	}
 
-	/* Interleaved mode */
-	rc = snd_pcm_hw_params_set_access(gp_handle, gp_params, SND_PCM_ACCESS_RW_INTERLEAVED);
-	if (rc < 0)
-	{
-		printf("unable to Interleaved mode.\n");
-//		goto err1;
+	/* 使用默认数据初始化声卡参数结构体 */
+	if ((err = snd_pcm_hw_params_any(handle, params)) < 0) {
+		printf("failed to initialize hardware parameter structure (%s)\n", snd_strerror(err));
+		return -1;
 	}
 
-	snd_pcm_format_t format;
-
-	if (8 == g_wave_header.FmtSize)
-	{
-		format = SND_PCM_FORMAT_U8;
-	}
-	else if (16 == g_wave_header.FmtSize)
-	{
-		format = SND_PCM_FORMAT_S16_LE;
-	}
-	else if (24 == g_wave_header.FmtSize)
-	{
-		format = SND_PCM_FORMAT_U24_LE;
-	}
-	else if (32 == g_wave_header.FmtSize)
-	{
-		format = SND_PCM_FORMAT_U32_LE;
-	}
-	else
-	{
-		printf("SND_PCM_FORMAT_UNKNOWN.\n");
-		format = SND_PCM_FORMAT_UNKNOWN;
-//		goto err1;
+	/* 设置声卡的访问参数为交错访问 */
+	if ((err = snd_pcm_hw_params_set_access(handle, params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
+		printf("cannot set access type (%s)\n", snd_strerror(err));
+		return -1;
 	}
 
-	/* set format */
-	rc = snd_pcm_hw_params_set_format(gp_handle, gp_params, format);
-	if (rc < 0)
-	{
-		printf("unable to set format.\n");
-//		goto err1;
+	/* 设置声卡的数据格式为有符号的32位小端数 */
+	if ((err = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S32_LE)) < 0) {
+	//if ((err = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE)) < 0) {
+	//if ((err = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_U16_LE)) < 0) {
+		printf("cannot set sample format (%s)\n", snd_strerror(err));
+		return -1;
 	}
 
-	/* set channels (stero) */
-	snd_pcm_hw_params_set_channels(gp_handle, gp_params, g_wave_header.nChannels);
-	if (rc < 0)
-	{
-		printf("unable to set channels (stero).\n");
-//		goto err1;
+	/* 设置声卡的采样率为44100 */
+	rate = 44100;
+	if ((err = snd_pcm_hw_params_set_rate_near(handle, params, &rate, 0)) < 0) {
+		printf("cannot set sample format (%s)\n", snd_strerror(err));
+		return -1;
+	}
+	printf("rate: %d\n", rate);
+
+	/* 设置声卡的声道为2 */
+	int channels = 2;
+	if ((err = snd_pcm_hw_params_set_channels(handle, params, channels)) < 0) {
+		printf("cannot set channel count (%s)\n", snd_strerror(err));
+		return -1;
 	}
 
-	/* set sampling rate */
-    u32 dir, rate = g_wave_header.nSamplesPerSec;
-	rc = snd_pcm_hw_params_set_rate_near(gp_handle, gp_params, &rate, &dir);
-	if (rc < 0)
-	{
-		printf("unable to set sampling rate.\n");
-//		goto err1;
+	frames = 1152;
+	//frames = 512;
+	if ((err = snd_pcm_hw_params_set_period_size_near(handle, params, &frames, 0)) < 0) {
+		printf("cannot set period size (%s)\n", snd_strerror(err));
+		return -1;
+	}
+	printf("frames: %d\n", frames);
+		
+	if ((err = snd_pcm_hw_params(handle, params)) < 0) {
+		printf("cannot set parameters (%s)\n", snd_strerror(err));
+		return -1;
 	}
 
-	/* Write the parameters to the dirver */
-	rc = snd_pcm_hw_params(gp_handle, gp_params);
-	if (rc < 0) {
-		printf("unable to set hw parameters: %s\n", snd_strerror(rc));
-//		goto err1;
-	}
-
-	snd_pcm_hw_params_get_period_size(gp_params, &g_frames, &dir);
-	g_bufsize = g_frames * 2;	//g_frames * 4 //播放速度
-	gp_buffer = (u8 *)malloc(g_bufsize);
-	if (gp_buffer == NULL)
-	{
-		printf("malloc failed\n");
-		//goto err1;
+	// snd_pcm_hw_params_free(params);
+	if ((err = snd_pcm_prepare(handle)) < 0) {
+		printf("cannont prepare audio interface for use (%s)\n", snd_strerror(err));
+		return -1;
 	}
 
 	return 0;
-
-//err1:
-	snd_pcm_close(gp_handle);
-	return -1;
 }
 
-int main(int argc, char *argv[])
+/* 解码函数 */
+void *decode(void *pthread_arg)
 {
-	if (argc < 2)
-	{
-		printf("usage: %s filename.wav\n", argv[0]);
+	struct mad_stream 		Stream;
+	struct mad_frame 		Frame;
+	struct mad_synth 		Synth;
+	//mad_timer_t				Timer;
+	unsigned char 			Mp3_InputBuffer[INPUT_BUFFER_SIZE];
+	unsigned char			*OutputPtr = OutputBuffer;
+	unsigned char *const	OutputBufferEnd = OutputBuffer + OUTPUT_BUFFER_SIZE;
+	int						i, err;
+	int						fd = (int)pthread_arg;
+
+	/* libmad初始化 */
+	mad_stream_init(&Stream);
+	mad_frame_init(&Frame);
+	mad_synth_init(&Synth);
+	// set_volume(50);
+	/* 开始解码 */
+	do {
+		/* 如果缓冲区空了或不足一帧数据, 就向缓冲区填充数据 */
+		if(Stream.buffer == NULL || Stream.error == MAD_ERROR_BUFLEN) {
+			size_t 			BufferSize;		/* 缓冲区大小 */
+			size_t			Remaining;		/* 帧剩余数据 */
+			unsigned char	*BufferStart;	/* 头指针 */
+
+			if (Stream.next_frame != NULL) {
+
+				/* 把剩余没解码完的数据补充到这次的缓冲区中 */
+				Remaining = Stream.bufend - Stream.next_frame;
+				memmove(Mp3_InputBuffer, Stream.next_frame, Remaining);
+				BufferStart = Mp3_InputBuffer + Remaining;
+				BufferSize = INPUT_BUFFER_SIZE - Remaining;
+			} else {
+
+				/* 设置了缓冲区地址, 但还没有填充数据 */
+				BufferSize = INPUT_BUFFER_SIZE;
+				BufferStart = Mp3_InputBuffer;
+				Remaining = 0;
+			}
+
+			/* 从文件中读取数据并填充缓冲区 */
+			BufferSize = read(fd, BufferStart, BufferSize);
+			if (BufferSize <= 0) {
+				printf("file read error\n");
+				exit(-1);
+			}
+
+			mad_stream_buffer(&Stream, Mp3_InputBuffer, BufferSize + Remaining);
+			Stream.error = (mad_error)0;
+		}
+
+		if (err = mad_frame_decode(&Frame, &Stream)) {
+			// printf("decoder error: %x\n", Stream.error);
+
+			if (MAD_RECOVERABLE(Stream.error)) {
+				printf("recorve\n");
+				continue;
+			} else {
+				if (Stream.error == MAD_ERROR_BUFLEN) {
+					// printf("buffer数据不足一帧, 需要继续填充\n");
+
+					continue; /* buffer解码光了, 需要继续填充了 */
+				} else if (Stream.error == MAD_ERROR_LOSTSYNC) {
+					printf("lost sync\n");
+
+					int tagsize;
+					tagsize = id3_tag_query(Stream.this_frame, Stream.bufend - Stream.this_frame);
+					if (tagsize > 0) {
+						mad_stream_skip(&Stream, tagsize);
+					}
+					continue;
+				} else {
+					printf("oops!! error, stop decoder\n");
+					exit(-1);
+				}
+			}
+		}
+		/* 设置每帧的播放时间 */
+		//mad_timer_add(&Timer, Frame.header.duration);
+		/* 解码成音频数据 */
+		mad_synth_frame(&Synth, &Frame);
+
+
+		pthread_mutex_lock(&lock);
+		if (finished) {
+			pthread_cond_wait(&empty, &lock);
+		}
+		/*printf("Synth.pcm.length: %d\n", Synth.pcm.length);
+		printf("samplerate: %d\n", Synth.pcm.samplerate);
+		 if (rate != Synth.pcm.samplerate) {
+			if ((err = snd_pcm_hw_params_set_rate_near(handle, params, &rate, 0)) < 0) {
+				printf("cannot set sample format (%s)\n", snd_strerror(err));
+				return -1;
+			}
+			rate = Synth.pcm.samplerate;
+			if ((err = snd_pcm_hw_params(handle, params)) < 0) {
+				printf("cannot set parameters (%s)\n", snd_strerror(err));
+				return -1;
+			}
+			if ((err = snd_pcm_prepare(handle)) < 0) {
+				printf("cannont prepare audio interface for use (%s)\n", snd_strerror(err));
+				return -1;
+			}
+		}*/
+
+		/* 解码后的音频数据转换成16位的数据 */
+		for (i = 0; i < Synth.pcm.length; i++) {
+			//unsigned short Sample;
+			signed int Sample;
+			Sample = Synth.pcm.samples[0][i];
+			//Sample = MadFixedToUshort(Synth.pcm.samples[0][i]);
+			*(OutputPtr++) = (Sample & 0xff);
+			*(OutputPtr++) = (Sample >> 8);
+			*(OutputPtr++) = (Sample >> 16);
+			*(OutputPtr++) = (Sample >> 24);
+
+			if (MAD_NCHANNELS(&Frame.header) == 2) {
+				Sample = Synth.pcm.samples[1][i];
+				//Sample = MadFixedToUshort(Synth.pcm.samples[1][i]);
+				*(OutputPtr++) = (Sample & 0xff);
+				*(OutputPtr++) = (Sample >> 8);
+				*(OutputPtr++) = (Sample >> 16);
+				*(OutputPtr++) = (Sample >> 24);
+			}
+
+			/* 输出缓冲区填充满 */
+			if (OutputPtr >= OutputBufferEnd) {
+				OutputPtr = OutputBuffer;
+				finished = 1;
+				pthread_mutex_unlock(&lock);
+				pthread_cond_signal(&full);
+			}
+		}
+	} while(1);
+
+	mad_synth_finish(&Synth);
+	mad_frame_finish(&Frame);
+	mad_stream_finish(&Stream);
+
+	return NULL;
+}
+
+long writebuf(snd_pcm_t *handle, char *buf, long len, size_t *frames)
+{
+	long r;
+	while (len > 0) {
+		r = snd_pcm_writei(handle, buf, 4);
+		if (r == -EAGAIN)
+			continue;
+		if (r < 4) {
+			printf("write = %li\n", r);
+		}
+		//printf("write = %li\n", r);
+		if (r < 0)
+			return r;
+		// showstat(handle, 0);
+		//buf += r * 4;
+		buf += r * 8;
+		len -= r;
+		*frames += r;
+	}
+	return 0;
+}
+
+int main(int argc, char **argv)
+{
+	int			mp3_fd;
+	int			err = -1;
+	pthread_t	decode_thread;
+
+	if (!argv[1]) {
+		printf("plz input a mp3 file\n");
 		return -1;
 	}
 
-	FILE * fp = open_and_print_file_params(argv[1]);
-	//int fd = open(argv[1], O_RDONLY);
-	if (fp == NULL)
-	{
-		printf("open_and_print_file_params error\n");
+	mp3_fd = open(argv[1], O_RDONLY);
+	if (!mp3_fd) {
+		perror("failed to open file ");
 		return -1;
-  }
+	}
 
-	int ret = set_hardware_params();
-	if (ret < 0)
-	{
-		printf("set_hardware_params error\n");
+	if (snd_init() < 0) {
+		printf("faile to init snd card\n");
 		return -1;
+	}
+
+	pthread_mutex_init(&lock, NULL);
+	pthread_cond_init(&empty, NULL);
+	pthread_cond_init(&full, NULL);
+	pthread_create(&decode_thread, NULL, decode, (void*)mp3_fd);
+	
+	while (1) {
+		pthread_mutex_lock(&lock);
+		if (!finished) {
+			pthread_cond_wait(&full, &lock);
+		}
+		
+		//if ((err = snd_pcm_writei(handle, OutputBuffer, frames)) < 0) {
+		size_t count;
+		if ((err = writebuf(handle, (char *)OutputBuffer, 1152, &count)) < 0) {
+			printf("write error: %s, errno: %d\n", snd_strerror(err), err);
+			if (err == -EPIPE) {
+				int errb;
+				errb = snd_pcm_recover(handle, err, 0);
+				if (errb < 0) {
+					printf("failed to recover from underrun\n");
+					return -1;
+				} else {
+					printf("recover\n");
+				}
+				snd_pcm_prepare(handle);
+			}
+		}
+
+		finished = 0;
+		pthread_mutex_unlock(&lock);
+		pthread_cond_signal(&empty);
 	}
 	
-	size_t rc;
-	while (1)
-	{
-		rc = fread(gp_buffer, g_bufsize, 1, fp);
-		if (rc <1)
-		{
-			break;
-		}
-
-		ret = snd_pcm_writei(gp_handle, gp_buffer, g_frames);
-		if (ret == -EPIPE) {
-			printf("underrun occured\n");
-			break;
-		}
-		else if (ret < 0) {
-			printf("error from writei: %s\n", snd_strerror(ret));
-			break;
-		}
-	}
-
-
-	snd_pcm_drain(gp_handle);
-	snd_pcm_close(gp_handle);
-	free(gp_buffer);
-	fclose(fp);
 	return 0;
 }

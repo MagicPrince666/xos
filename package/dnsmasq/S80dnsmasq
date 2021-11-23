@@ -8,8 +8,8 @@ case "$1" in
 		ip link add name br-lan type bridge
 		ip link set br-lan up
 		if ifconfig -a | grep eth0 > /dev/null; then
-			ifconfig eth0 up
-			ip link set dev eth0 master br-lan
+			#ifconfig eth0 up
+			#ip link set dev eth0 master br-lan
 		fi
 		if ifconfig -a | grep usb0 > /dev/null; then
 			ifconfig usb0 up

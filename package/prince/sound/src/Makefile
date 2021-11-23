@@ -3,7 +3,7 @@ TARGET	= sound
 DIR		= . 
 INC		= -I. 
 CFLAGS	= -Os -Wall
-LDFLAGS =
+LDFLAGS = -lpthread -lid3tag -lasound -lmad
 
 OBJPATH	= .
 
