@@ -3,6 +3,7 @@
 #include <vector>
 #include "xepoll.h"
 #include "interface.h"
+#include "trig.h"
 
 class GpioKey
 {
@@ -19,4 +20,5 @@ private:
     Interface *m_interface_;
     void getFiles(std::string path, std::vector<std::string>& files);
     struct timeval last_time_;
+    Trig *trig;
 };

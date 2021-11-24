@@ -14,11 +14,13 @@
 
 #include "ultrasonic.h"
 
+
 GpioKey::GpioKey(Xepoll *epoll, Interface *interface)
 : epoll_(epoll), m_interface_(interface)
 {
     char          buf[256] = { 0, };  /* RATS: Use ok */
     int           fd = -1;
+    trig = new Trig();
     std::string dev = "";
     std::vector<std::string> events;
     getFiles("/dev/input/", events);
@@ -39,6 +41,7 @@ GpioKey::GpioKey(Xepoll *epoll, Interface *interface)
         exit(0);
     }
     init();
+    trig->Action();
 }
 
 GpioKey::~GpioKey(void)
@@ -46,6 +49,7 @@ GpioKey::~GpioKey(void)
     if (key_input_fd_ > 0) {
         close(key_input_fd_);
     }
+    delete trig;
 }
 
 void GpioKey::getFiles(std::string path, std::vector<std::string>& files)
@@ -99,6 +103,7 @@ int GpioKey::IRKey(void)
                     time_t time = 1000000 - last_time_.tv_usec + key.time.tv_usec;
                 }
                 std::cout << "Time = " << time << std::endl;
+                //trig->Action();
             }
         }
     }
