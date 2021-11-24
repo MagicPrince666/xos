@@ -24,6 +24,8 @@ Trig::Trig() {
     if(trig_fd_ <= 0) {
         std::cout << "Init trig pin error" << std::endl;
         exit(0);
+    } else {
+        write(trig_fd_, "0", 1);
     }
 }
 
@@ -35,8 +37,8 @@ Trig::~Trig() {
 
 int Trig::Action() {
     if(trig_fd_ > 0) {
-        write(trig_fd_, "0", 1);
         write(trig_fd_, "1", 1);
+        usleep(10);
         write(trig_fd_, "0", 1);
     } else {
         std::cout << "trig pin error" << std::endl;

@@ -427,6 +427,11 @@
 		function = "spi1";
 	};
 
+	uart2_pins: uart2_pins {
+		pins = "PA0", "PA1";
+		function = "uart2";
+	};
+
 	pwm0_pin: pwm0@0 {
 		pins = "PA5";
 		function = "pwm0";

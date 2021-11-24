@@ -1,0 +1,8 @@
+config BR2_PACKAGE_INV_MPU
+	bool "inv_mpu"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  Test invensense,mpu6500 senser
+
+comment "sonny ps2 needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP
