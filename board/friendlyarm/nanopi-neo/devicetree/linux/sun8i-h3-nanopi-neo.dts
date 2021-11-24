@@ -229,6 +229,11 @@
 		drive-strength = <30>;
 	};
 
+	i2c0_pins: i2c0-pins {
+		pins = "PB6", "PB7";
+		function = "i2c0";
+	};
+
 	t_irq: t_irq-pins {
 		pins = "PA2";
 		function = "gpio_in";
@@ -241,4 +246,10 @@
 		"MIC1", "Mic",
 		"Mic",  "MBIAS";
 	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+	pinctrl-names = "default";
+    pinctrl-0 = <&i2c0_pins>;
 };
