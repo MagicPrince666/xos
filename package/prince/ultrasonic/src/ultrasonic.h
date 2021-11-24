@@ -4,6 +4,7 @@
 #include "xepoll.h"
 #include "interface.h"
 #include "trig.h"
+#include "servo_motor.h"
 
 class GpioKey
 {
@@ -21,4 +22,5 @@ private:
     void getFiles(std::string path, std::vector<std::string>& files);
     struct timeval last_time_;
     Trig *trig;
+    ServoMotor *servo;
 };

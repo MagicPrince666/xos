@@ -41,7 +41,8 @@ GpioKey::GpioKey(Xepoll *epoll, Interface *interface)
         exit(0);
     }
     init();
-    trig->Action();
+    // trig->Action();
+    servo = new ServoMotor();
 }
 
 GpioKey::~GpioKey(void)
