@@ -50,12 +50,12 @@
 	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
 
 	aliases {
-		serial0 = &uart0;
+		// serial0 = &uart0;
 		serial1 = &uart1;
 	};
 
 	chosen {
-		stdout-path = "serial0:115200n8";
+		stdout-path = "serial1:115200n8";
 		/delete-node/ framebuffer@0;
 	};
 
@@ -80,6 +80,12 @@
 			gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 		};
+
+		trig {
+			label = "trig";
+			gpios = <&pio 0 0 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
 	};
 
 	gpio-keys {
@@ -89,10 +95,10 @@
 		autorepeat;
 
 		switch@0 {
-			label = "key3";
+			label = "echo";
 			linux,code = <103>;
 			interrupt-parent = <&pio>;
-			interrupts = <0 0 IRQ_TYPE_EDGE_BOTH>;//PA0
+			interrupts = <0 6 IRQ_TYPE_EDGE_BOTH>;//PA6
 		};
 	};
 
@@ -105,13 +111,13 @@
 		backlight-boot-on;
 	};
 };
-
+/*
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pa_pins>;
 	status = "okay";
 };
-
+*/
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart1_pins>;
@@ -189,11 +195,23 @@
 	usb0_id_det-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>; /* PG12 */
 };
 
+&pwm {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pwm0_pins>;
+        status = "okay";
+};
+
 &pio {
 	spi0_pins: spi0-pins {
 		pins = "PC0", "PC1", "PC2", "PC3";
 		function = "spi0";
-   };
+   	};
+
+	pwm0_pins: pwm0 {
+        pins = "PA5";
+        function = "pwm0";
+		drive-strength = <30>;
+	};
 
 	spi0_pins_cs1: spi0_pins_cs1 {
 		pins = "PC3", "PA3";
@@ -208,10 +226,19 @@
 	backlight_pins: backlight-pins {
 		pins = "PG9";
 		function = "gpio_out";
+		drive-strength = <30>;
 	};
 
 	t_irq: t_irq-pins {
 		pins = "PA2";
 		function = "gpio_in";
 	};
+};
+
+&codec {
+	allwinner,audio-routing =
+		"Line Out", "LINEOUT",
+		"MIC1", "Mic",
+		"Mic",  "MBIAS";
+	status = "okay";
 };
