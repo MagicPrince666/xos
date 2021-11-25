@@ -12,7 +12,7 @@ TimerFd::TimerFd(Xepoll *epoll)
     if(!init()) {
       std::cout << "timerfd init failed!" << std::endl;
     }
-    trig = new Trig();
+    // trig = new Trig();
     servo = new ServoMotor();
 }
 
@@ -53,13 +53,13 @@ int TimerFd::timeOutCallBack() {
     trig->Action(); // 触发超声波发射
 
     if(move_dir_) {
-        angle_ += 15;
+        angle_ += 5;
         if(angle_ > 90) {
             angle_ = 90;
             move_dir_ = false;
         }
     } else {
-        angle_ -= 15;
+        angle_ -= 5;
         if(angle_ < 0) {
             angle_ = 0;
             move_dir_ = true;
@@ -71,8 +71,6 @@ int TimerFd::timeOutCallBack() {
     return ret;
 }
 
-void TimerFd::Transfer(bool flag) {
-    if(flag) {
-        trig->Action();
-    }
+void TimerFd::Transfer(int num) {
+    // std::cout << "distance = " << num << " mm" <<std::endl;
 }

@@ -90,6 +90,7 @@ int GpioKey::IRKey(void)
     int ret = read(key_input_fd_, &key, sizeof(key));
     if(ret > 0) {
         if(key.code == 103) {
+
             if(key.value == 1) {
                 last_time_ = key.time;
                 // std::cout << "Start Time sec = " << key.time.tv_sec << " usec = " << key.time.tv_usec << std::endl;
@@ -105,9 +106,14 @@ int GpioKey::IRKey(void)
                     return -1;
                 }
                 // std::cout << "End Time sec = " << key.time.tv_sec << " usec = " << key.time.tv_usec << std::endl;
-                double distance = 340 * ((double)time/1000000.0) / 2.0;
-                std::cout << "distance = " << distance << " m" <<std::endl;
+                double distance = 34000 * ((double)time/1000000.0) / 2.0;
+                std::cout << "Time = " << time/1000 << " ms" <<std::endl;
+                std::cout << "Distance = " << distance << " mm" <<std::endl;
+                if(nullptr != m_interface_){
+                    m_interface_->Transfer(distance);
+                }
             }
+
         }
     }
     return ret;

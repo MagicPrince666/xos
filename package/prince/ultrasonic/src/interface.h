@@ -4,5 +4,5 @@ class Interface
 {
 public:
     virtual ~Interface() {}
-    virtual void Transfer(bool flag) = 0;
+    virtual void Transfer(int num) = 0;
 };

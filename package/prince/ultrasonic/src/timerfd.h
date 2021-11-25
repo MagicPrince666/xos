@@ -15,7 +15,7 @@ public:
     bool init();
     int timeOutCallBack();
 
-    void Transfer(bool flag);
+    void Transfer(int num);
 
 private:
     Xepoll *epoll_;
