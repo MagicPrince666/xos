@@ -73,6 +73,11 @@
 			allwinner,codec-analog-controls = <&codec_analog>;
 			status = "disabled";
 		};
+
+		codec_analog: codec-analog@1f015c0 {
+			compatible = "allwinner,sun8i-h3-codec-analog";
+			reg = <0x01f015c0 0x4>;
+		};
 	};
 
 	leds {
@@ -89,12 +94,6 @@
 			gpios = <&r_pio 0 10 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 			linux,default-trigger = "timer";
-		};
-
-		blk {
-			label = "backlight";
-			gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
 		};
 
 		trig {
@@ -127,13 +126,13 @@
 		backlight-boot-on;
 	};
 };
-/*
+
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pa_pins>;
-	status = "okay";
+	status = "disabled";
 };
-*/
+
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart1_pins>;
@@ -165,7 +164,7 @@
 		reset-gpios = <&pio 6 8 GPIO_ACTIVE_LOW>; //PG8
 		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>;//PA1
 		debug = <0>;
-//		backlight = <&backlight>;
+		backlight = <&backlight>;
 	};
 
 	tsc2046@1 {
@@ -175,7 +174,7 @@
 		pinctrl-0 = <&t_irq>;
 		interrupt-parent = <&pio>;
 		interrupts = <0 2 IRQ_TYPE_EDGE_FALLING>;	//PA2
-		spi-max-frequency = <2500000>;
+		spi-max-frequency = <2000000>;
 		pendown-gpio = <&pio 0 2 GPIO_ACTIVE_HIGH>;
 		vcc-supply = <&reg_vcc3v3>;
 
@@ -213,9 +212,9 @@
 };
 
 &pwm {
-        pinctrl-names = "default";
-        pinctrl-0 = <&pwm0_pins>;
-        status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm0_pins>;
+	status = "okay";
 };
 
 &pio {
@@ -270,18 +269,19 @@
 	pinctrl-names = "default";
     pinctrl-0 = <&i2c0_pins>;
 
-	mpu6500: accelerometer@68 {
+	mpu6500: accelerometer@77 {
 		compatible = "invensense,mpu6500";
-		reg = <0x68>;
+		reg = <0x77>;
 		interrupt-parent = <&pio>;
 		interrupts = <6 11 IRQ_TYPE_EDGE_RISING>; //PG 11
 		orientation = <0xff 0 0 0 1 0 0 0 0xff>;
-		status = "disabled";
+		status = "okay";
 	};
 
 	mpu9250: imu@68 {
-		compatible = "invensense,mpu6050";
+		compatible = "invensense,mpu9250";
 		reg = <0x68>;
+		status = "disabled";
 		interrupt-parent = <&pio>;
 		interrupts = <6 11 IRQ_TYPE_EDGE_RISING>;
 		i2c-gate {

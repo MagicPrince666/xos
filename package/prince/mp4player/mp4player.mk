@@ -24,7 +24,6 @@ endef
 
 define MP4PLAYER_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/mp4player $(TARGET_DIR)/usr/bin
-    $(INSTALL) -D -m 0755 $(@D)/bigbuckbunny_320x240.h264 $(TARGET_DIR)/root
 endef
 
 define MP4PLAYER_PERMISSIONS

@@ -1,9 +1,9 @@
-TARGET	= ultrasonic
+TARGET	= mp3play
 
 DIR		= . 
 INC		= -I.
 CFLAGS	= -Os -Wall
-LDFLAGS =
+LDFLAGS = -lpthread -lasound -lmpg123
 
 OBJPATH	= .
 

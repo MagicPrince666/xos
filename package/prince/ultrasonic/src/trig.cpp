@@ -40,7 +40,10 @@ int Trig::Action() {
         write(trig_fd_, "1", 1);
         usleep(10);
         write(trig_fd_, "0", 1);
+        return 0;
     } else {
-        std::cout << "trig pin error" << std::endl;
+        std::cout << "trig pin error trig_fd_ = " << trig_fd_ << std::endl;
+        return -1;
     }
+    return 0;
 }

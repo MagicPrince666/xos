@@ -14,6 +14,7 @@
 #include "xepoll.h"
 #include "ultrasonic.h"
 #include "interface.h"
+#include "timerfd.h"
 
 static void sigint_handler(int sig)
 {
@@ -27,7 +28,8 @@ int main(int argc, char *argv[]) {
 
 	Xepoll xepoll;//初始化事件模型
 
-    GpioKey ultrasonic(&xepoll, nullptr);
+    TimerFd timerfd(&xepoll);
+    GpioKey ultrasonic(&xepoll, &timerfd);
 
     return xepoll.loop();//等待事件触发
 }

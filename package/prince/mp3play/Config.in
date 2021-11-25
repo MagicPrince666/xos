@@ -1,0 +1,10 @@
+config BR2_PACKAGE_MP3PLAY
+	bool "mp3 play"
+	depends on BR2_INSTALL_LIBSTDCPP
+	select BR2_PACKAGE_ALSA_LIB
+	select BR2_PACKAGE_MPG123
+	help
+	  Test mp3 display
+
+comment "sonny ps2 needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP

@@ -14,13 +14,11 @@
 
 #include "ultrasonic.h"
 
-
 GpioKey::GpioKey(Xepoll *epoll, Interface *interface)
 : epoll_(epoll), m_interface_(interface)
 {
     char          buf[256] = { 0, };  /* RATS: Use ok */
     int           fd = -1;
-    trig = new Trig();
     std::string dev = "";
     std::vector<std::string> events;
     getFiles("/dev/input/", events);
@@ -41,8 +39,6 @@ GpioKey::GpioKey(Xepoll *epoll, Interface *interface)
         exit(0);
     }
     init();
-    // trig->Action();
-    servo = new ServoMotor();
 }
 
 GpioKey::~GpioKey(void)
@@ -50,7 +46,6 @@ GpioKey::~GpioKey(void)
     if (key_input_fd_ > 0) {
         close(key_input_fd_);
     }
-    delete trig;
 }
 
 void GpioKey::getFiles(std::string path, std::vector<std::string>& files)
@@ -97,14 +92,21 @@ int GpioKey::IRKey(void)
         if(key.code == 103) {
             if(key.value == 1) {
                 last_time_ = key.time;
+                // std::cout << "Start Time sec = " << key.time.tv_sec << " usec = " << key.time.tv_usec << std::endl;
             } else {
-                if (key.time.tv_sec == last_time_.tv_sec) {
-                    time_t time = key.time.tv_usec - last_time_.tv_usec;
+                time_t time = 0;
+                if (key.time.tv_sec > last_time_.tv_sec) {
+                    time = (key.time.tv_sec - last_time_.tv_sec)*1000000 \
+                     - last_time_.tv_usec + key.time.tv_usec;
+                } else if(key.time.tv_sec == last_time_.tv_sec){
+                    time =  key.time.tv_usec - last_time_.tv_usec;
                 } else {
-                    time_t time = 1000000 - last_time_.tv_usec + key.time.tv_usec;
+                    std::cout << "Time Error" << std::endl;
+                    return -1;
                 }
-                std::cout << "Time = " << time << std::endl;
-                //trig->Action();
+                // std::cout << "End Time sec = " << key.time.tv_sec << " usec = " << key.time.tv_usec << std::endl;
+                double distance = 340 * ((double)time/1000000.0) / 2.0;
+                std::cout << "distance = " << distance << " m" <<std::endl;
             }
         }
     }
