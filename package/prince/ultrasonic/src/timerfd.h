@@ -5,9 +5,8 @@
 #include "xepoll.h"
 #include "servo_motor.h"
 #include "trig.h"
-#include "interface.h"
 
-class TimerFd : public Interface {
+class TimerFd {
 public:
     TimerFd(Xepoll *epoll);
     ~TimerFd();
@@ -15,15 +14,14 @@ public:
     bool init();
     int timeOutCallBack();
 
-    void Transfer(int num);
-
 private:
     Xepoll *epoll_;
     int timer_fd_{-1};
     bool move_dir_{true};
     int angle_{0};
     ServoMotor *servo;
-    Trig *trig;
+    // Trig *trig;
+    int count_{0};
 };
 
 #endif

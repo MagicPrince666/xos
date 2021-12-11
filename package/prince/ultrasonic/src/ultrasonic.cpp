@@ -11,11 +11,12 @@
 #include <dirent.h>
 #include <string.h>
 #include <linux/joystick.h>
+#include <iomanip>
 
 #include "ultrasonic.h"
 
-GpioKey::GpioKey(Xepoll *epoll, Interface *interface)
-: epoll_(epoll), m_interface_(interface)
+GpioKey::GpioKey(Xepoll *epoll)
+: epoll_(epoll)
 {
     char          buf[256] = { 0, };  /* RATS: Use ok */
     int           fd = -1;
@@ -90,30 +91,23 @@ int GpioKey::IRKey(void)
     int ret = read(key_input_fd_, &key, sizeof(key));
     if(ret > 0) {
         if(key.code == 103) {
+            // std::cout << "Value = " << key.value <<std::endl;
+            // std::cout << "Time = " << key.time.tv_sec << "." << (key.time.tv_usec)/1000 << " s" <<std::endl;
 
-            if(key.value == 1) {
+            if(key.value == 1) { // 记录开始时间
                 last_time_ = key.time;
-                // std::cout << "Start Time sec = " << key.time.tv_sec << " usec = " << key.time.tv_usec << std::endl;
             } else {
-                time_t time = 0;
-                if (key.time.tv_sec > last_time_.tv_sec) {
-                    time = (key.time.tv_sec - last_time_.tv_sec)*1000000 \
-                     - last_time_.tv_usec + key.time.tv_usec;
-                } else if(key.time.tv_sec == last_time_.tv_sec){
-                    time =  key.time.tv_usec - last_time_.tv_usec;
-                } else {
-                    std::cout << "Time Error" << std::endl;
-                    return -1;
-                }
-                // std::cout << "End Time sec = " << key.time.tv_sec << " usec = " << key.time.tv_usec << std::endl;
-                double distance = 34000 * ((double)time/1000000.0) / 2.0;
-                std::cout << "Time = " << time/1000 << " ms" <<std::endl;
-                std::cout << "Distance = " << distance << " mm" <<std::endl;
-                if(nullptr != m_interface_){
-                    m_interface_->Transfer(distance);
-                }
-            }
+                // 换算距离
+                double time = 0.0;
+                double starttime = last_time_.tv_sec * 1000000 + last_time_.tv_usec;
+                double endtime = key.time.tv_sec * 1000000 + key.time.tv_usec;
 
+                time = (endtime - starttime) * 0.0001;
+
+                double distance = 170.0 * time * 0.0001;
+                std::cout << "Time = " << time << " ms" <<std::endl;
+                std::cout << "Distance = " << std::setprecision(3) << distance << " m" <<std::endl;
+            }
         }
     }
     return ret;
@@ -126,4 +120,8 @@ bool GpioKey::init() {
         epoll_->add(key_input_fd_, std::bind(&GpioKey::IRKey, this));
   }
   return true;
+}
+
+void GpioKey::Transfer(int num) {
+    is_action_ = num;
 }

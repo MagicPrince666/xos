@@ -1,0 +1,5 @@
+menuconfig BR2_PACKAGE_HX711
+	bool "hx711"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+		HX711 weight scale interface

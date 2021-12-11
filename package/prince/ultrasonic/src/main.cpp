@@ -29,7 +29,8 @@ int main(int argc, char *argv[]) {
 	Xepoll xepoll;//初始化事件模型
 
     TimerFd timerfd(&xepoll);
-    GpioKey ultrasonic(&xepoll, &timerfd);
+    GpioKey ultrasonic(&xepoll);
+    Trig trig(&ultrasonic);
 
     return xepoll.loop();//等待事件触发
 }

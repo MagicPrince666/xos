@@ -3,7 +3,7 @@ TARGET	= ultrasonic
 DIR		= . 
 INC		= -I.
 CFLAGS	= -Os -Wall
-LDFLAGS =
+LDFLAGS = -lpthread
 
 OBJPATH	= .
 

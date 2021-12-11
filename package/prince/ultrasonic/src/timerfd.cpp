@@ -12,7 +12,7 @@ TimerFd::TimerFd(Xepoll *epoll)
     if(!init()) {
       std::cout << "timerfd init failed!" << std::endl;
     }
-    // trig = new Trig();
+    //trig = new Trig();
     servo = new ServoMotor();
 }
 
@@ -21,7 +21,7 @@ TimerFd::~TimerFd()
     if (timer_fd_) {
         close(timer_fd_);
     }
-    delete trig;
+    //delete trig;
     delete servo;
 }
 
@@ -50,7 +50,11 @@ int TimerFd::timeOutCallBack() {
     // 需要读出该fd的数据，否则定时器无法正常执行(重要)
     uint64_t value;
     int ret = read(timer_fd_, &value, sizeof(uint64_t));
-    trig->Action(); // 触发超声波发射
+
+    // if(count_++ >= 30) {
+    //     count_ = 0;
+    //     trig->Action(); // 触发超声波发射
+    // }
 
     if(move_dir_) {
         angle_ += 5;
@@ -69,8 +73,4 @@ int TimerFd::timeOutCallBack() {
     servo->servo(angle_);
 
     return ret;
-}
-
-void TimerFd::Transfer(int num) {
-    // std::cout << "distance = " << num << " mm" <<std::endl;
 }
