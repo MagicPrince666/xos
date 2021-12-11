@@ -1,0 +1,352 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR X11)
+
+/dts-v1/;
+#include "suniv-f1c100s.dtsi"
+
+/ {
+	model = "Widora MangoPi R3";
+	compatible = "allwinner,suniv-f1c200s",
+			 "allwinner,suniv-f1c100s";
+
+	chosen {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		bootargs = "console=ttyS0,115200 rootwait init=/preinit root=/dev/mtdblock2 rootfstype=squashfs overlayfsdev=/dev/mtdblock3";
+
+		simplefb_lcd: framebuffer-lcd0 {
+			compatible = "allwinner,simple-framebuffer",
+				     "simple-framebuffer";
+			allwinner,pipeline = "de_be0-lcd0";
+			clocks = <&ccu CLK_BUS_DE_BE>, <&ccu CLK_DE_BE>,
+				 <&ccu CLK_DRAM_DE_BE>, <&ccu CLK_BUS_LCD>,
+				 <&ccu CLK_TCON>;
+			status = "disabled";
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		trig {
+			label = "trig";
+			gpios = <&pio 0 0 GPIO_ACTIVE_HIGH>; //PA0
+			default-state = "off";
+		};
+
+		blk {
+			label = "blk";
+			gpios = <&pio 4 0 GPIO_ACTIVE_HIGH>; //PA0
+			default-state = "on";
+		};
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		autorepeat;
+
+		switch@0 {
+			label = "echo";
+			linux,code = <103>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&sr_irq>;
+			interrupt-parent = <&pio>;
+			interrupts = <4 1 IRQ_TYPE_EDGE_BOTH>;//PE1
+		};
+	};
+/*
+	backlight: backlight {
+		compatible = "gpio-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&backlight_pins>;
+		gpios = <&pio 4 0 GPIO_ACTIVE_HIGH>; // PE 0
+		backlight-boot-on;
+	};
+*/
+};
+
+&spi0 {
+	status = "okay";
+
+	spi-nor@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "winbond,w25q128", "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
+		status = "disabled";
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x70000>;
+				read-only;
+			};
+
+			partition@1 {
+				label = "kernel";
+				reg = <0x70000 0x590000>;
+				read-only;
+			};
+
+			partition@2 {
+				label = "rom";
+				reg = <0x600000 0x700000>;
+				read-only;
+			};
+
+			partition@3 {
+				label = "overlay";
+				reg = <0xd00000 0x300000>;
+			};
+		};
+	};
+
+	spi-nand@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-nand";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
+		status = "okay";
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x100000>;
+				read-only;
+			};
+
+			partition@1 {
+				label = "kernel";
+				reg = <0x100000 0x500000>;
+				read-only;
+			};
+
+			partition@2 {
+				label = "rom";
+				reg = <0x600000 0x2a00000>;
+				read-only;
+			};
+
+			partition@3 {
+				label = "overlay";
+				reg = <0x3000000 0x1000000>;
+			};
+
+			partition@4 {
+				label = "udisk";
+				reg = <0x4000000 0x4000000>;
+			};
+		};
+	};
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_pa_pins>;
+	status = "okay";
+};
+
+&mmc0 {
+	status = "okay";
+	broken-cd;
+
+	esp8089: sdio_wifi@1 {
+		compatible = "esp,esp8089";
+		reg = <1>;
+		esp,crystal-26M-en = <2>;
+	};
+};
+
+&otg_sram {
+	status = "okay";
+};
+
+&usb_otg {
+	dr_mode = "peripheral"; /* host peripheral */
+	status = "okay";
+};
+
+&usbphy {
+	status = "okay";
+};
+
+&cedar_ve {
+	status = "okay";
+};
+
+&ion {
+	status = "okay";
+};
+
+&codec {
+	allwinner,audio-routing =
+		"Headphone", "HP",
+		"Headphone", "HPCOM",
+		"LINEIN", "Line In",
+		"FMINL", "Left FM In",
+		"FMINR", "Right FM In",
+		"MIC", "Mic";
+	status = "okay";
+};
+
+&i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c0_pd_pins>;
+	status = "okay";
+
+	rtp@48 {
+		compatible = "ti,tsc2007";
+		reg = <0x48>;
+		interrupt-parent = <&pio>;
+		interrupts = <4 12 IRQ_TYPE_EDGE_FALLING>;
+		gpios = <&pio 4 12 GPIO_ACTIVE_LOW>;
+		pendown-gpio = <&pio 4 12 GPIO_ACTIVE_LOW>;
+		ti,x-plate-ohms = <660>;
+		wakeup-source;
+		status = "disabled";
+	};
+
+	ctp@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+		interrupt-parent = <&pio>;
+		interrupts = <4 12 IRQ_TYPE_EDGE_FALLING>; // PE12
+		irq-gpios = <&pio 4 12 GPIO_ACTIVE_HIGH>; // PE12
+		reset-gpios = <&pio 0 0 GPIO_ACTIVE_HIGH>; // PA0
+	};
+
+	mpu9250: imu@68 {
+		compatible = "invensense,mpu9250";
+		reg = <0x68>;
+		status = "okay";
+		interrupt-parent = <&pio>;
+		interrupts = <4 11 IRQ_TYPE_EDGE_RISING>;
+		i2c-gate {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			ax8975@c {
+				compatible = "ak,ak8975";
+				reg = <0x0c>;
+			};
+		};
+		/*invensense,int_config = <0x10>;
+		invensense,level_shifter = <0>;
+		invensense,orientation = [01 00 00 00 01 00 00 00 01];
+		invensense,sec_slave_type = <0>;
+		invensense,key = [4e cc 7e eb f6 1e 35 22 00 34 0d 65 32 e9 94 89];*/
+	};
+
+	bmp280: pressure@76 {
+		compatible = "bosch,bmp280";
+		reg = <0x76>;
+	};
+
+	vl53l0x@29 {
+		compatible = "st,vl53l0x";
+		reg = <0x29>;
+		interrupt-parent = <&pio>;
+		interrupts = <4 11 IRQ_TYPE_EDGE_FALLING>;
+	};
+};
+
+&pio {
+	spi1_pins: spi1-pins-pa {
+		pins = "PE7", "PE8", "PE9", "PE10";
+		function = "spi1";
+	};
+
+	spi1_pins_cs1: spi0_pins_cs1 {
+		pins = "PE7", "PE3";
+		function = "gpio_out";
+	};
+
+	pwm1_pin: pwm1@0 {
+		pins = "PE6";
+		function = "pwm1";
+		drive-strength = <30>;
+		bias-pull-up;
+	};
+
+	t_irq: t_irq-pins {
+		pins = "PE2";
+		function = "gpio_in";
+	};
+
+	sr_irq: sr_04-pins {
+		pins = "PE1";
+		function = "gpio_in";
+	};
+/*
+	backlight_pins: backlight-pins {
+		pins = "PE0";
+		function = "gpio_out";
+		drive-strength = <30>;
+	};
+*/
+};
+
+&pwm {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm1_pin>;
+	status = "okay";
+};
+
+&spi1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi1_pins &spi1_pins_cs1>;
+	spi-num-chipselects = <2>;
+	cs-gpios = <&pio 4 7 GPIO_ACTIVE_HIGH>, <&pio 4 3 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+
+	display@0 {
+		compatible = "ilitek,ili9341";
+		reg = <0>;
+		status = "okay";
+		spi-max-frequency = <50000000>;
+		rotate = <270>;
+		bgr;
+		fps = <30>;
+		buswidth = <8>;
+		dc-gpios = <&pio 4 4 GPIO_ACTIVE_HIGH>; //PE4
+		reset-gpios = <&pio 4 5 GPIO_ACTIVE_HIGH>; //PE5
+		debug = <0>;
+//		backlight = <&backlight>;
+	};
+
+	tsc2046@1 {
+		reg = <1>;	/* CS1 */
+		compatible = "ti,tsc2046";
+		pinctrl-names = "default";
+		pinctrl-0 = <&t_irq>;
+		interrupt-parent = <&pio>;
+		interrupts = <4 2 IRQ_TYPE_EDGE_FALLING>;	//PE2
+		spi-max-frequency = <2000000>;
+		pendown-gpio = <&pio 4 2 GPIO_ACTIVE_HIGH>;
+		vcc-supply = <&reg_vcc3v3>;
+
+		ti,x-min = /bits/ 16 <0>;
+		ti,x-max = /bits/ 16 <320>;
+		ti,y-min = /bits/ 16 <0>;
+		ti,y-max = /bits/ 16 <240>;
+		ti,x-plate-ohms = /bits/ 16 <40>;
+		ti,pressure-max = /bits/ 16 <255>;
+
+		wakeup-source;
+		status = "okay";
+	};
+};
