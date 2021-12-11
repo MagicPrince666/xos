@@ -14,7 +14,7 @@
 		ranges;
 
 		bootargs = "console=ttyS0,115200 rootwait init=/preinit root=/dev/mtdblock2 rootfstype=squashfs overlayfsdev=/dev/mtdblock3";
-
+/*
 		simplefb_lcd: framebuffer-lcd0 {
 			compatible = "allwinner,simple-framebuffer",
 				     "simple-framebuffer";
@@ -24,6 +24,7 @@
 				 <&ccu CLK_TCON>;
 			status = "disabled";
 		};
+*/
 	};
 
 	leds {
@@ -51,8 +52,8 @@
 		switch@0 {
 			label = "echo";
 			linux,code = <103>;
-			pinctrl-names = "default";
-			pinctrl-0 = <&sr_irq>;
+			// pinctrl-names = "default";
+			// pinctrl-0 = <&sr_irq>;
 			interrupt-parent = <&pio>;
 			interrupts = <4 1 IRQ_TYPE_EDGE_BOTH>;//PE1
 		};
@@ -318,12 +319,12 @@
 		reg = <0>;
 		status = "okay";
 		spi-max-frequency = <50000000>;
-		rotate = <270>;
+		rotate = <90>;
 		bgr;
 		fps = <30>;
 		buswidth = <8>;
 		dc-gpios = <&pio 4 4 GPIO_ACTIVE_HIGH>; //PE4
-		reset-gpios = <&pio 4 5 GPIO_ACTIVE_HIGH>; //PE5
+		reset-gpios = <&pio 4 5 GPIO_ACTIVE_LOW>; //PE5
 		debug = <0>;
 //		backlight = <&backlight>;
 	};
