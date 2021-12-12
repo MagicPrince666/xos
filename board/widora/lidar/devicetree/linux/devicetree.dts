@@ -63,6 +63,7 @@
         compatible = "avia,hx711";
         sck-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>;
         dout-gpios = <&pio 4 11 GPIO_ACTIVE_HIGH>;
+		avdd-supply = <&reg_vcc3v3>;
         clock-frequency = <100000>;
     };
 
@@ -242,8 +243,6 @@
 		compatible = "invensense,mpu9250";
 		reg = <0x68>;
 		status = "okay";
-		interrupt-parent = <&pio>;
-		interrupts = <4 11 IRQ_TYPE_EDGE_RISING>;
 		i2c-gate {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -267,8 +266,6 @@
 	vl53l0x@29 {
 		compatible = "st,vl53l0x";
 		reg = <0x29>;
-		interrupt-parent = <&pio>;
-		interrupts = <4 11 IRQ_TYPE_EDGE_FALLING>;
 	};
 };
 
