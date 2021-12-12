@@ -3,26 +3,34 @@
 # touchscreen
 #
 ################################################################################
-TOUCH_SCREEN_VERSION = main
-TOUCH_SCREEN_SITE = $(call github,MagicPrince666,touchscreen,$(TOUCH_SCREEN_VERSION))
-TOUCH_SCREEN_DEPENDENCIES = 
-TOUCH_SCREEN_INSTALL_STAGING = YES
-TOUCH_SCREEN_INSTALL_TARGET = YES
+TOUCHSCREEN_VERSION = main
+TOUCHSCREEN_SITE = $(call github,MagicPrince666,touchscreen,$(TOUCHSCREEN_VERSION))
+TOUCHSCREEN_DEPENDENCIES = 
+TOUCHSCREEN_INSTALL_STAGING = YES
+TOUCHSCREEN_INSTALL_TARGET = YES
 
-TOUCH_SCREEN_CONF_OPTS =
+TOUCHSCREEN_CONF_OPTS =
 
-TOUCH_SCREEN_DIR := $(BUILD_DIR)/touchscreen
+TOUCHSCREEN_DIR := $(BUILD_DIR)/touchscreen
 
-define TOUCH_SCREEN_INSTALL_TARGET_CMDS
+define TOUCHSCREEN_BUILD_CMDS
+    make CC=$(TARGET_CC) CXX=$(TARGET_CXX) -C $(@D)
+endef
+
+define TOUCHSCREEN_CLEAN_CMDS
+    make -C $(@D) clean
+endef
+
+define TOUCHSCREEN_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/touchscreen $(TARGET_DIR)/usr/bin
 endef
 
-define TOUCH_SCREEN_PERMISSIONS
+define TOUCHSCREEN_PERMISSIONS
     /usr/bin/touchscreen f 4755 0 0 - - - - -
 endef
 
-define TOUCH_SCREEN_UNINSTALL_TARGET_CMDS
+define TOUCHSCREEN_UNINSTALL_TARGET_CMDS
     $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) uninstall
 endef
 
-$(eval $(cmake-package))
+$(eval $(generic-package))

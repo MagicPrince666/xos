@@ -1,5 +1,5 @@
-config BR2_PACKAGE_TOUCH_SCREEN
-	bool "touch screen"
+config BR2_PACKAGE_TOUCHSCREEN
+	bool "touchscreen"
 	depends on BR2_INSTALL_LIBSTDCPP
 	help
 	  Test touch screen
