@@ -1,0 +1,8 @@
+config BR2_PACKAGE_TOUCH_SCREEN
+	bool "touch screen"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+	  Test touch screen
+
+comment "touch screen needs a toolchain w/ C++"
+	depends on !BR2_INSTALL_LIBSTDCPP

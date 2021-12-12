@@ -45,6 +45,10 @@
 / {
 	model = "Prince NanoPi NEO";
 	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
 };
 
 &ehci0 {

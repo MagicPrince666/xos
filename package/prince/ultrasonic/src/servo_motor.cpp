@@ -1,7 +1,7 @@
 #include "servo_motor.h"
 
 ServoMotor::ServoMotor() {
-    pwm_ = new Pwm(1);
+    pwm_ = new Pwm(0);
     servo(45); //初始45度 正中
 }
 

@@ -98,7 +98,7 @@
 
 		trig {
 			label = "trig";
-			gpios = <&pio 0 6 GPIO_ACTIVE_HIGH>;
+			gpios = <&pio 0 2 GPIO_ACTIVE_HIGH>; //PA2
 			default-state = "off";
 		};
 	};
@@ -114,8 +114,8 @@
 			linux,code = <103>;
 			pinctrl-names = "default";
 			pinctrl-0 = <&sr_irq>;
-			interrupt-parent = <&pio>;
-			interrupts = <0 0 IRQ_TYPE_EDGE_BOTH>;//PA0
+			interrupt-parent = <&r_pio>;
+			interrupts = <0 11 IRQ_TYPE_EDGE_BOTH>;//PL11
 		};
 	};
 
@@ -125,7 +125,7 @@
 		pinctrl-0 = <&backlight_pins>;
 
 		gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>; /* PG 9 */
-		backlight-boot-on;
+		backlight-boot-off;
 	};
 };
 
@@ -159,7 +159,7 @@
 		reg = <0>;
 		status = "okay";
 		spi-max-frequency = <50000000>;
-		rotate = <90>;
+		rotate = <270>;
 		bgr;
 		fps = <30>;
 		buswidth = <8>;
@@ -175,9 +175,9 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&t_irq>;
 		interrupt-parent = <&pio>;
-		interrupts = <0 2 IRQ_TYPE_EDGE_FALLING>;	//PA2
+		interrupts = <0 6 IRQ_TYPE_EDGE_FALLING>;	//PA6
 		spi-max-frequency = <2000000>;
-		pendown-gpio = <&pio 0 2 GPIO_ACTIVE_HIGH>;
+		pendown-gpio = <&pio 0 6 GPIO_ACTIVE_HIGH>;
 		vcc-supply = <&reg_vcc3v3>;
 
 		ti,x-min = /bits/ 16 <0>;
@@ -253,12 +253,12 @@
 	};
 
 	sr_irq: sr_04-pins {
-		pins = "PA0";
+		pins = "PL11";
 		function = "gpio_in";
 	};
 
 	t_irq: t_irq-pins {
-		pins = "PA2";
+		pins = "PA6";
 		function = "gpio_in";
 	};
 };
@@ -276,13 +276,21 @@
 	pinctrl-names = "default";
     pinctrl-0 = <&i2c0_pins>;
 
-	mpu6500: accelerometer@77 {
-		compatible = "invensense,mpu6500";
-		reg = <0x77>;
-		interrupt-parent = <&pio>;
-		interrupts = <6 11 IRQ_TYPE_EDGE_RISING>; //PG 11
-		orientation = <0xff 0 0 0 1 0 0 0 0xff>;
+	mpu6050@68 {
+		compatible = "invensense,mpu6050";
+		reg = <0x68>;
 		status = "okay";
+		interrupt-parent = <&pio>;
+		interrupts = <0 0 IRQ_TYPE_EDGE_RISING>; //PA0
+		mount-matrix = "-0.984807753012208",  /* x0 */
+		               "0",                   /* y0 */
+		               "-0.173648177666930",  /* z0 */
+		               "0",                   /* x1 */
+		               "-1",                  /* y1 */
+		               "0",                   /* z1 */
+		               "-0.173648177666930",  /* x2 */
+		               "0",                   /* y2 */
+		               "0.984807753012208";   /* z2 */
 	};
 
 	mpu9250: imu@68 {
@@ -290,7 +298,7 @@
 		reg = <0x68>;
 		status = "disabled";
 		interrupt-parent = <&pio>;
-		interrupts = <6 11 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <0 0 IRQ_TYPE_EDGE_RISING>;
 		i2c-gate {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -309,5 +317,13 @@
 	bmp280: pressure@76 {
 		compatible = "bosch,bmp280";
 		reg = <0x76>;
+		status = "disabled";
+	};
+
+	vl53l0x@29 {
+		compatible = "st,vl53l0x";
+		reg = <0x29>;
+		interrupt-parent = <&pio>;
+		interrupts = <6 11 IRQ_TYPE_EDGE_FALLING>; //PG11
 	};
 };
