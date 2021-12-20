@@ -7,17 +7,21 @@
 ################################################################################
 
 #仓库分支名称
-LVGL_VERSION = origin/master
+LVGL_VERSION = master
 #仓库git地址
 LVGL_SITE = https://github.com/lvgl/lv_port_linux_frame_buffer
+#LVGL_SITE = $(call github,lvgl,lv_port_linux_frame_buffer,$(LVGL_VERSION))
 #获取源码的方式
 LVGL_SITE_METHOD = git
 LVGL_SOURCE = lv_port_linux_frame_buffer.tar.gz
+
 LVGL_ALWAYS_BUILD = YES
 LVGL_INSTALL_STAGING = YES
 LVGL_GIT_SUBMODULES = YES
 LVGL_CFLAGS =
 LVGL_LDFLAGS =
+
+LVGL_DEPENDENCIES = tslib
 
 LVGL_LICENSE = MIT
 LVGL_LICENSE_FILES = LICENSE
