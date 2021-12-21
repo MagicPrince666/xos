@@ -1,0 +1,4 @@
+config BR2_PACKAGE_WL8PUART
+	bool "wl8puart"
+	help
+	  Test usb uart interface with wl8puart
