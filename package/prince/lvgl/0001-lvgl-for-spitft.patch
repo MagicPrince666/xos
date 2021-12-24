@@ -9,8 +9,8 @@ Index: lvgl-origin_master/lv_conf.h
 -#define LV_COLOR_DEPTH     32
 +#define LV_COLOR_DEPTH     16 //test
 +
-+#define LV_HOR_RES_MAX          (320)
-+#define LV_VER_RES_MAX          (240)
++#define LV_HOR_RES_MAX          320
++#define LV_VER_RES_MAX          240
  
  /*Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)*/
  #define LV_COLOR_16_SWAP   0
