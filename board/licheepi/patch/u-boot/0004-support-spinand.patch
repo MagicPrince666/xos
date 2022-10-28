@@ -1,193 +1,64 @@
-diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index bbe1887623..9a5d6b2347 100644
---- a/arch/arm/dts/Makefile
-+++ b/arch/arm/dts/Makefile
-@@ -546,6 +546,7 @@ dtb-$(CONFIG_MACH_SUN8I_R40) += \
- 	sun8i-r40-bananapi-m2-ultra.dtb \
- 	sun8i-v40-bananapi-m2-berry.dtb
- dtb-$(CONFIG_MACH_SUN8I_V3S) += \
-+	sun8i-v3s-prince.dtb \
- 	sun8i-v3s-licheepi-zero.dtb 
- dtb-$(CONFIG_MACH_SUN8I_S3) += \
- 	sun8i-s3-generic.dtb
-diff --git a/arch/arm/include/asm/arch-sunxi/clock_sun6i.h b/arch/arm/include/asm/arch-sunxi/clock_sun6i.h
-index 8001a81b8f..6c015f2f94 100644
---- a/arch/arm/include/asm/arch-sunxi/clock_sun6i.h
-+++ b/arch/arm/include/asm/arch-sunxi/clock_sun6i.h
-@@ -463,6 +463,7 @@ struct sunxi_ccm_reg {
- #ifdef CONFIG_MACH_SUN8I_R40
- #define AHB_RESET_OFFSET_SATA		24
- #endif
-+#define AHB_RESET_OFFSET_OTG		24
- #define AHB_RESET_OFFSET_GMAC		17
- #define AHB_RESET_OFFSET_MCTL		14
- #define AHB_RESET_OFFSET_MMC3		11
+diff --git a/arch/arm/dts/sun8i-v3s-licheepi-zero.dts b/arch/arm/dts/sun8i-v3s-licheepi-zero.dts
+index 2e4587d2..7413d1a9 100644
+--- a/arch/arm/dts/sun8i-v3s-licheepi-zero.dts
++++ b/arch/arm/dts/sun8i-v3s-licheepi-zero.dts
+@@ -90,6 +90,19 @@
+ 	status = "okay";
+ };
+ 
++&spi0 {
++    pinctrl-0 = <&spi0_pins>;
++    pinctrl-names = "default";
++    status = "okay";
++    flash@0 {
++        #address-cells = <1>;
++        #size-cells = <1>;
++        compatible = "spi-nand";
++        reg = <0>;
++        spi-max-frequency = <50000000>;
++	};
++};
++
+ &usb_otg {
+ 	dr_mode = "otg";
+ 	status = "okay";
 diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
-index b7cb87a98f..0d053b8087 100644
+index c1f639fc..7f892984 100644
 --- a/arch/arm/mach-sunxi/Kconfig
 +++ b/arch/arm/mach-sunxi/Kconfig
-@@ -1,7 +1,7 @@
- if ARCH_SUNXI
- 
- config SPL_LDSCRIPT
--	default "arch/arm/cpu/armv7/sunxi/u-boot-spl.lds" if !ARM64
-+	default "arch/arm/cpu/armv7/sunxi/u-boot-spl.lds" if !ARM64 || MACH_SUN8I_V3S || MACH_SUN8I_S3
- 
- config IDENT_STRING
- 	default " Allwinner Technology"
-@@ -262,6 +262,7 @@ config MACH_SUN8I_V3S
- 	select SUNXI_DRAM_DW
+@@ -318,6 +318,14 @@ config MACH_SUN8I_V3S
  	select SUNXI_DRAM_DW_16BIT
  	select SUPPORT_SPL
-+	select SUNXI_DE2
  
- config MACH_SUN8I_S3
- 	bool "sun8i (Allwinner S3)"
-@@ -1006,13 +1007,55 @@ config SPL_STACK_R_ADDR
- 	default 0x4fe00000 if MACH_SUN50I_H6
- 
- config SPL_SPI_SUNXI
--	bool "Support for SPI Flash on Allwinner SoCs in SPL"
--	depends on MACH_SUN4I || MACH_SUN5I || MACH_SUN7I || MACH_SUNXI_H3_H5 || MACH_SUN50I || MACH_SUN8I_R40 || MACH_SUN50I_H6
-+	bool "Support for SPI (NOR) Flash on Allwinner SoCs in SPL"
-+	depends on MACH_SUN4I || MACH_SUN5I || MACH_SUN7I || MACH_SUNXI_H3_H5 || MACH_SUN50I || MACH_SUN8I_R40 || MACH_SUN50I_H6 || MACH_SUN8I_V3S || MACH_SUN8I_S3
- 	help
- 	  Enable support for SPI Flash. This option allows SPL to read from
- 	  sunxi SPI Flash. It uses the same method as the boot ROM, so does
- 	  not need any extra configuration.
- 
-+config SPL_SPINAND_SUNXI
-+	bool "Support for SPI NAND-Flash on Allwinner SoCs in SPL"
-+	depends on MACH_SUN4I || MACH_SUN5I || MACH_SUN7I || MACH_SUNXI_H3_H5 || MACH_SUN50I || MACH_SUN8I_V3S || MACH_SUN8I_S3
++ config SPL_SPINAND_SUNXI
++	bool "Support for SPI Nand Flash on Allwinner SoCs in SPL"
++	depends on MACH_SUN8I_V3S
 +	help
-+	  Enable support for SPI-NAND Flash. This option allows SPL to read from
-+	  sunxi SPI-NAND Flash. It needs further configuration to calculate all offsets correctly.
++	  Enable support for SPI Nand Flash. This option allows SPL to read from
++	  sunxi SPI Nand Flash. It uses the same method as the boot ROM, so does
++	  not need any extra configuration.
 +
-+config SPL_SPINAND_SUNXI_SPL_SIZE
-+	int "Expected SPL size after padding to blocksize"
-+	depends on SPL_SPINAND_SUNXI
-+	default 24576
-+	help
-+	  The sunxi BROM is only able to load 1KB per page when booting from spi-nand.
-+	  Thus the SPL is getting chunked to 1KB pages in spi-nand. To correctly calculate
-+	  the address of u-boot it is thus neccessary to know the size of the SPL in 
-+	  spi-nand.
-+
-+config SPL_SPINAND_SUNXI_UBOOT_PADDING
-+	int "Offset between SPL and u-boot"
-+	depends on SPL_SPINAND_SUNXI
-+	default 8192
-+	help
-+	  u-boot is placed with an offset between SPL. To correctly calculate
-+	  the address of u-boot it is thus neccessary to know the offset. 
-+
-+config SPL_SPINAND_SUNXI_PAGESIZE
-+	int "NAND pagesize in KB"
-+	depends on SPL_SPINAND_SUNXI
-+	default 2048
-+	help
-+	  The sunxi BROM is only able to load 1KB per page when booting from spi-nand.
-+	  Thus the SPL is getting chunked to 1KB pages in spi-nand. To correctly calculate
-+	  the address of u-boot it is thus neccessary to know the page size of the spi-nand. 
-+
-+config SPL_SPINAND_SUNXI_SPL_USE_GENERIC2K
-+	bool "Generic SPI-NAND config with 2K page-size"
-+	depends on SPL_SPINAND_SUNXI
-+	default n
-+	help
-+	  If no known spi-nand is found, try with generic settings for spi-nand with a
-+	  page-size of 2K.
-+
- config PINE64_DT_SELECTION
- 	bool "Enable Pine64 device tree selection code"
- 	depends on MACH_SUN50I
+ config MACH_SUN9I
+ 	bool "sun9i (Allwinner A80)"
+ 	select CPU_V7A
 diff --git a/arch/arm/mach-sunxi/Makefile b/arch/arm/mach-sunxi/Makefile
-index d129f33479..490901251c 100644
+index 58f807cb..535475e5 100644
 --- a/arch/arm/mach-sunxi/Makefile
 +++ b/arch/arm/mach-sunxi/Makefile
-@@ -36,6 +36,7 @@ obj-$(CONFIG_DRAM_SUN8I_A33)	+= dram_sun8i_a33.o
+@@ -39,6 +39,7 @@ obj-$(CONFIG_DRAM_SUN8I_A33)	+= dram_sun8i_a33.o
  obj-$(CONFIG_DRAM_SUN8I_A83T)	+= dram_sun8i_a83t.o
  obj-$(CONFIG_DRAM_SUN9I)	+= dram_sun9i.o
  obj-$(CONFIG_SPL_SPI_SUNXI)	+= spl_spi_sunxi.o
-+obj-$(CONFIG_SPL_SPINAND_SUNXI)	+= spl_spinand_sunxi.o
++obj-$(CONFIG_SPL_SPINAND_SUNXI)    += spl_spinand_sunxi.o
  obj-$(CONFIG_SUNXI_DRAM_DW)	+= dram_sunxi_dw.o
  obj-$(CONFIG_SUNXI_DRAM_DW)	+= dram_timings/
  obj-$(CONFIG_DRAM_SUN50I_H6)	+= dram_sun50i_h6.o
-diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
-index 6aa28bbc3c..35c4293fd6 100644
---- a/arch/arm/mach-sunxi/board.c
-+++ b/arch/arm/mach-sunxi/board.c
-@@ -223,6 +223,12 @@ void s_init(void)
- 
- #define SUNXI_INVALID_BOOT_SOURCE	-1
- 
-+#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
-+static int sunxi_get_boot_source(void)
-+{
-+	return (s8)readb(SPL_ADDR + 0x6fff);
-+}
-+#else
- static int sunxi_get_boot_source(void)
- {
- 	if (!is_boot0_magic(SPL_ADDR + 4)) /* eGON.BT0 */
-@@ -230,7 +236,7 @@ static int sunxi_get_boot_source(void)
- 
- 	return readb(SPL_ADDR + 0x28);
- }
--
-+#endif
- /* The sunxi internal brom will try to loader external bootloader
-  * from mmc0, nand flash, mmc2.
-  */
-@@ -293,12 +299,32 @@ unsigned long spl_mmc_get_uboot_raw_sector(struct mmc *mmc)
- 
- 	return sector;
- }
--
-+#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
- u32 spl_boot_device(void)
- {
- 	return sunxi_get_boot_device();
- }
-+#else
-+/*
-+ * suniv BROM do not pass the boot media type to SPL, so we try with the
-+ * boot sequence in BROM: mmc0->spinor->fail.
-+ */
-+void board_boot_order(u32 *spl_boot_list)
-+{
-+	/*
-+	 * See the comments above in sunxi_get_boot_device() for infomation
-+	 * about FEL boot.
-+	 */
-+	if (!is_boot0_magic(SPL_ADDR + 4)) {
-+		spl_boot_list[0] = BOOT_DEVICE_BOARD;
-+		return;
-+	}
- 
-+	spl_boot_list[0] = BOOT_DEVICE_MMC1;
-+	spl_boot_list[1] = BOOT_DEVICE_MMC2;
-+	spl_boot_list[2] = BOOT_DEVICE_SPI;
-+}
-+#endif
- void board_init_f(ulong dummy)
- {
- 	spl_init();
-@@ -343,7 +369,7 @@ void reset_cpu(ulong addr)
- #endif
- }
- 
--#if !CONFIG_IS_ENABLED(SYS_DCACHE_OFF) && !defined(CONFIG_ARM64)
-+#if !CONFIG_IS_ENABLED(SYS_DCACHE_OFF) && !defined(CONFIG_ARM64) && !defined(CONFIG_MACH_SUN8I_V3S) && !defined(CONFIG_MACH_SUN8I_S3)
- void enable_caches(void)
- {
- 	/* Enable D-cache. I-cache is already enabled in start.S */
 diff --git a/arch/arm/mach-sunxi/spl_spinand_sunxi.c b/arch/arm/mach-sunxi/spl_spinand_sunxi.c
 new file mode 100644
-index 0000000000..b231a4678b
+index 00000000..259de525
 --- /dev/null
 +++ b/arch/arm/mach-sunxi/spl_spinand_sunxi.c
-@@ -0,0 +1,759 @@
+@@ -0,0 +1,758 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2019 Benedikt-Alexander Mokroß <bam@icognize.de>
@@ -273,7 +144,6 @@ index 0000000000..b231a4678b
 +#define SPI0_CLK_DIV_NONE			0x0000
 +#define SPI0_CLK_DIV_BY_2           0x1000
 +#define SPI0_CLK_DIV_BY_4           0x1001
-+#define SPI0_CLK_DIV_BY_32          0x100f
 +
 +#define DUMMY_BURST_BYTE 			0x00
 +
@@ -382,7 +252,7 @@ index 0000000000..b231a4678b
 +	}
 +};
 +
-+#ifdef CONFIG_SPL_SPINAND_SUNXI_SPL_USE_GENERIC2K
++#ifdef CONFIG_SPL_SPINAND_SUNXI_SPL_USE_GENERIC2K_ON_UNKNOWN
 +struct sunxi_nand_config sunxi_generic_nand_config = {
 +	.name = "Generic 2K SPI-NAND",
 +	.jedec_id = 0xFFFFFFFF,
@@ -408,7 +278,7 @@ index 0000000000..b231a4678b
 +		}
 +		++ptr;
 +	}
-+#ifdef CONFIG_SPL_SPINAND_SUNXI_SPL_USE_GENERIC2K
++#ifdef CONFIG_SPL_SPINAND_SUNXI_SPL_USE_GENERIC2K_ON_UNKNOWN
 +	return &sunxi_generic_nand_config;
 +#else
 +	return NULL;
@@ -947,528 +817,27 @@ index 0000000000..b231a4678b
 +}
 +/* Use priorty 0 to override the default if it happens to be linked in */
 +SPL_LOAD_IMAGE_METHOD("sunxi SPI-NAND", 0, BOOT_DEVICE_SPI, spl_spi_load_image);
-diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 769530412b..dd82e284b0 100644
---- a/board/sunxi/board.c
-+++ b/board/sunxi/board.c
-@@ -846,6 +846,16 @@ static void setup_environment(const void *fdt)
- 		}
- 	}
- }
-+static int usb_gadget_init(void)
-+{
-+	int ret;
-+	struct udevice *usb_dev;
-+	ret = uclass_first_device(UCLASS_USB_GADGET_GENERIC, &usb_dev);
-+	if (!usb_dev || ret) {
-+		pr_err("No USB gadget device found\n");
-+	}
-+	return ret;
-+}
- 
- int misc_init_r(void)
- {
-@@ -867,12 +877,35 @@ int misc_init_r(void)
- 		env_set("mmc_bootdev", "1");
- 	}
- 
-+	switch (boot) {
-+		case BOOT_DEVICE_MMC1:
-+			env_set("boot_device", "mmc0");
-+			break;
-+		case BOOT_DEVICE_MMC2:
-+			env_set("boot_device", "mmc1");
-+			break;
-+		case BOOT_DEVICE_SPI:
-+			env_set("boot_device", "spi");
-+			break;
-+		default:
-+			env_set("boot_device", "fel");
-+			break;
-+	}
-+
- 	setup_environment(gd->fdt_blob);
- 
- #ifdef CONFIG_USB_ETHER
- 	usb_ether_init();
+\ No newline at end of file
+diff --git a/include/configs/sun8i.h b/include/configs/sun8i.h
+index 56363563..d361fd11 100644
+--- a/include/configs/sun8i.h
++++ b/include/configs/sun8i.h
+@@ -24,9 +24,18 @@
+ #define CONFIG_ARMV7_SECURE_MAX_SIZE	(SUNXI_SRAM_A2_SIZE - 33 * 1024)
  #endif
  
-+#ifdef CONFIG_USB_GADGET
-+	usb_gadget_init();
-+#endif
++#define CONFIG_BOOTCOMMAND  "mtd read spi-nand0 0x41800000 0x100000 0x20000; "  \
++                            "mtd read spi-nand0 0x41000000 0x120000 0x500000; " \
++                            "bootz 0x41000000 - 0x41800000"
 +
-+	if(env_get("bootcmd") == NULL){
-+		env_set("bootcmd", CONFIG_BOOTCOMMAND);
-+	}
++#define CONFIG_BOOTARGS    "console=ttyS0,115200 earlyprintk panic=5 rootwait " \
++                            "mtdparts=spi0.0:1M(uboot)ro,128k(dtb)ro,5M(kernel)ro,-(rootfs) ubi.mtd=3 root=ubi0:rootfs rw rootfstype=ubifs"
 +
- 	return 0;
- }
+ /*
+  * Include common sunxi configuration where most the settings are
+  */
+ #include <configs/sunxi-common.h>
  
-diff --git a/cmd/usb_mass_storage.c b/cmd/usb_mass_storage.c
-index c5c6899787..09e0804f17 100644
---- a/cmd/usb_mass_storage.c
-+++ b/cmd/usb_mass_storage.c
-@@ -56,7 +56,7 @@ static int ums_init(const char *devtype, const char *devnums_part_str)
- 	char *s, *t, *devnum_part_str, *name;
- 	struct blk_desc *block_dev;
- 	disk_partition_t info;
--	int partnum;
-+	int partnum = 0;
- 	int ret = -1;
- 	struct ums *ums_new;
- 
-diff --git a/common/spl/Kconfig b/common/spl/Kconfig
-index 9d52b75cb4..5ccf611dda 100644
---- a/common/spl/Kconfig
-+++ b/common/spl/Kconfig
-@@ -1107,6 +1107,15 @@ config SYS_SPI_U_BOOT_OFFS
- 	 Address within SPI-Flash from where the u-boot payload is fetched
- 	 from.
- 
-+config SYS_SPI_NAND_U_BOOT_OFFS
-+	hex "address of u-boot payload in SPI NAND flash"
-+	default 0xd000 if ARCH_SUNXI
-+	default 0x0
-+	depends on SPL_SPI_LOAD || SPL_SPINAND_SUNXI
-+	help
-+	 Address within SPI-NAND Flash from where the u-boot payload is fetched
-+	 from.
-+
- config SPL_THERMAL
- 	bool "Driver support for thermal devices"
- 	help
-diff --git a/common/spl/spl.c b/common/spl/spl.c
-index 932e6ab98a..df13f5ef6e 100644
---- a/common/spl/spl.c
-+++ b/common/spl/spl.c
-@@ -579,8 +579,25 @@ static int boot_from_devices(struct spl_image_info *spl_image,
- 
- 		loader = spl_ll_find_loader(spl_boot_list[i]);
- #if defined(CONFIG_SPL_SERIAL_SUPPORT) && defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
--		if (loader)
-+		if (loader) {
- 			printf("Trying to boot from %s\n", loader->name);
-+#if defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
-+			switch (spl_boot_list[i]) {
-+				case BOOT_DEVICE_MMC1:
-+					writeb(0, CONFIG_SUNXI_SRAM_ADDRESS + 0x6fff);
-+					break;
-+				case BOOT_DEVICE_MMC2:
-+					writeb(2, CONFIG_SUNXI_SRAM_ADDRESS + 0x6fff);
-+					break;
-+				case BOOT_DEVICE_SPI:
-+					writeb(3, CONFIG_SUNXI_SRAM_ADDRESS + 0x6fff);
-+					break;
-+				default:
-+					writeb(-1, CONFIG_SUNXI_SRAM_ADDRESS + 0x6fff);
-+					break;
-+			}
-+#endif
-+		}
- 		else
- 			puts(SPL_TPL_PROMPT "Unsupported Boot Device!\n");
- #endif
-diff --git a/configs/allwinner_s3_generic_defconfig b/configs/allwinner_s3_generic_defconfig
-index 2c368215ed..0eace0ad6a 100644
---- a/configs/allwinner_s3_generic_defconfig
-+++ b/configs/allwinner_s3_generic_defconfig
-@@ -2,6 +2,13 @@ CONFIG_ARM=y
- CONFIG_ARCH_SUNXI=y
- CONFIG_MACH_SUN8I_S3=y
- 
-+CONFIG_DRAM_CLK=360
-+CONFIG_DRAM_ZQ=14779
-+CONFIG_SUN8I_EMAC=y
-+CONFIG_DM_ETH=y
-+CONFIG_MII=y
-+CONFIG_DM_MDIO_MUX=y
-+
- CONFIG_DEFAULT_DEVICE_TREE="sun8i-s3-generic"
- CONFIG_SPL=y
- CONFIG_CMD_BOOTMENU=y
-@@ -9,12 +16,8 @@ CONFIG_CMD_MEMINFO=y
- CONFIG_BOOTDELAY=0
- 
- CONFIG_NETDEVICES=y
--CONFIG_SUN8I_EMAC=y
- CONFIG_NET_RANDOM_ETHADDR=y
- 
--CONFIG_DM_SPI=y
--CONFIG_SUNXI_SPI=y
--
- CONFIG_MMC=y
- CONFIG_MMC_SUNXI_SLOT_EXTRA=2
- CONFIG_MMC0_CD_PIN="PF6"
-@@ -30,25 +33,77 @@ CONFIG_DM_PWM=y
- CONFIG_PWM_SUNXI=y
- CONFIG_BACKLIGHT_PWM=y
- 
-+# USB
-+CONFIG_CMD_DFU=y
-+CONFIG_PHY=y
-+CONFIG_PHY_SUN4I_USB=y
- CONFIG_USB_GADGET_VBUS_DRAW=250
--
- CONFIG_USB_MUSB_GADGET=y
- CONFIG_USB_MUSB_SUNXI=y
- CONFIG_USB_MUSB_DISABLE_BULK_COMBINE_SPLIT=y
- CONFIG_USB_MUSB_PIO_ONLY=y
- CONFIG_USB_STORAGE=y
--
--CONFIG_PHY=y
--CONFIG_PHY_SUN4I_USB=y
--
- CONFIG_USB_EHCI_HCD=y
--CONFIG_USB_EHCI_GENERIC=y
- CONFIG_USB_OHCI_HCD=y
--CONFIG_USB_OHCI_GENERIC=y
--
- CONFIG_CMD_USB_MASS_STORAGE=y
--
-+CONFIG_USB_GADGET_DOWNLOAD=y
- CONFIG_CMD_FASTBOOT=y
- CONFIG_FASTBOOT_FLASH_MMC=y
- CONFIG_FASTBOOT_FLASH_MMC_DEV=1
- CONFIG_FASTBOOT_CMD_OEM_FORMAT=y
-+
-+# UBI
-+CONFIG_MTD_UBI=y
-+CONFIG_MTD_UBI_FASTMAP=y
-+CONFIG_MTD_UBI_FASTMAP_AUTOCONVERT=1
-+CONFIG_CMD_UBI=y
-+CONFIG_CMD_UBIFS=y
-+CONFIG_RBTREE=y
-+CONFIG_MTD_DEVICE=y
-+CONFIG_MTD_PARTITIONS=y
-+CONFIG_CMD_MTDPARTS=y
-+CONFIG_LZO=y
-+CONFIG_LZMA=y
-+
-+# ENV
-+CONFIG_ENV_IS_IN_FAT=n
-+CONFIG_ENV_IS_IN_UBI=y
-+CONFIG_ENV_UBI_PART="ubi0"
-+CONFIG_ENV_UBI_VOLUME="ubootenv"
-+CONFIG_ENV_UBI_VOLUME_REDUND="ubootenv2"
 +
 +
-+# BOOT
-+CONFIG_MTDIDS_DEFAULT="spi-nand0=0"
-+CONFIG_MTDPARTS_DEFAULT="mtdparts=0:1M(boot),-(ubi0)"
-+CONFIG_BOOTCOMMAND="ubifsmount ubi0:kernel; ubifsload $kernel_addr_r uImage; ubifsload $fdt_addr_r dtb; bootm 0x41000000 - 0x41800000"
-+CONFIG_USE_BOOTARGS=y
-+CONFIG_BOOTARGS="console=ttyS0,115200 earlyprintk panic=5 rootwait ubi.mtd=1,2048 rootfstype=ubifs root=ubi0:rootfs rw"
-+
-+### NOR
-+## SPI
-+# CONFIG_SPI=y
-+# CONFIG_SPI_BOOT=y
-+# CONFIG_SUNXI_SPI=y
-+# CONFIG_SPL_SPI_SUPPORT=y
-+# CONFIG_SPL_SPI_SUNXI=y
-+
-+### NAND
-+CONFIG_CLK=y
-+CONFIG_CLK_SUNXI=y
-+CONFIG_CLK_SUN8I_V3S=y
-+CONFIG_SUNXI_SPI=y
-+CONFIG_SPI_SUNXI=y
-+CONFIG_CMD_MTD=y
-+CONFIG_MTD=y
-+CONFIG_MTD_SPI_NAND=y
-+CONFIG_SPI=y
-+CONFIG_SPI_MEM=y
-+CONFIG_SPL_SPINAND_SUNXI=y
-+CONFIG_DM=y
-+CONFIG_DM_SPI=y
-+CONFIG_CMD_DM=y
-+CONFIG_CMD_SPI=y
-+CONFIG_SPL_SPINAND_SUNXI_SPL_SIZE=24576
-+CONFIG_SPL_SPINAND_SUNXI_UBOOT_PADDING=8192
-+CONFIG_SPL_SPINAND_SUNXI_PAGESIZE=2048
-diff --git a/drivers/mtd/nand/spi/core.c b/drivers/mtd/nand/spi/core.c
-index cd624ec6ae..69d209518a 100644
---- a/drivers/mtd/nand/spi/core.c
-+++ b/drivers/mtd/nand/spi/core.c
-@@ -661,6 +661,8 @@ static bool spinand_isbad(struct nand_device *nand, const struct nand_pos *pos)
- 		.mode = MTD_OPS_RAW,
- 	};
- 	int ret;
-+	struct mtd_oob_region region;
-+	int i;
- 
- 	memset(spinand->oobbuf, 0, 2);
- 	ret = spinand_select_target(spinand, pos->target);
-@@ -671,8 +673,12 @@ static bool spinand_isbad(struct nand_device *nand, const struct nand_pos *pos)
- 	if (ret)
- 		return ret;
- 
--	if (spinand->oobbuf[0] != 0xff || spinand->oobbuf[1] != 0xff)
--		return true;
-+	spinand->eccinfo.ooblayout->rfree(spinand->base.mtd, 0, &region);
-+
-+	for(i = 0 ; i < req.ooblen && i < region.offset; i++){
-+		if (spinand->oobbuf[i] != 0xff)
-+			return true;
-+	}
- 
- 	return false;
- }
-@@ -707,6 +713,7 @@ static int spinand_markbad(struct nand_device *nand, const struct nand_pos *pos)
- 		.oobbuf.out = spinand->oobbuf,
- 	};
- 	int ret;
-+	struct mtd_oob_region region;
- 
- 	/* Erase block before marking it bad. */
- 	ret = spinand_select_target(spinand, pos->target);
-@@ -722,6 +729,8 @@ static int spinand_markbad(struct nand_device *nand, const struct nand_pos *pos)
- 		return ret;
- 
- 	memset(spinand->oobbuf, 0, 2);
-+	spinand->eccinfo.ooblayout->rfree(spinand->base.mtd, 0, &region);
-+	req.ooblen = region.offset < req.ooblen ? region.offset : req.ooblen;
- 	return spinand_write_page(spinand, &req);
- }
- 
-diff --git a/drivers/mtd/nand/spi/gigadevice.c b/drivers/mtd/nand/spi/gigadevice.c
-index 0b228dcb5b..d8e1e7d120 100644
---- a/drivers/mtd/nand/spi/gigadevice.c
-+++ b/drivers/mtd/nand/spi/gigadevice.c
-@@ -107,7 +107,92 @@ static const struct mtd_ooblayout_ops gd5fxgq4xexxg_ooblayout = {
- 	.rfree = gd5fxgq4xexxg_ooblayout_free,
- };
- 
-+static int gd5fxgq4xa_ooblayout_ecc(struct mtd_info *mtd, int section,
-+				  struct mtd_oob_region *region)
-+{
-+	if (section > 3)
-+		return -ERANGE;
-+
-+	region->offset = (16 * section) + 8;
-+	region->length = 8;
-+
-+	return 0;
-+}
-+
-+static int gd5fxgq4xa_ooblayout_free(struct mtd_info *mtd, int section,
-+				   struct mtd_oob_region *region)
-+{
-+	if (section > 3)
-+		return -ERANGE;
-+
-+	if (section) {
-+		region->offset = 16 * section;
-+		region->length = 8;
-+	} else {
-+		/* section 0 has one byte reserved for bad block mark */
-+		region->offset = 1;
-+		region->length = 7;
-+	}
-+	return 0;
-+}
-+
-+static int gd5fxgq4xa_ecc_get_status(struct spinand_device *spinand,
-+					 u8 status)
-+{
-+	switch (status & STATUS_ECC_MASK) {
-+	case STATUS_ECC_NO_BITFLIPS:
-+		return 0;
-+
-+	case GD5FXGQ4XA_STATUS_ECC_1_7_BITFLIPS:
-+		/* 1-7 bits are flipped. return the maximum. */
-+		return 7;
-+
-+	case GD5FXGQ4XA_STATUS_ECC_8_BITFLIPS:
-+		return 8;
-+
-+	case STATUS_ECC_UNCOR_ERROR:
-+		return -EBADMSG;
-+
-+	default:
-+		break;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static const struct mtd_ooblayout_ops gd5fxgq4xa_ooblayout = {
-+	.ecc = gd5fxgq4xa_ooblayout_ecc,
-+	.rfree = gd5fxgq4xa_ooblayout_free,
-+};
-+
-+static int gd5fxgq5xexxg_ooblayout_free(struct mtd_info *mtd, int section,
-+					struct mtd_oob_region *region)
-+{
-+	if (section)
-+		return -ERANGE;
-+
-+	/* Q5 seems have some bug on OOB ECC */
-+	region->offset = 16;
-+	region->length = 4;
-+
-+	return 0;
-+}
-+
-+static const struct mtd_ooblayout_ops gd5fxgq5xexxg_ooblayout = {
-+	.ecc = gd5fxgq4xexxg_ooblayout_ecc,
-+	.rfree = gd5fxgq5xexxg_ooblayout_free,
-+};
-+
- static const struct spinand_info gigadevice_spinand_table[] = {
-+	SPINAND_INFO("GD5F1GQ4UAxxG", 0xf1,
-+		     NAND_MEMORG(1, 2048, 64, 64, 1024, 1, 1, 1),
-+		     NAND_ECCREQ(8, 512),
-+		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
-+					      &write_cache_variants,
-+					      &update_cache_variants),
-+		     0,
-+		     SPINAND_ECCINFO(&gd5fxgq4xa_ooblayout,
-+				     gd5fxgq4xa_ecc_get_status)),
- 	SPINAND_INFO("GD5F1GQ4UExxG", 0xd1,
- 		     NAND_MEMORG(1, 2048, 128, 64, 1024, 1, 1, 1),
- 		     NAND_ECCREQ(8, 512),
-@@ -117,6 +202,15 @@ static const struct spinand_info gigadevice_spinand_table[] = {
- 		     0,
- 		     SPINAND_ECCINFO(&gd5fxgq4xexxg_ooblayout,
- 				     gd5fxgq4xexxg_ecc_get_status)),
-+	SPINAND_INFO("GD5F1GQ5UExxG", 0x51,
-+		     NAND_MEMORG(1, 2048, 128, 64, 1024, 1, 1, 1),
-+		     NAND_ECCREQ(4, 512),
-+		     SPINAND_INFO_OP_VARIANTS(&read_cache_variants,
-+					      &write_cache_variants,
-+					      &update_cache_variants),
-+		     0,
-+		     SPINAND_ECCINFO(&gd5fxgq5xexxg_ooblayout,
-+				     gd5fxgq4xexxg_ecc_get_status)),
- };
- 
- static int gigadevice_spinand_detect(struct spinand_device *spinand)
-diff --git a/drivers/mtd/spi/spi-nor-ids.c b/drivers/mtd/spi/spi-nor-ids.c
-index abdf560e02..e3399e63f2 100644
---- a/drivers/mtd/spi/spi-nor-ids.c
-+++ b/drivers/mtd/spi/spi-nor-ids.c
-@@ -311,6 +311,7 @@ const struct flash_info spi_nor_ids[] = {
- 	{ INFO("w25q64cv", 0xef4017, 0, 64 * 1024,  128, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
- 	{ INFO("w25q128", 0xef4018, 0, 64 * 1024, 256, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
- 	{ INFO("w25q256", 0xef4019, 0, 64 * 1024, 512, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
-+	{ INFO("xt25f128", 0x0b4018, 0, 64 * 1024, 256, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
- #endif
- #ifdef CONFIG_SPI_FLASH_XMC
- 	/* XMC (Wuhan Xinxin Semiconductor Manufacturing Corp.) */
-diff --git a/drivers/net/sun8i_emac.c b/drivers/net/sun8i_emac.c
-index 1ae776b446..fbfcdfdf69 100644
---- a/drivers/net/sun8i_emac.c
-+++ b/drivers/net/sun8i_emac.c
-@@ -52,6 +52,7 @@
- #define RX_TOTAL_BUFSIZE	(CONFIG_ETH_BUFSIZE * CONFIG_RX_DESCR_NUM)
- 
- #define H3_EPHY_DEFAULT_VALUE	0x58000
-+#define V3S_EPHY_DEFAULT_VALUE  0x38000
- #define H3_EPHY_DEFAULT_MASK	GENMASK(31, 15)
- #define H3_EPHY_ADDR_SHIFT	20
- #define REG_PHY_ADDR_MASK	GENMASK(4, 0)
-@@ -107,6 +108,7 @@ enum emac_variant {
- 	H3_EMAC,
- 	A64_EMAC,
- 	R40_GMAC,
-+	V3S_EMAC,
- };
- 
- struct emac_dma_desc {
-@@ -274,7 +276,7 @@ static int sun8i_emac_set_syscon_ephy(struct emac_eth_dev *priv, u32 *reg)
- 		 * needs to be configured and powered up before use
- 		*/
- 		*reg &= ~H3_EPHY_DEFAULT_MASK;
--		*reg |=  H3_EPHY_DEFAULT_VALUE;
-+		*reg |= ((priv->variant == V3S_EMAC) ? V3S_EPHY_DEFAULT_VALUE :  H3_EPHY_DEFAULT_VALUE);
- 		*reg |= priv->phyaddr << H3_EPHY_ADDR_SHIFT;
- 		*reg &= ~H3_EPHY_SHUTDOWN;
- 		*reg |= H3_EPHY_SELECT;
-@@ -313,7 +315,7 @@ static int sun8i_emac_set_syscon(struct sun8i_eth_pdata *pdata,
- 	}
- 
- 	reg &= ~(SC_ETCS_MASK | SC_EPIT);
--	if (priv->variant == H3_EMAC || priv->variant == A64_EMAC)
-+	if (priv->variant == H3_EMAC || priv->variant == V3S_EMAC || priv->variant == A64_EMAC)
- 		reg &= ~SC_RMII_EN;
- 
- 	switch (priv->interface) {
-@@ -1028,6 +1030,8 @@ static const struct udevice_id sun8i_emac_eth_ids[] = {
- 		.data = (uintptr_t)A83T_EMAC },
- 	{.compatible = "allwinner,sun8i-r40-gmac",
- 		.data = (uintptr_t)R40_GMAC },
-+	{.compatible = "allwinner,sun8i-v3s-emac",
-+	    .data = (uintptr_t)V3S_EMAC },
- 	{ }
- };
- 
-diff --git a/drivers/phy/allwinner/phy-sun4i-usb.c b/drivers/phy/allwinner/phy-sun4i-usb.c
-index 612c428cf5..2cec2c679a 100644
---- a/drivers/phy/allwinner/phy-sun4i-usb.c
-+++ b/drivers/phy/allwinner/phy-sun4i-usb.c
-@@ -351,7 +351,7 @@ static int sun4i_usb_phy_xlate(struct phy *phy,
- {
- 	struct sun4i_usb_phy_data *data = dev_get_priv(phy->dev);
- 
--	if (args->args_count >= data->cfg->num_phys)
-+	if (args->args_count > data->cfg->num_phys)
- 		return -EINVAL;
- 
- 	if (data->cfg->missing_phys & BIT(args->args[0]))
-diff --git a/drivers/usb/musb-new/musb_core.c b/drivers/usb/musb-new/musb_core.c
-index 2574a6fd4b..1468ce7343 100644
---- a/drivers/usb/musb-new/musb_core.c
-+++ b/drivers/usb/musb-new/musb_core.c
-@@ -1874,6 +1874,7 @@ allocate_instance(struct device *dev,
- 	}
- 
- 	musb->controller = dev;
-+	musb->dyn_fifo = config->dyn_fifo;
- 
- 	musb->dyn_fifo = config->dyn_fifo;
- 	return musb;
-diff --git a/drivers/usb/musb-new/sunxi.c b/drivers/usb/musb-new/sunxi.c
-index 98bf736978..311d32469b 100644
---- a/drivers/usb/musb-new/sunxi.c
-+++ b/drivers/usb/musb-new/sunxi.c
-@@ -467,7 +467,7 @@ static int musb_usb_probe(struct udevice *dev)
- 
- 	ret = generic_phy_get_by_name(dev, "usb", &glue->phy);
- 	if (ret) {
--		pr_err("failed to get usb PHY\n");
-+		pr_err("sunxi failed to get usb PHY\n");
- 		return ret;
- 	}
- 
-diff --git a/drivers/video/sunxi/sunxi_lcd.c b/drivers/video/sunxi/sunxi_lcd.c
-index bc0a782a1c..4df80410a0 100644
---- a/drivers/video/sunxi/sunxi_lcd.c
-+++ b/drivers/video/sunxi/sunxi_lcd.c
-@@ -27,10 +27,22 @@ static void sunxi_lcdc_config_pinmux(void)
- #if defined(CONFIG_MACH_SUN50I) || defined(CONFIG_MACH_SUN8I_V3S) || defined(CONFIG_MACH_SUN8I_S3)
- 	int pin;
- 
--	for (pin = SUNXI_GPD(0); pin <= SUNXI_GPD(21); pin++) {
--		sunxi_gpio_set_cfgpin(pin, SUNXI_GPD_LCD0);
--		sunxi_gpio_set_drv(pin, 3);
--	}
-+#if defined(CONFIG_MACH_SUN8I_V3S)
-+#define SUN8I_V3S_GPE_LCD 3
-+        for (pin = SUNXI_GPE(0); pin <= SUNXI_GPE(24); pin++) {
-+                if (pin >= SUNXI_GPE(20) && pin <= SUNXI_GPE(22))
-+                        continue; /* These pins are not LCD */
-+                sunxi_gpio_set_cfgpin(pin, SUN8I_V3S_GPE_LCD);
-+        }
-+        printf("init v3s gpio e for lcd\n");
-+#elif defined(CONFIG_MACH_SUN8I_S3)
-+        for (pin = SUNXI_GPD(0); pin <= SUNXI_GPD(21); pin++) {
-+                sunxi_gpio_set_cfgpin(pin, SUNXI_GPD_LCD0);
-+                sunxi_gpio_set_drv(pin, 3);
-+        }
-+        printf("init s3 gpio e for lcd\n");
-+#endif
-+
- #endif
- }
- 
+ #endif /* __CONFIG_H */
