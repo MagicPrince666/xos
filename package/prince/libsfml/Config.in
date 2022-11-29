@@ -1,0 +1,10 @@
+config BR2_PACKAGE_LIBSFML
+	bool "libsfml"
+	select BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_XAPP_XRANDR
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_X11
+	help
+	  Simple and Fast Multimedia Library
+
+	  https://www.sfml-dev.org/
