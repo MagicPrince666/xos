@@ -53,12 +53,12 @@ void getFiles(std::string path, std::vector<std::string>& files)
 int main(int argc, char **argv)
 {
 	JpegDecoder decoder;
+
 	std::vector<std::string> files;
 	getFiles(argv[1], files);
 
 	for (auto file : files) {
 		FILE *infile;
-        /* 2.指定源文件 */
 		if ((infile = fopen(file.c_str(), "rb")) == NULL) {
 			fprintf(stderr, "can't open %s\n", file.c_str());
 			continue;
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 		decoder.Decode();
 
 		sleep(3);
-    }
+	}
 
     return 0;
 }
