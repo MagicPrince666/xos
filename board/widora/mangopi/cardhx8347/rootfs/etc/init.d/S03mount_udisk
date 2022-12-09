@@ -1,5 +1,4 @@
 #!/bin/sh
-exit 0
 
 [ -f /lib/modules/`uname -r`/kernel/drivers/usb/gadget/legacy/g_mass_storage.ko ] || exit 0
 

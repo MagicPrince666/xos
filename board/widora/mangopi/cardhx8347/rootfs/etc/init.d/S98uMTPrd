@@ -3,7 +3,7 @@
 # Start uMTPrd....
 #
 
-# exit 0
+exit 0
 
 start() {
     printf "Starting uMTPrd: "
