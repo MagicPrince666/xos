@@ -128,14 +128,18 @@
 		function = "spi1";
 	};
 
-	pwm0_pin: pwm0@0 {
+	pwm0_pin: pwm0 {
 		pins = "PE12";
 		function = "pwm0";
+		drive-strength = <30>;
+		bias-pull-up;
 	};
 
-	pwm1_pin: pwm1@0 {
+	pwm1_pin: pwm1 {
 		pins = "PE6";
 		function = "pwm1";
+		drive-strength = <30>;
+		bias-pull-up;
 	};
 };
 
@@ -158,7 +162,7 @@
 
 &pwm {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pwm0_pin &pwm1_pin>;
+	pinctrl-0 = <&pwm0_pin>, <&pwm1_pin>;
 	status = "okay";
 };
 
