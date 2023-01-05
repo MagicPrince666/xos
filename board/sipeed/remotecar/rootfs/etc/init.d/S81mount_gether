@@ -1,0 +1,29 @@
+#!/bin/sh
+
+exit 0
+
+[ -f /lib/modules/`uname -r`/kernel/drivers/usb/gadget/legacy/g_ether.ko ] || exit 0
+
+case "$1" in
+	start)
+		printf "Starting g_ether: "
+		modprobe g_ether
+		if ifconfig -a | grep br-lan > /dev/null; then
+			ifconfig usb0 up
+			ip link set dev usb0 master br-lan
+		fi
+		;;
+	stop)
+		printf "Stopping g_ether: "
+		modprobe -r g_ether
+		;;
+	restart|reload)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac
+
+exit 0
