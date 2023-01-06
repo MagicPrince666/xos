@@ -123,7 +123,8 @@
 };
 
 &pio {
-	spi1_pins: spi1-pins-pa {
+
+	spi1_pins: spi1-pins-pe {
 		pins = "PE7", "PE8", "PE9", "PE10";
 		function = "spi1";
 	};
@@ -153,7 +154,7 @@
 	psxpad@0 {
 		reg = <0>;
 		compatible = "sony,psxpad-spi";
-		spi-max-frequency = <125000>; // 250KHz/500KHz
+		spi-max-frequency = <500000>; // 250KHz/500KHz
 		spi-cpha;
 		spi-cpol;
 		status = "okay";
@@ -175,6 +176,12 @@
 &mmc0 {
 	status = "okay";
 	broken-cd;
+
+	esp8089: sdio_wifi@1 {
+		compatible = "esp,esp8089";
+		reg = <1>;
+		esp,crystal-26M-en = <2>;
+	};
 };
 
 &otg_sram {
