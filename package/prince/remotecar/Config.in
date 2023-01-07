@@ -1,0 +1,5 @@
+menuconfig BR2_PACKAGE_REMOTECAR
+	bool "remotecar"
+	depends on BR2_INSTALL_LIBSTDCPP
+	help
+		A linux remote car

@@ -3,6 +3,8 @@
 # Start uMTPrd....
 #
 
+exit 0
+
 start() {
     printf "Starting uMTPrd: "
     mount none /sys/kernel/config -t configfs
