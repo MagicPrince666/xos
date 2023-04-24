@@ -1,6 +1,7 @@
 config BR2_PACKAGE_IDEVICEINSTALLER
 	bool "ideviceinstaller"
 	select BR2_PACKAGE_LIBUSB
+	select BR2_PACKAGE_LIBZIP
 	help
 	  The ideviceinstaller library allows communication with iBoot/iBSS of iOS devices via USB.
 
