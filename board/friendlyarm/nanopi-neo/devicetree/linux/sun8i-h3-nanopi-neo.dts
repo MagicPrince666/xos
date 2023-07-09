@@ -95,12 +95,6 @@
 			default-state = "on";
 			linux,default-trigger = "timer";
 		};
-
-		trig {
-			label = "trig";
-			gpios = <&pio 0 2 GPIO_ACTIVE_HIGH>; //PA2
-			default-state = "off";
-		};
 	};
 
 	gpio-keys {
@@ -110,12 +104,24 @@
 		autorepeat;
 
 		switch@0 {
-			label = "echo";
+			label = "left";
 			linux,code = <103>;
-			pinctrl-names = "default";
-			pinctrl-0 = <&sr_irq>;
-			interrupt-parent = <&r_pio>;
-			interrupts = <0 11 IRQ_TYPE_EDGE_BOTH>;//PL11
+			interrupt-parent = <&pio>;
+			interrupts = <0 2 IRQ_TYPE_EDGE_BOTH>; // PA2
+		};
+
+		switch@1 {
+			label = "mode";
+			linux,code = <104>;
+			interrupt-parent = <&pio>;
+			interrupts = <6 11 IRQ_TYPE_EDGE_BOTH>; // PG11
+		};
+
+		switch@2 {
+			label = "right";
+			linux,code = <105>;
+			interrupt-parent = <&pio>;
+			interrupts = <0 4 IRQ_TYPE_EDGE_BOTH>;// PA4
 		};
 	};
 
@@ -124,15 +130,22 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&backlight_pins>;
 
-		gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>; /* PG 9 */
-		backlight-boot-off;
+		gpios = <&pio 0 6 GPIO_ACTIVE_HIGH>; // PA6
+		backlight-boot-on;
+	};
+
+	pwm-gpio@0 {
+		compatible = "pwm-gpio";
+		reg = <0>;
+		#pwm-cells = <3>;
+		pwm-gpio = <&r_pio 0 11 GPIO_ACTIVE_HIGH>; // PL11
 	};
 };
 
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pa_pins>;
-	status = "disabled";
+	status = "okay";
 };
 
 &uart1 {
@@ -151,7 +164,7 @@
     pinctrl-names = "default";
     pinctrl-0 = <&spi0_pins &spi0_pins_cs1>;
 	spi-num-chipselects = <2>;
-	cs-gpios = <&pio 2 3 GPIO_ACTIVE_HIGH>, <&pio 0 3 GPIO_ACTIVE_HIGH>;
+	cs-gpios = <&pio 2 3 GPIO_ACTIVE_HIGH>, <&pio 9 9 GPIO_ACTIVE_HIGH>; // PC3 PG9
     status = "okay";
 
 	ili9341@0 {
@@ -163,8 +176,7 @@
 		bgr;
 		fps = <30>;
 		buswidth = <8>;
-		reset-gpios = <&pio 6 8 GPIO_ACTIVE_LOW>; //PG8
-		dc-gpios = <&pio 0 1 GPIO_ACTIVE_HIGH>;//PA1
+		dc-gpios = <&pio 6 8 GPIO_ACTIVE_HIGH>;// PG8
 		debug = <0>;
 		backlight = <&backlight>;
 	};
@@ -175,9 +187,9 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&t_irq>;
 		interrupt-parent = <&pio>;
-		interrupts = <0 6 IRQ_TYPE_EDGE_FALLING>;	//PA6
+		interrupts = <0 3 IRQ_TYPE_EDGE_FALLING>;	//PA3
 		spi-max-frequency = <2000000>;
-		pendown-gpio = <&pio 0 6 GPIO_ACTIVE_HIGH>;
+		pendown-gpio = <&pio 0 3 GPIO_ACTIVE_HIGH>;
 		vcc-supply = <&reg_vcc3v3>;
 
 		ti,x-min = /bits/ 16 <0>;
@@ -216,7 +228,7 @@
 &pwm {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pwm0_pins>;
-	status = "okay";
+	status = "disabled";
 };
 
 &pio {
@@ -232,7 +244,7 @@
 	};
 
 	spi0_pins_cs1: spi0_pins_cs1 {
-		pins = "PC3", "PA3";
+		pins = "PC3", "PG9";
 		function = "gpio_out";
 	};
 
@@ -242,7 +254,7 @@
 	};
 
 	backlight_pins: backlight-pins {
-		pins = "PG9";
+		pins = "PA6";
 		function = "gpio_out";
 		drive-strength = <30>;
 	};
@@ -252,13 +264,8 @@
 		function = "i2c0";
 	};
 
-	sr_irq: sr_04-pins {
-		pins = "PL11";
-		function = "gpio_in";
-	};
-
 	t_irq: t_irq-pins {
-		pins = "PA6";
+		pins = "PA3";
 		function = "gpio_in";
 	};
 };
@@ -281,7 +288,7 @@
 		reg = <0x68>;
 		status = "okay";
 		interrupt-parent = <&pio>;
-		interrupts = <0 0 IRQ_TYPE_EDGE_RISING>; //PA0
+		interrupts = <0 17 IRQ_TYPE_EDGE_RISING>; // PA17
 		mount-matrix = "-0.984807753012208",  /* x0 */
 		               "0",                   /* y0 */
 		               "-0.173648177666930",  /* z0 */
@@ -298,7 +305,7 @@
 		reg = <0x68>;
 		status = "disabled";
 		interrupt-parent = <&pio>;
-		interrupts = <0 0 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <0 17 IRQ_TYPE_EDGE_RISING>;
 		i2c-gate {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -318,12 +325,5 @@
 		compatible = "bosch,bmp280";
 		reg = <0x76>;
 		status = "disabled";
-	};
-
-	vl53l0x@29 {
-		compatible = "st,vl53l0x";
-		reg = <0x29>;
-		interrupt-parent = <&pio>;
-		interrupts = <6 11 IRQ_TYPE_EDGE_FALLING>; //PG11
 	};
 };
