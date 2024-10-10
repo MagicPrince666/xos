@@ -50,7 +50,7 @@
 	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
 
 	aliases {
-		// serial0 = &uart0;
+		serial0 = &uart0;
 		serial1 = &uart1;
 	};
 
