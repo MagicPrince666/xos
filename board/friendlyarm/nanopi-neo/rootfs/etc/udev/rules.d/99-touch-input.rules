@@ -1,0 +1,2 @@
+SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ACTION=="add", ATTRS{idVendor}=="03f7", ATTRS{idProduct}=="1218", ATTRS{product}=="iBox2", MODE:="0666", SYMLINK+="cputools%n"
+SUBSYSTEM=="backlight", KERNEL=="backlight*", ATTR{bl_power}="0", RUN+="/usr/bin/chmod 0666 /sys%p/brightness"
