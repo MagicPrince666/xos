@@ -55,7 +55,7 @@
 	};
 
 	chosen {
-		stdout-path = "serial1:115200n8";
+		stdout-path = "serial0:115200n8";
 		/delete-node/ framebuffer@0;
 	};
 
@@ -116,13 +116,14 @@
 			interrupt-parent = <&pio>;
 			interrupts = <6 11 IRQ_TYPE_EDGE_BOTH>; // PG11
 		};
-
+#if 0
 		switch@2 {
 			label = "right";
 			linux,code = <105>;
 			interrupt-parent = <&pio>;
 			interrupts = <0 4 IRQ_TYPE_EDGE_BOTH>;// PA4
 		};
+#endif
 	};
 
 	backlight: backlight {
