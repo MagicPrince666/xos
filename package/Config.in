@@ -14,6 +14,11 @@ menu "prince custom software packages"
 
 endmenu
 
+menu "klipper custom software packages"
+	source "package/klipper/Config.in"
+
+endmenu
+
 menu "Audio and video applications"
 	source "package/alsa-utils/Config.in"
 	source "package/atest/Config.in"
