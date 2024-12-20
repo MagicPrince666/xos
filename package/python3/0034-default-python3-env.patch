@@ -1,0 +1,7 @@
+--- a/Lib/site.py	2024-12-20 11:20:10.896071063 +0800
++++ b/Lib/site.py	2024-12-20 11:20:20.876492519 +0800
+@@ -1,3 +1,4 @@
++#!/usr/bin/env python3
+ """Append module search paths for third-party packages to sys.path.
+ 
+ ****************************************************************
