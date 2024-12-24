@@ -11,6 +11,7 @@ KLIPPER3D_REPL_SETUP_TYPE = setuptools
 
 define KLIPPER3D_REPL_BUILD_CMDS
 	cp $(KLIPPER3D_REPL_PKGDIR)/pyproject.toml $(@D)/pyproject.toml	
+	cp $(KLIPPER3D_REPL_PKGDIR)/setup.py $(@D)/setup.py
 endef
 
 $(eval $(python-package))
