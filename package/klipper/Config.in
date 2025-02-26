@@ -1,3 +1,4 @@
 source "package/klipper/klipper3d/Config.in"
 source "package/klipper/klipper3d-repl/Config.in"
 source "package/klipper/klipper3d-wrecklab/Config.in"
+source "package/klipper/moonraker/Config.in"
