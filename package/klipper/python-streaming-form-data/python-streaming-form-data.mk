@@ -13,7 +13,7 @@ PYTHON_STREAMING_FORM_DATA_DEPENDENCIES = python3
 
 define PYTHON_STREAMING_FORM_DATA_BUILD_CMDS
 	cp $(PYTHON_STREAMING_FORM_DATA_PKGDIR)/setup.py $(@D)/setup.py	
-	$(TARGET_MAKE_ENV) $(TARGET_CC) $(@D)/src/streaming_form_data/_parser.c -I$(STAGING_DIR)/usr/include/python$(PYTHON3_VERSION_MAJOR) -shared -o $(@D)/libstreaming_form_data.so
+	$(TARGET_MAKE_ENV) $(TARGET_CC) $(@D)/src/streaming_form_data/_parser.c -I$(STAGING_DIR)/usr/include/python$(PYTHON3_VERSION_MAJOR) -fPIC -shared -lpython$(PYTHON3_VERSION_MAJOR) -o $(@D)/libstreaming_form_data.so
 endef
 
 define PYTHON_STREAMING_FORM_DATA_INSTALL_TARGET_CMDS
