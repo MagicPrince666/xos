@@ -1,0 +1,7 @@
+config BR2_PACKAGE_PYTHON_STREAMING_FORM_DATA
+	bool "python-streaming-form-data"
+	select BR2_PACKAGE_PYTHON_NUMPY
+	help
+	  Python bindings for the docker credentials store API.
+
+	  https://github.com/shin-/dockerpy-creds
