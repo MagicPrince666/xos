@@ -10,6 +10,6 @@ WantedBy=multi-user.target
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/python /opt/moonraker/moonraker.py -d /root -c /opt/moonraker/moonraker.conf -l /tmp/moonraker.log
+ExecStart=/usr/bin/python /opt/moonraker/moonraker/moonraker.py -d /root -c /opt/moonraker/moonraker.conf -l /tmp/moonraker.log
 Restart=always
 RestartSec=10

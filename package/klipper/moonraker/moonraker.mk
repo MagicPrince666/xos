@@ -7,11 +7,11 @@
 # TODO: add config to create default user if does not exists
 MOONRAKER_VERSION = v0.7.1
 MOONRAKER_SITE = $(call github,Arksine,moonraker,$(MOONRAKER_VERSION))
-MOONRAKER_DEPENDENCIES = klipper3d
+MOONRAKER_DEPENDENCIES = klipper3d python-prompt-toolkit python-pygments
 MOONRAKER_SETUP_TYPE = setuptools
 
 define MOONRAKER_BUILD_CMDS
-	cp $(MOONRAKER_PKGDIR)/setup.py $(@D)/setup.py	
+	cp $(MOONRAKER_PKGDIR)/pyproject.toml $(@D)/pyproject.toml		
 endef
 
 define MOONRAKER_INSTALL_TARGET_CMDS
