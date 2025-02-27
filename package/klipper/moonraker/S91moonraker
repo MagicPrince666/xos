@@ -20,7 +20,7 @@ PIDFILE=/var/run/moonraker.pid
 #. /lib/lsb/init-functions
 MOONRAKER_USER=root
 MOONRAKER_EXEC=/usr/bin/python
-MOONRAKER_ARGS="/opt/moonraker/moonraker.py -d /root -c /opt/moonraker/moonraker.conf -l /tmp/moonraker.log"
+MOONRAKER_ARGS="/opt/moonraker/moonraker/moonraker.py -d /root -c /opt/moonraker/moonraker.conf -l /tmp/moonraker.log"
 # Read defaults file
 [ -r $DEFAULTS_FILE ] && . $DEFAULTS_FILE
 
