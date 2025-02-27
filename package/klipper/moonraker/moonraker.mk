@@ -11,7 +11,6 @@ MOONRAKER_DEPENDENCIES = klipper3d
 MOONRAKER_SETUP_TYPE = setuptools
 
 define MOONRAKER_BUILD_CMDS
-	# cp $(MOONRAKER_PKGDIR)/pyproject.toml $(@D)/pyproject.toml
 	cp $(MOONRAKER_PKGDIR)/setup.py $(@D)/setup.py	
 endef
 
@@ -28,7 +27,7 @@ define MOONRAKER_INSTALL_INIT_SYSV
 endef
 
 define MOONRAKER_INSTALL_INIT_SYSTEMD
-	$(INSTALL) -D -m 0644 $(MOONRAKER_PKGDIR)/etc/systemd/system/moonraker.service \
+	$(INSTALL) -D -m 0644 $(MOONRAKER_PKGDIR)/moonraker.service \
 		$(TARGET_DIR)/usr/lib/systemd/system/moonraker.service
 endef
 

@@ -1,0 +1,15 @@
+#Systemd service file for moonraker
+
+[Unit]
+Description=Starts moonraker on startup
+After=network.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+RemainAfterExit=yes
+ExecStart=/usr/bin/python /opt/moonraker/moonraker.py -d /root -c /opt/moonraker/moonraker.conf -l /tmp/moonraker.log
+Restart=always
+RestartSec=10
